@@ -1,1 +1,3 @@
-# PhaME
+# Phylogenetic and Molecular Evolution (PhaME) tool
+
+
