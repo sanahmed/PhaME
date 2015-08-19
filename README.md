@@ -1,6 +1,6 @@
 # Phylogenetic and Molecular Evolution (PhaME) analysis tool
 
-PhaME is a phylogenetic and 
+ 
 
 --------------------------------------------------------------
 ## SYSTEM REQUIREMENT
