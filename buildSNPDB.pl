@@ -488,7 +488,7 @@ while(<$fh>){
       }
    }
 }
-print "BEFORE\t$ref_id\t$query_id\t$pairCount\n";
+#print "BEFORE\t$ref_id\t$query_id\t$pairCount\n";
 if ($ref_id=~ /(.+)_(\d+)_(\d+)$/){$ref_id=$1;}
 #if ($query_id=~ /(.+)_(\d+)_(\d+)$/){$query_id=$1;}
 if ($contig==1){
@@ -497,7 +497,7 @@ if ($contig==1){
 }
 else{if ($query_id=~ /(.+)_(\d+)_(\d+)$/){$query_id=$1;}}
 
-print "AFTER\t$ref_id\t$query_id\t$pairCount\n";
+#print "AFTER\t$ref_id\t$query_id\t$pairCount\n";
 $pairSNPcount{"$ref_id:$query_id"}=$pairCount;
 $coreSNPcount{"$ref_id:$query_id"}=$coreCount;
 $cdsSNPcount{"$ref_id:$query_id"}=$cdsCount;
@@ -529,7 +529,7 @@ foreach my $keys(sort{$a<=>$b}keys %gap_location){
    $last=$keys;
 }
 my $base_total= (length $ref_sequence)-$gap_total;
-print BASE "Total sequence length:\t",length $ref_sequence,
+print BASE "Reference sequence length:\t",length $ref_sequence,
 "\nTotal gap length:\t$gap_total
 Core genome length:\t$base_total\n";
 
