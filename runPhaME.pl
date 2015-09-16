@@ -164,7 +164,7 @@ print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 
 &print_timeInterval($runtime,"\tChecking directories and files... ");
-my $check=SNPphy::check($workdir,$refdir,$time,$data,$name,$logfile);
+my $check=PhaME::check($workdir,$refdir,$time,$data,$name,$logfile);
 if ($data==7){$check=0;}
 #print "\nCHECK:\t$check\n";
 my $snpdir=$outdir.'/snps';
@@ -240,7 +240,7 @@ if ($check==0){
          if ($nucmer==1){
             if ($files=~/.+\.fn|s?a?s?t?a$/ && $files!~/contigs?/ && $files!~ /fa?s?t?q/){
                my $fasta="$refdir/$files";
-               my ($list,$genome_size)=SNPphy::prepareComplete($workdir,$fasta,$rname);
+               my ($list,$genome_size)=PhaME::prepareComplete($workdir,$fasta,$rname);
                $fasta_list{$list}=$genome_size;
             }
          }
@@ -256,7 +256,7 @@ if ($check==0){
          if ($files=~/.+\.fn|s?a?s?t?a$/ && $files!~/contigs?/ && $files!~/fa?s?t?q/){
             my $fasta="$workdir/$files";
             if (!exists $fasta_list{$qname}){
-               my ($list,$genome_size)=SNPphy::prepareComplete($workdir,$fasta,$qname);
+               my ($list,$genome_size)=PhaME::prepareComplete($workdir,$fasta,$qname);
                $fasta_list{$list}=$genome_size;
             }
          }
@@ -264,7 +264,7 @@ if ($check==0){
       if ($contig_nucmer==1){
          if ($files=~ /.+\.contigs?/ && $files!~ /fa?s?t?q/){
             my $contig=$workdir.'/'.$files;
-            my ($list,$genome_size)=SNPphy::prepareContig($workdir,$contig,$qname);
+            my ($list,$genome_size)=PhaME::prepareContig($workdir,$contig,$qname);
             $contig_list{$list}=$genome_size;
          }
       }
@@ -306,7 +306,7 @@ if ($nucmer==1){
    }
 
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
-   SNPphy::completeNUCmer($workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   PhaME::completeNUCmer($workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
 #   &print_timeInterval($runtime,"\tNUCmer on genomes complete\n");
 }
 
@@ -319,8 +319,8 @@ if ($contig_nucmer==1){
    }
 
    &print_timeInterval($runtime,"Running NUCmer on contigs\n");
-   SNPphy::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",$code,$threads,$reference,$time,$error,$logfile);
-#   SNPphy::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",$threads,$reference,"2",$error);
+   PhaME::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",$code,$threads,$reference,$time,$error,$logfile);
+#   PhaME::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",$threads,$reference,"2",$error);
 }
 close STAT;
 
@@ -332,17 +332,17 @@ if ($read_mapping==1){
 
    if ($time==2){
       &print_timeInterval($runtime,"Identifying all gaps\n");
-      $mappingGaps=SNPphy::identifyGaps($outdir,"$workdir/fasta_list.txt",$name,"map",$project);
-      SNPphy::removeGaps($bindir,$reference,$mappingGaps);
+      $mappingGaps=PhaME::identifyGaps($outdir,"$workdir/fasta_list.txt",$name,"map",$project);
+      PhaME::removeGaps($bindir,$reference,$mappingGaps);
       &print_timeInterval($runtime,"Mapping reads to reference\n");
-      my $end=SNPphy::readsMapping($workdir,$bindir,"$workdir/reads_list.txt",$threads,$name,$error,$logfile);
+      my $end=PhaME::readsMapping($workdir,$bindir,"$workdir/reads_list.txt",$threads,$name,$error,$logfile);
       &print_timeInterval($runtime,"$end\n");
    }
    elsif ($time==1){
       my $tempdir=$outdir.'/temp/';
       `cp $reference $tempdir`;
       &print_timeInterval($runtime,"Mapping reads to reference\n");
-      my $end=SNPphy::readsMapping($workdir,$bindir,"$workdir/reads_list.txt",$threads,$name,$error,$logfile);
+      my $end=PhaME::readsMapping($workdir,$bindir,"$workdir/reads_list.txt",$threads,$name,$error,$logfile);
       &print_timeInterval($runtime,"$end\n");
    }
 }
@@ -352,21 +352,21 @@ if ($buildSNP==1){
       &print_timeInterval($runtime,"Preparing to identify SNPs\n");
       print "\tGenBank file provided, SNPs will be differentiated as coding vs noncoding\n";
       my ($genname,$genpath,$gensuffix)=fileparse("$annotation",qr/\.[^.]*/);
-      SNPphy::codingRegions($outdir,$annotation,$genname);
+      PhaME::codingRegions($outdir,$annotation,$genname);
    }
    &print_timeInterval($runtime,"Identifying SNPs\n");
-   SNPphy::identifyGaps($outdir,"$workdir/working_list.txt",$name,"snp",$project);
-   my $end=SNPphy::buildSNPDB($outdir,$bindir,$reference,"$workdir/working_list.txt",$project,$gsignal,$error,$logfile);
+   PhaME::identifyGaps($outdir,"$workdir/working_list.txt",$name,"snp",$project);
+   my $end=PhaME::buildSNPDB($outdir,$bindir,$reference,"$workdir/working_list.txt",$project,$gsignal,$error,$logfile);
    &print_timeInterval($runtime,"$end\n");
 }
 
 if ($buildtree==1|| $bs==1){
-   if (($tree==2||$tree==3)&&($modeltest==1)){SNPphy::modeltest($outdir,$project,$threads,$error,$logfile);}
-   my $end=SNPphy::buildTree($bindir,$outdir,$threads,$tree,"$project\_all",$error,$logfile);
-   if ($gsignal==1){SNPphy::buildTree($bindir,$outdir,$threads,$tree,"$project\_cds",$error,$logfile);}
+   if (($tree==2||$tree==3)&&($modeltest==1)){PhaME::modeltest($outdir,$project,$threads,$error,$logfile);}
+   my $end=PhaME::buildTree($bindir,$outdir,$threads,$tree,"$project\_all",$error,$logfile);
+   if ($gsignal==1){PhaME::buildTree($bindir,$outdir,$threads,$tree,"$project\_cds",$error,$logfile);}
    &print_timeInterval($runtime,"$end\n");
    if ($bsignal==1){
-      my $end=SNPphy::bootstrap($bindir,$outdir,$threads,$tree,"$project\_all",$bootstrap,$error,$logfile);
+      my $end=PhaME::bootstrap($bindir,$outdir,$threads,$tree,"$project\_all",$bootstrap,$error,$logfile);
       &print_timeInterval($runtime,"$end\n");
    }
 }
@@ -399,34 +399,34 @@ if ($ps==1){
    }
    my $gapfile=$outdir."/$project\_gaps.txt";
 
-   $end=SNPphy::extractGenes($outdir,$stats_file,$reference,$bindir,"$workdir/working_list.txt",$threads,$gapfile,$genefile,$error,$logfile);
+   $end=PhaME::extractGenes($outdir,$stats_file,$reference,$bindir,"$workdir/working_list.txt",$threads,$gapfile,$genefile,$error,$logfile);
    &print_timeInterval($runtime,"$end\n");
 
-   $end=SNPphy::translateGenes($outdir,$bindir,$threads,"translate",$error,$logfile);
+   $end=PhaME::translateGenes($outdir,$bindir,$threads,"translate",$error,$logfile);
    &print_timeInterval($runtime,"$end\n");
 
-   $end=SNPphy::alignGenes($outdir,$bindir,$threads,"mafft",$error,$logfile);
+   $end=PhaME::alignGenes($outdir,$bindir,$threads,"mafft",$error,$logfile);
    &print_timeInterval($runtime,"$end\n");
 
-   $end=SNPphy::revTransGenes($outdir,$bindir,$threads,"pal2nal",$error,$logfile);
+   $end=PhaME::revTransGenes($outdir,$bindir,$threads,"pal2nal",$error,$logfile);
    &print_timeInterval($runtime,"$end\n");
 
    my $core=$genedir."/".$project."_core_genome.cdn";
-   $end=SNPphy::core($outdir,$bindir,$core,$error,$logfile);
+   $end=PhaME::core($outdir,$bindir,$core,$error,$logfile);
    &print_timeInterval($runtime,"$end\n");
 
    if ($pselection==1 || $pselection==3){
-      SNPphy::paml($outdir,$bindir,$ptree,0,"Sites","1,2",$core,$threads,$error,$logfile);
-      SNPphy::paml($outdir,$bindir,$ptree,2,"BrSites",2,$core,$threads,$error,$logfile);
+      PhaME::paml($outdir,$bindir,$ptree,0,"Sites","1,2",$core,$threads,$error,$logfile);
+      PhaME::paml($outdir,$bindir,$ptree,2,"BrSites",2,$core,$threads,$error,$logfile);
    }
    if ($pselection==2 || $pselection==3){
       my $roottree=$outdir."/".$name."_cds_rooted.tree";
       print "$roottree\n";
-      SNPphy::hyphy($outdir,$bindir,$tbest,$roottree,$core,$threads,"bsrel",$error,$logfile);
+      PhaME::hyphy($outdir,$bindir,$tbest,$roottree,$core,$threads,"bsrel",$error,$logfile);
    }
 }
 
-if ($clean){SNPphy::clean($outdir);}
+if ($clean){PhaME::clean($outdir);}
 
 &print_timeInterval($runtime,"End of run!\n");
 
