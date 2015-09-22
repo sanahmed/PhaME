@@ -20,7 +20,7 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * SAMtools version 0.1.19 and vcftools - Convert BAM files created by Bowtie
 
-* FastTree version >=2.1.7- Contruction of phylogenetic tree
+* FastTree version >=2.1.8- Contruction of phylogenetic tree
 
 * RAxML version >=8.0.26 - Maximum likelihood construction of phylogenetic tree
 
@@ -38,6 +38,11 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 You can use "git" to obtain the package:
 
     $ git clone https://github.com/LANL-Bioinformatics/PhaME.git
+
+### Installing PhaME
+
+    $ cd PhaME
+    $ ./INSTALL.sh
     
 --------------------------------------------------------------
 ### Running PhaME
@@ -64,7 +69,7 @@ INPUT files required
 
 From the working directory that contains the control file run the following command to extract whole genome SNPs
 
-    $ runPhaME.pl 
+    $ bin/runPhaME.pl test/phame.ctl
 
 #### OUTPUT files
 

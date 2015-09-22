@@ -1,7 +1,7 @@
 #!/usr/bin/perl -w
 
 use strict;
-use FindBin;
+use FindBin qw($RealBin);
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
@@ -12,6 +12,9 @@ my $muscle_options= "-diags";
 my $mafft_options= "";
 my @files;
 my $thread;
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 GetOptions(
    'd=s'      => \$dir,
@@ -47,16 +50,9 @@ Usage: $0 -d (directory) -m (script)
 ";
 exit;
 } 
-my $bindir=getBinDirectory();
 my $pm= new Parallel::ForkManager($thread);
 $pm->run_on_finish(sub{my ($pid,$ident)=@_;});
 
-sub getBinDirectory
-{
-my @t = split '/', "$FindBin::RealBin";
-my $path = join '/', @t;
-return ($path);
-}
 
 opendir(DIR, $dir);
 while (my $file= readdir(DIR)){
@@ -76,12 +72,12 @@ while (my $file= readdir(DIR)){
 for (my $i=0; $i<=$#files; $i++){
    $pm->start and next;   
    my ($ref_file_name,$ref_file_path,$ref_file_suffix)=fileparse("$files[$i]", qr/\.[^.]*/);
-   if ($program=~/oneline/){`$bindir/fasta_oneline.pl $files[$i] > $ref_file_path/$ref_file_name.faa`}
-   if ($program=~ /mafft/i){`$bindir/mafft $mafft_options $files[$i] > $ref_file_path/$ref_file_name.msa`;}
-   if ($program=~/pal2nal/){`$bindir/pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
-#   if ($program=~/pal2nal/){`$bindir/pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
-   if ($program=~ /translate/){`$bindir/translate.pl $files[$i] > $ref_file_path/$ref_file_name.faa`;}
-   elsif ($program=~ /muscle/i){`$bindir/muscle3.8.31_i86linux64 $muscle_options -in $files[$i] -out $ref_file_path$ref_file_name.msa`;}
+   if ($program=~/oneline/){`fasta_oneline.pl $files[$i] > $ref_file_path/$ref_file_name.faa`}
+   if ($program=~ /mafft/i){`mafft $mafft_options $files[$i] > $ref_file_path/$ref_file_name.msa`;}
+   if ($program=~/pal2nal/){`pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
+#   if ($program=~/pal2nal/){`pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
+   if ($program=~ /translate/){`translate.pl $files[$i] > $ref_file_path/$ref_file_name.faa`;}
+   elsif ($program=~ /muscle/i){`muscle $muscle_options -in $files[$i] -out $ref_file_path$ref_file_name.msa`;}
 $pm->finish;
 }
 $pm->wait_all_children;

@@ -8,10 +8,13 @@
 ######################################################
 
 use strict;
-use FindBin;
+use FindBin qw($RealBin);
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 my ($indir,$reference,$prefix,$thread,$list,$aligner);
 my @command;
@@ -38,7 +41,6 @@ chdir $outdir;
 
 if ($indir=~ /.+\/$/){my $temp= chop($indir);}
 my $querydir= $indir;
-my $bindir=getBinDirectory();
  
 read_directory($querydir);
 
@@ -48,7 +50,7 @@ my $pm=new Parallel::ForkManager($thread);
 $pm->run_on_finish ( # called BEFORE the first call to start()
    sub{
       my ($pid,$ident)=@_;
-      print "Process (Ident: $ident) (pid: $pid) core dumped.\n";
+ #     print "Process (Ident: $ident) (pid: $pid) core dumped.\n";
 #      print "Exit code\t$exit_code\nExit signal\t$exit_signal\nCore dump\t$core_dump\n";
       opendir (TEMP, "$outdir");
       my $lines =0;
@@ -158,23 +160,16 @@ if ($temp=~/pread/i){
       $read2=$path.$1.$2.'2'.$4.$suffix;
    }
 
-   my $bowtie_command= "$bindir/runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+   my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
 #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
    push (@command,$bowtie_command);
 }
 elsif ($temp=~/sread/i){
    $prefix.="\_$name";
-   my $bowtie_command= "$bindir/runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+   my $bowtie_command= "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
 #   print "READ1:  $read1\n$bowtie_command\n\n\n";
    push (@command,$bowtie_command);
 }
-}
-
-sub getBinDirectory
-{
-my @t = split '/', "$FindBin::RealBin";
-my $path = join '/', @t;
-return ($path);
 }
 
 sub usage

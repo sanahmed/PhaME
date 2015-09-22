@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl 
 ################################################################
 # Written by Sanaa Ahmed
 # Jan. 03, 2013
@@ -16,7 +16,7 @@
 
 use strict;
 use Getopt::Long;
-use diagnostics;
+#use diagnostics;
 use FileHandle;
 use File::Basename;
 
@@ -169,7 +169,7 @@ if ($fh->open("< $reffile")){
       unless($_){next;};
       ($header,@seq)=split /\n/,$_;
       $ref_sequence= join "",@seq;
-      print length $ref_sequence,"\n";
+      #print length $ref_sequence,"\n";
       $reference= $header;
    }
    $/="\n";
@@ -354,7 +354,7 @@ foreach my $comparison(@header_list){
                elsif (!defined $noncoding_location{$_}){
                   my $snp=$_;
                   ($start,$end)=read_coords($_);
-                  print "$start\t$end\n";
+                 # print "$start\t$end\n";
                   print STAT "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\n";
                }
             }
@@ -405,14 +405,14 @@ print CDSMAT "\n";
 print IMAT "\n";
 
 foreach my $column(@headers){
-   print "$column\n";
+   #print "$column\n";
    if ($column!~/contig/ && $column!~/read/){
       print PMAT "$column\t";
       print CMAT "$column\t";
       print CDSMAT "$column\t";
       print IMAT "$column\t";
       foreach my $row(@headers){
-         print "$column:$row\n";
+         #print "$column:$row\n";
          if ($column eq $row){
             print PMAT "\t";
             print CMAT "\t";
@@ -473,7 +473,7 @@ while(<$fh>){
    }
 
    if ($ssuffix =~ /vcf/){
-      my $depth;
+      my $depth=0;
       if (/^#CHROM.+\/$reference\_(\S+)\.sort\.bam/){$query_id=$1.'_pread';}
       if ($_ !~ /^#/){
          ($ref_id,$ref_pos,$tmp,$ref_base,$snp,$snp_quality,$tmp,$vcf_info,$vcf_info2,$tmp)=split /\t/,$_;
@@ -623,8 +623,8 @@ sub read_coords
 {
 my $snp=shift;
 my $name;
-my $start;
-my $end;
+my $start="";
+my $end="";
 my $product;
 
 open (CDS, "$CDScoords")||die "$!";
@@ -633,6 +633,7 @@ while (<CDS>){
    ($name,$start,$end,$product)= split /\s+/,$_;
    if ($snp>=$start && $snp<=$end){return ($start,$end);}
 }
+return ($start,$end);
 }
 
 sub usage

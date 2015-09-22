@@ -11,10 +11,12 @@
 ######################################################
 
 use strict;
-use FindBin;
+use FindBin qw($RealBin);
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 my $breaklen=200;
 my $mincluster=65;
@@ -59,7 +61,6 @@ if ($outdir=~ /.+\/$/){my $temp= chop($outdir);}
 chdir $outdir;
 if ($working_dir=~ /.+\/$/){my $temp= chop($working_dir);}
 my $query_dir= $working_dir.'/files';
-my $bindir=getBinDirectory();
 
 if (! -e "gaps"){mkdir "gaps";}
 if (! -e "snps"){mkdir "snps";}
@@ -120,30 +121,30 @@ for (my $i=0;$i<=$#query_list; $i++){
    my $query=$query_list[$i];
 
 print "Running nucmer on $prefix\n";
-   my $nucmer_command= "$bindir/MUMmer3.23/nucmer $options -p $prefix $reference $query";
+   my $nucmer_command= "nucmer $options -p $prefix $reference $query  2>/dev/null";
    if (system ($nucmer_command)){die "Error running $nucmer_command.\n";}
 
 #print "\nRunning delta-filter for SNPs\n";
-   my $filter_command= "$bindir/MUMmer3.23/delta-filter -1 $identity $prefix.delta > $outdir/$prefix.snpfilter";
+   my $filter_command= "delta-filter -1 $identity $prefix.delta > $outdir/$prefix.snpfilter";
    if (system ($filter_command)){die "Error running $filter_command.\n";}
 
 #print "Running show-snps\n";
-   my $snp_command= "$bindir/MUMmer3.23/show-snps -CT $outdir/$prefix.snpfilter > $outdir/$prefix.snps";
+   my $snp_command= "show-snps -CT $outdir/$prefix.snpfilter > $outdir/$prefix.snps";
    if (system ($snp_command)){die "Error running $snp_command.\n";}
 
-   my $snp_INDEL= `$bindir/SNP_INDEL_count.pl $outdir/$prefix.snps`;
+   my $snp_INDEL= `SNP_INDEL_count.pl $outdir/$prefix.snps`;
    $snp_INDEL=~ s/\n//;
    ($snp_n,$indel_n)= split /\t/,$snp_INDEL;
 
 #print "Running delta-filter for gaps\n";
-   $filter_command= "$bindir/MUMmer3.23/delta-filter $identity $outdir/$prefix.delta > $outdir/$prefix.gapfilter";
+   $filter_command= "delta-filter $identity $outdir/$prefix.delta > $outdir/$prefix.gapfilter";
    if (system ($filter_command)){die "Error running $filter_command.\n";}
 
 #print "Running show-coords\n";
-   my $coords_command= "$bindir/MUMmer3.23/show-coords -clTr $outdir/$prefix.gapfilter > $outdir/$prefix.coords";
+   my $coords_command= "show-coords -clTr $outdir/$prefix.gapfilter > $outdir/$prefix.coords";
    if (system ($coords_command)){die "Error running $coords_command.\n";}
 
-   my $gaps= `$bindir/parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix.coords 2>/dev/null`;
+   my $gaps= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix.coords 2>/dev/null`;
 #   my $gaps= `bin/wgSNPphylogeny/parse_gaps_from_nucmer_coords.pl $gap_cutoff $outdir/$prefix.coords 2>/dev/null`;
    ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps;
 
@@ -175,31 +176,31 @@ for (my $i=0;$i<=$#reference_list; $i++){
       my $reference=$reference_list[$i];
 
       print "Running nucmer on $prefix\n";
-      my $nucmer_command= "$bindir/MUMmer3.23/nucmer $options -p $prefix $reference $query";
+      my $nucmer_command= "nucmer $options -p $prefix $reference $query  2>/dev/null";
       if (system ($nucmer_command)){die "Error running $nucmer_command.\n";}
 
 #print "\nRunning delta-filter for SNPs\n";
-      my $filter_command= "$bindir/MUMmer3.23/delta-filter -1 $identity $prefix.delta > $outdir/$prefix.snpfilter";
+      my $filter_command= "delta-filter -1 $identity $prefix.delta > $outdir/$prefix.snpfilter";
       if (system ($filter_command)){die "Error running $filter_command.\n";}
 
 #print "Running show-snps\n";
-      my $snp_command= "$bindir/MUMmer3.23/show-snps -CT $outdir/$prefix.snpfilter > $outdir/$prefix.snps";
+      my $snp_command= "show-snps -CT $outdir/$prefix.snpfilter > $outdir/$prefix.snps";
       if (system ($snp_command)){die "Error running $snp_command.\n";}
 
-      my $snp_INDEL= `$bindir/SNP_INDEL_count.pl $outdir/$prefix.snps`;
+      my $snp_INDEL= `SNP_INDEL_count.pl $outdir/$prefix.snps`;
       $snp_INDEL=~ s/\n//;
       ($snp_n,$indel_n)= split /\t/,$snp_INDEL;
 
 #print "Running delta-filter for gaps\n";
-      $filter_command= "$bindir/MUMmer3.23/delta-filter $identity $outdir/$prefix.delta > $outdir/$prefix.gapfilter";
+      $filter_command= "delta-filter $identity $outdir/$prefix.delta > $outdir/$prefix.gapfilter";
       if (system ($filter_command)){die "Error running $filter_command.\n";}
 
 #print "Running show-coords\n";
-      my $coords_command= "$bindir/MUMmer3.23/show-coords -clTr $outdir/$prefix.gapfilter > $outdir/$prefix.coords";
+      my $coords_command= "show-coords -clTr $outdir/$prefix.gapfilter > $outdir/$prefix.coords";
       if (system ($coords_command)){die "Error running $coords_command.\n";}
 
-      my $gaps= `$bindir/parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix.coords 2>/dev/null`;
-      my $check= `$bindir/checkNUCmer.pl -i $outdir/$prefix.gaps -r $reference_list[$i]`;
+      my $gaps= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix.coords 2>/dev/null`;
+      my $check= `checkNUCmer.pl -i $outdir/$prefix.gaps -r $reference_list[$i]`;
       if ($check==1){print "$query_list[$j] aligned < 25% of the $reference_list[$i] genome\n";}
 
       ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps;
@@ -226,13 +227,6 @@ sub cleanup
 `mv $outdir/*_snp_INDEL.txt $outdir/stats`;
 `mv $outdir/*_gaps.txt $outdir/stats`;
 `mv $outdir/*.coords $outdir/stats`;
-}
-
-sub getBinDirectory
-{
-my @t = split '/', "$FindBin::RealBin";
-my $path = join '/', @t;
-return ($path);
 }
 
 sub usage

@@ -2,12 +2,15 @@
 
 use strict;
 use Getopt::Long;
-use FindBin;
+use FindBin qw($RealBin);
 
 my $identity=95;
 my $len_cutoff=0;
 my $output="repeats_coords.txt";
 my $stats= "repeats_stats.txt";
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 GetOptions(
    'i=i'      => \$identity,
@@ -33,13 +36,11 @@ exit;
 my $file=$ARGV[0];
 &Usage unless (-e $file);
 
-my $bindir= getBinDirectory();
-
-my $command="$bindir/MUMmer3.23/nucmer --maxmatch --nosimplify --prefix=seq_seq$$ $file $file";
+my $command="nucmer --maxmatch --nosimplify --prefix=seq_seq$$ $file $file 2>/dev/null";
 print "Running self-nucmer on $file.\n";
 if (system ("$command")) {die "$command"}; 
 # apply identity cutoff and lenght cutoff and use awk to skip self-hits
-my $command="$bindir/MUMmer3.23/show-coords -r -I $identity -L $len_cutoff -T seq_seq$$.delta | awk \'\$1 != \$3 || \$2 != \$4 && \$8==\$9 {print}\' > seq_seq$$.coords";
+my $command="show-coords -r -I $identity -L $len_cutoff -T seq_seq$$.delta | awk \'\$1 != \$3 || \$2 != \$4 && \$8==\$9 {print}\' > seq_seq$$.coords";
 if (system ("$command")) {die "$command"};
 &get_coords_file("seq_seq$$.coords");
 unlink "seq_seq$$.delta";
@@ -145,9 +146,3 @@ close INFASTA;
 return \%len;
 }
 
-sub getBinDirectory
-{
-my @t = split '/', "$FindBin::RealBin";
-my $path = join '/', @t;
-return ($path);
-}

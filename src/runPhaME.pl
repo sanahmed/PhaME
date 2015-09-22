@@ -1,12 +1,17 @@
 #!/usr/bin/perl -w
 
 use strict;
-use FindBin qw($Bin);
+use FindBin qw($Bin $RealBin);
 use lib "$Bin";
+use lib "$RealBin/../lib/";
 use File::Basename;
 use PhaME;
 
 $|=1;
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
+$ENV{PERL5LIB} = "$RealBin/../ext/lib/perl5:$ENV{PERL5LIB}";
 
 =head
 
@@ -74,11 +79,11 @@ my %read_list;
 my $mappingGaps;
 my $ptree;
 
-my $control= "phame.ctl";
+my $control= $ARGV[0] || "phame.ctl";
 my $bindir=getBinDirectory();
 
 ## Read in control file 
-open(CTL, "$control")||die "Please provide a control file in the working directory";
+open(CTL, "$control")||die "Please provide a control file";
 while (<CTL>){
    if (/refdir\s*=\s*(\S+)\s*#{0,1}.*$/){
       $refdir=$1;
