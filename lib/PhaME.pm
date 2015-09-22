@@ -338,7 +338,7 @@ foreach my $begin (sort{$a<=>$b} keys %CDS){
    $last=$end;
 }
    if ($last < $source_end){
-      $gap_start = $end+1;
+      $gap_start = $last+1;
       print OUT "$name\t$gap_start\t$source_end\tnoncoding\n";
    }
 }
