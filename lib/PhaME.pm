@@ -26,10 +26,14 @@ my $alignment=0;
 my %refcheck;
 
 if ($time==1){
-   if (-e "$wdir/RAxML_*.$project"){
+
+   my @overwrite=glob("$wdir/RAxML_*.$project\_all");
+   @overwrite=glob("$wdir/RAxML_*.$project\_cds");
+   if (scalar @overwrite >0){
       print "*WARNING* RAxML tree with the name $project already exist. They will be overwritten.\n";
-      `rm $wdir/RAxML_*.$project`;
+      foreach (@overwrite){`rm $_`;}
    }
+   
    if (-e $log && !-z $log){
       open (LOG,"$log")||die "$!";
       while (<LOG>){
@@ -530,7 +534,7 @@ if ($tree==1){
    if (system ($bestTree)){die "Error running $bestTree.\n";}
 }
 
-if ($tree >=2){
+if ($tree >1){
    my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
    print $bootTrees;
    if (system ($bootTrees)){die "Error running $bootTrees.\n";}
