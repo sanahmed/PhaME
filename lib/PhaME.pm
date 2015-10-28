@@ -30,7 +30,7 @@ if ($time==1){
    my @overwrite=glob("$wdir/RAxML_*.$project\_all");
    @overwrite=glob("$wdir/RAxML_*.$project\_cds");
    if (scalar @overwrite >0){
-      print "*WARNING* RAxML tree with the name $project already exist. They will be overwritten.\n";
+      print "*WARNING* RAxML trees with the name $project already exist. They will be overwritten.\n";
       foreach (@overwrite){`rm $_`;}
    }
    
