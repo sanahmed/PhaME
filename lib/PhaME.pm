@@ -34,6 +34,7 @@ if ($time==1){
          if (/Read Mapping complete/){$progress=3;}
          if (/SNP alignment complete/){$progress=4;$alignment=1;}
          if (/Tree phylogeny complete/ && $alignment==1){$progress=5;}
+         if (!/Tree phylogeny complete/ && -e "RAxML_*.$project"){'rm RAxML_*.$project'}
       }
    }
 
