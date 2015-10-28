@@ -26,7 +26,7 @@ my %refcheck;
 
 if ($time==1){
    if (-e "RAxML_*.$project"){
-      print "*WARNING* RAxML tree with the name $project already exist. These phylogenies will be delelted.\n";
+      print "*WARNING* RAxML tree with the name $project already exist. They will be overwritten.\n";
       'rm RAxML_*.$project';
    }
    if (-e $log && !-z $log){
