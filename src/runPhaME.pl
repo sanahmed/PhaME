@@ -169,7 +169,7 @@ print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 
 &print_timeInterval($runtime,"\tChecking directories and files... ");
-my $check=PhaME::check($workdir,$refdir,$time,$data,$name,$logfile);
+my $check=PhaME::check($workdir,$refdir,$time,$data,$name,$logfile,$project);
 if ($data==7){$check=0;}
 #print "\nCHECK:\t$check\n";
 my $snpdir=$outdir.'/snps';
