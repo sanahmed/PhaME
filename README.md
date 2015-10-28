@@ -50,10 +50,11 @@ You can use "git" to obtain the package:
 #### Prepare the input files
 INPUT files required
 
-* A reference directory with the following file suffixes
+* A directory with reference files which have the following file suffixes
   - *.fasta
   - *.fna
   - *.fa
+  - *.gff  (optional: to analyze Coding region SNPs of a selected reference file)
     
 * A working directory 
   - Contig files with the following file suffixes
@@ -67,7 +68,11 @@ INPUT files required
      
   - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/LANL-Bioinformatics/PhaME/master/phame.ctl))
 
-From the working directory that contains the control file run the following command to extract whole genome SNPs
+#### Test run
+
+* Please modify the values of 'refdir' and 'workdir' in the test/phame.ctl file to corresponding absolute PhaME installed path.
+
+* From the PhaME directory 
 
     $ bin/runPhaME.pl test/phame.ctl
 
