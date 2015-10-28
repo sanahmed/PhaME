@@ -18,6 +18,7 @@ my $time=shift;
 my $data=shift;
 my $reference=shift;
 my $log=shift;
+my $project=shift;
 my $list=$dir.'/working_list.txt';
 my $wdir=$dir.'/results';
 my $progress=0;
