@@ -32,6 +32,10 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * HyPhy version >=2.2 - For optional evolutionary analyses
 
+The C/C++ compiling enviroment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
+
+PhaME was tested successfully on our Linux servers (Ubuntu 14.04.3 LTS).
+
 --------------------------------------------------------------
 ### Obtaining PhaME
 
