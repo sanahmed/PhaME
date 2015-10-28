@@ -25,7 +25,10 @@ my $alignment=0;
 my %refcheck;
 
 if ($time==1){
-   if (-e "RAxML_*.$project"){'rm RAxML_*.$project';}
+   if (-e "RAxML_*.$project"){
+      print "*WARNING* RAxML tree with the name $project already exist. These phylogenies will be delelted.\n";
+      'rm RAxML_*.$project';
+   }
    if (-e $log && !-z $log){
       open (LOG,"$log")||die "$!";
       while (<LOG>){
