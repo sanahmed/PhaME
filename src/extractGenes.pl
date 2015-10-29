@@ -41,8 +41,8 @@ GetOptions(
    'p|gap=s'      => \$gapfile,
 );
 
-my $maxthreads=`grep -c ^processor /proc/cpuinfo`;
-if ($thread <1 || $thread>$maxthreads){die ("-thread value must be between 1 and $maxthreads.\n");}
+my $maxthreads = ($^O =~ /darwin/)?  `sysctl hw.ncpu | awk '{print \$2}'`:`grep -c ^processor /proc/cpuinfo`;
+if ($threads <1 || $threads>$maxthreads){die ("-thread value must be between 1 and $maxthreads.\n");}
 
 my $genedir=$dir.'/PSgenes';
 if (!-d $genedir){`mkdir $genedir`;}

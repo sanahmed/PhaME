@@ -51,7 +51,7 @@ GetOptions(
 
 &usage() unless ($working_dir);
 
-my $max_thread=`grep -c ^processor /proc/cpuinfo`;
+my $max_thread=($^O =~ /darwin/)?  `sysctl hw.ncpu | awk '{print \$2}'`:`grep -c ^processor /proc/cpuinfo`;;
 if ($thread < 1 || $thread>$max_thread){
    die("-thread value must be between than 1 and $max_thread.\n");
 }

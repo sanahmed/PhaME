@@ -130,7 +130,7 @@ while (<CTL>){
 #     0=no clean; 1=clean
    if (/threads\s*=\s*(\d+)\s*#{0,1}.*$/){
       $threads=$1;
-      my $maxthreads=`grep -c ^processor /proc/cpuinfo`;
+      my $maxthreads = ($^O =~ /darwin/)?  `sysctl hw.ncpu | awk '{print \$2}'`:`grep -c ^processor /proc/cpuinfo`;
       if ($threads <1 || $threads>$maxthreads){die ("-thread value must be between 1 and $maxthreads.\n");}
    }
    if (/cutoff\s*=\s*(\d+)\s*#.*$/){$cutoff=$1;}
