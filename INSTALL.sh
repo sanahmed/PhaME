@@ -26,7 +26,7 @@ download_ext () {
    fi; 
   
    if hash curl 2>/dev/null; then
-		if [ -n ${HTTP_PROXY} ]; then
+		if [[ -n ${HTTP_PROXY} ]]; then
    	  		curl --proxy $HTTP_PROXY -L $1  -o $2;
    	  	else
 			curl -L $1 -o $2; 

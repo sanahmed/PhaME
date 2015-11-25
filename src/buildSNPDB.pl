@@ -46,6 +46,7 @@ my @header_list;
 my @headers;
 my %gap_location;
 my %noncoding_location;
+my %coding_location;
 my %query_gaps;
 my $snp_file;
 my %pairSNPcount;
@@ -121,7 +122,7 @@ print CMAT "\t";
 print CDSMAT "\t";
 print IMAT "\t";
 #if ($genbank==1){print CDSSTAT "SNP Pos\tGenomes\n";}
-
+read_cds_coords() if ($coding==1);
 read_reference($reffile);
 
 print "Reading Gaps file.\n";
@@ -287,7 +288,7 @@ foreach my $comparison(@header_list){
    foreach (sort {$a<=>$b}keys %snp_location){
       $current_snp=$_ -1;
       #Check SNP is not present in gaps and present in coding region.
-      if (!defined $gap_location{$_} && !defined $noncoding_location{$_}){
+      if (!defined $gap_location{$_} && defined $coding_location{$_}){
          if (defined $snp_location{$_}{$comparison}){
             print CDSOUT $snp_location{$_}{$comparison};
             $CDScount++;
@@ -319,7 +320,7 @@ foreach my $comparison(@header_list){
    foreach (sort {$a<=>$b}keys %snp_location){
       $current_snp=$_ -1;
       #Check SNP is not present in gaps and present in coding region.
-      if (!defined $gap_location{$_} && defined $noncoding_location{$_}){
+      if (!defined $gap_location{$_} && defined $coding_location{$_}){
          if (defined $snp_location{$_}{$comparison}){print INTOUT $snp_location{$_}{$comparison};}
          else {
             $ref= substr($ref_sequence,$current_snp,1);
@@ -348,12 +349,12 @@ foreach my $comparison(@header_list){
          if (defined $snp_location{$_}{$comparison} && $first ne $second){
             $ref= substr($ref_sequence,$current_snp,1);
             if ($coding==1){
-               if (defined $noncoding_location{$_}){
+               if (!defined $coding_location{$_}){
                   print STAT "$first\t$second\tnoncoding SNP\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
                }
-               elsif (!defined $noncoding_location{$_}){
+               elsif (defined $coding_location{$_}){
                   my $snp=$_;
-                  ($start,$end)=read_coords($_);
+                  my ($start,$end,$product)= split /,/, $coding_location{$_};
                  # print "$start\t$end\n";
                   print STAT "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\n";
                }
@@ -467,8 +468,8 @@ while(<$fh>){
       $pairCount++;
       if (!defined $gap_location{$ref_pos}){
          $coreCount++;
-         if (defined $noncoding_location{$ref_pos}){$intCount++;}
-         if (!defined $noncoding_location{$ref_pos}){$cdsCount++;}
+         if (!defined $coding_location{$ref_pos}){$intCount++;}
+         if (defined $coding_location{$ref_pos}){$cdsCount++;}
       }
    }
 
@@ -482,8 +483,8 @@ while(<$fh>){
          if ($snp!~ /\./ && $ref_base!~ /\./ && $vcf_info2!~ /INDEL/ && $depth >=15){
             $pairCount++;
             if (!defined $gap_location{$ref_pos}){$coreCount++;}
-            if (defined $noncoding_location{$ref_pos}){$intCount++;}
-            if (!defined $noncoding_location{$ref_pos}){$cdsCount++;}
+            if (!defined $coding_location{$ref_pos}){$intCount++;}
+            if (defined $coding_location{$ref_pos}){$cdsCount++;}
          }
       }
    }
@@ -619,21 +620,16 @@ while (<IN>){
 close IN;
 }
 
-sub read_coords
+sub read_cds_coords
 {
-my $snp=shift;
-my $name;
-my $start="";
-my $end="";
-my $product;
-
 open (CDS, "$CDScoords")||die "$!";
 while (<CDS>){
    chomp;
-   ($name,$start,$end,$product)= split /\s+/,$_;
-   if ($snp>=$start && $snp<=$end){return ($start,$end);}
+   my ($id,$start,$end,$product)= split /\s+/,$_;
+   for ($start..$end){$coding_location{$_}="$start,$end,$product";}
+  # if ($snp>=$start && $snp<=$end){return ($start,$end);}
 }
-return ($start,$end);
+#return ($start,$end);
 }
 
 sub usage
