@@ -475,7 +475,7 @@ while(<$fh>){
 
    if ($ssuffix =~ /vcf/){
       my $depth=0;
-      if (/^#CHROM.+\/$reference\_(\S+)\.sort\.bam/){$query_id=$1.'_pread';}
+      if (/^#CHROM.+\/$reference\_(\S+)\.sort\.bam/){$query_id=$1.'_read';}
       if ($_ !~ /^#/){
          ($ref_id,$ref_pos,$tmp,$ref_base,$snp,$snp_quality,$tmp,$vcf_info,$vcf_info2,$tmp)=split /\t/,$_;
          my @values=split /;/,$vcf_info2;
@@ -594,7 +594,7 @@ my $depth=15;
 open (IN,"$snp_file")||die "$!";
 while (<IN>){
    chomp;
-   if (/^#CHROM.+\/\S+\/$reference\_(\S+)\.sort\.bam/){$query=$1.'_pread';}
+   if (/^#CHROM.+\/\S+\/$reference\_(\S+)\.sort\.bam/){$query=$1.'_read';}
    if (!/^\#/){
       ($ref,$rpos,$id,$rbase,$qbase,$qual,$filter,$info1,$info2,$tmp)= split ("\t",$_);
 #      print "$ref\t$rpos\t$rbase\t$qbase\t$info1\t$info2\t$tmp\n";
@@ -613,7 +613,7 @@ while (<IN>){
             print AMB "$reference\t$query\t$qbase\t$temp\t$rpos\n";
          }
          else{$snp_location{$rpos}{"$reference:$query"}= $qbase;$count++;}
-         $positions{$rpos}{"$ref:$query"}='pread';
+         $positions{$rpos}{"$ref:$query"}='read';
       }
    }
 }

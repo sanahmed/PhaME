@@ -4,6 +4,7 @@ use strict;
 use FindBin qw($Bin $RealBin);
 use lib "$Bin";
 use lib "$RealBin/../lib/";
+use lib "$RealBin/../ext/lib/perl5";
 use File::Basename;
 use PhaME;
 
@@ -11,7 +12,6 @@ $|=1;
 
 # set up environments
 $ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
-$ENV{PERL5LIB} = "$RealBin/../ext/lib/perl5:$ENV{PERL5LIB}";
 
 =head
 
@@ -277,20 +277,26 @@ if ($check==0){
          if ($files=~ /.+\.f{1}a?s?t?q$/ && $files!~ /.+\.f{1}n|s?a?s?t?a$/ && $files!~ /\.contigs?/){
             my $fastq=$refdir.'/'.$files;
 #            print "$qname\n";
+            my $read_list_name;
             if ($qname=~/(.+)[_.]R?[12]/){
-               if ($reads==2||$reads==3){
-                  my $read=$1.'_pread';
+               if ($reads==2){
+                  $read_list_name=$1.'_pread';
 #                   print "$read\n";
-                  $read_list{$read}++;
                }
-               if ($reads==1||$reads==3 && !exists $read_list{"$1_pread"}){
-                  my $read=$1.'_sread';
-                  $read_list{$read}++;
+               if ($reads==1 && !exists $read_list{"$1_pread"}){
+                  $read_list_name=$1.'_sread';
                }
+               if ($reads==3){
+                  delete $read_list{"$1_sread"};
+		  $read_list_name=$1.'_read';
+                  $read_list_name=$1.'_pread' if ( ! -e "$workdir/$1.fastq" && ! -e "$workdir/$1.fq");
+	       }
+                  $read_list{$read_list_name}++;
             }
             else{
-               my $read=$qname.'_sread';
-               $read_list{$read}++;
+               next if ($reads==2 || exists $read_list{"${qname}_read"});
+               $read_list_name=$qname.'_sread';
+               $read_list{$read_list_name}++;
             } 
          }
       }
