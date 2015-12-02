@@ -8,10 +8,13 @@
 ######################################################
 
 use strict;
-use FindBin;
+use FindBin qw($RealBin);
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 my ($indir,$reference,$prefix,$thread,$list,$aligner);
 my @command;
@@ -29,7 +32,7 @@ GetOptions(
 );
 
 &usage() unless ($indir && $aligner);
-my $max_thread=`grep -c ^processor /proc/cpuinfo`;
+my $max_thread=($^O =~ /darwin/)?  `sysctl hw.ncpu | awk '{print \$2}'`:`grep -c ^processor /proc/cpuinfo`;
 if ($thread<1 || $thread>$max_thread){die("-thread value must be between than 1 and $max_thread.\n");}
 
 if (! -e $outdir){mkdir "$outdir";}
@@ -38,7 +41,6 @@ chdir $outdir;
 
 if ($indir=~ /.+\/$/){my $temp= chop($indir);}
 my $querydir= $indir;
-my $bindir=getBinDirectory();
  
 read_directory($querydir);
 
@@ -48,7 +50,7 @@ my $pm=new Parallel::ForkManager($thread);
 $pm->run_on_finish ( # called BEFORE the first call to start()
    sub{
       my ($pid,$ident)=@_;
-      print "Process (Ident: $ident) (pid: $pid) core dumped.\n";
+ #     print "Process (Ident: $ident) (pid: $pid) core dumped.\n";
 #      print "Exit code\t$exit_code\nExit signal\t$exit_signal\nCore dump\t$core_dump\n";
       opendir (TEMP, "$outdir");
       my $lines =0;
@@ -57,7 +59,7 @@ $pm->run_on_finish ( # called BEFORE the first call to start()
             my $gap_file= $outdir.'/'.$file;
             open(FILE, "$gap_file");
             while (<FILE>){$lines++;}
-            if ($lines==1){`rm $gap_file`; print "Removed $gap_file\n"; $lines=0;}
+            if ($lines==1){`rm -f $gap_file`; print "Removed $gap_file\n"; $lines=0;}
             else {`mv $gap_file $outdir/gaps`;}
          }
 #         if ($file=~/.+\.vcf$/){
@@ -99,7 +101,7 @@ my %check;
 opendir(PARENT,$dir);
 while (my $files= readdir(PARENT)){  
    next if ($files=~ /^..?$/);
-   if ($files!~ /$name/ && $files=~ /(.+)[_.]R1.*\.fa?s?t?q$/){
+   if ($files!~ /$name/ && ($files=~ /(.+)[_.]R1.*\.fa?s?t?q$/ ||  $files=~ /(.+)[_.]1.*\.fa?s?t?q$/)){
       $temp= $1.'_pread';
 #      print "$temp\n";
       if (exists $queries{$temp} && !exists $check{$temp}){
@@ -108,27 +110,38 @@ while (my $files= readdir(PARENT)){
          $prefix= "$name";
          create_bowtie_commands($query,$prefix,$temp);
       }
-   }
-   if ($files!~ /$name/ && $files=~ /(.+)[_.]1.*\.fa?s?t?q$/){
-      $temp=$1.'_pread';
+      $temp= $1.'_read';
       if (exists $queries{$temp} && !exists $check{$temp}){
          $check{$temp}++;
          $query=$dir.'/'.$files;
-         $prefix=$name;
-#         print "$temp\n";
+         $prefix= "$name";
          create_bowtie_commands($query,$prefix,$temp);
       }
-   }
-   if ($files!~ /$name/ && $files=~ /(.+)\.fa?s?t?q$/){
       $temp= $1.'_sread';
-#   if ($files!~ /$name/ && $files=~ /(.+)_R.\.fastq$/){
-#      my $temp= $1.'_read';
       if (exists $queries{$temp} && !exists $check{$temp}){
          $check{$temp}++;
          $query=$dir.'/'.$files;
-#         my ($qname,$qpath,$qsuffix)=fileparse("$query",qr/\.[^.]*/);
          $prefix= "$name";
+         create_bowtie_commands($query,$prefix,$temp);
+      }
+
+   }
+ #  if ($files!~ /$name/ && $files=~ /(.+)[_.]1.*\.fa?s?t?q$/){
+  #    $temp=$1.'_pread';
+  #    if (exists $queries{$temp} && !exists $check{$temp}){
+   ##      $check{$temp}++;
+    #     $query=$dir.'/'.$files;
+     #    $prefix=$name;
 #         print "$temp\n";
+      #   create_bowtie_commands($query,$prefix,$temp);
+     # }
+  # }
+   if ($files!~ /$name/ && $files=~ /(.+)\.fa?s?t?q$/){
+      $temp= $1.'_sread';
+      if (exists $queries{$temp} && !exists $check{$temp}){
+         $check{$temp}++;
+         $query=$dir.'/'.$files;
+         $prefix= "$name";
          create_bowtie_commands($query,$prefix,$temp);
       }
    } 
@@ -143,6 +156,7 @@ my $prefix=shift;
 my $temp=shift;
 my $read1;
 my $read2;
+my $readu;
 
 my ($name,$path,$suffix)=fileparse("$read",qr/\.[^.]*/);
 if ($temp=~/pread/i){
@@ -158,23 +172,34 @@ if ($temp=~/pread/i){
       $read2=$path.$1.$2.'2'.$4.$suffix;
    }
 
-   my $bowtie_command= "$bindir/runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+   my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
 #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
    push (@command,$bowtie_command);
 }
 elsif ($temp=~/sread/i){
    $prefix.="\_$name";
-   my $bowtie_command= "$bindir/runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+   my $bowtie_command= "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
 #   print "READ1:  $read1\n$bowtie_command\n\n\n";
    push (@command,$bowtie_command);
-}
-}
+}elsif ($temp=~/_read/i){
+#   print "$read\n";
+   if ($name=~ /(.+)([_.]R)(\d)(.*)$/){
+      $prefix.= "\_$1";
+      $read1=$path.$1.$2.$3.$4.$suffix;
+      $read2=$path.$1.$2.'2'.$4.$suffix;
+      $readu=$path.$1.$suffix;
+   }
+   if ($name=~ /(.+)([_.])(1)(.*)$/){
+      $prefix.= "\_$1";
+      $read1=$path.$1.$2.$3.$4.$suffix;
+      $read2=$path.$1.$2.'2'.$4.$suffix;
+      $readu=$path.$1.$suffix;
+   }
 
-sub getBinDirectory
-{
-my @t = split '/', "$FindBin::RealBin";
-my $path = join '/', @t;
-return ($path);
+   my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+#   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
+   push (@command,$bowtie_command);
+}
 }
 
 sub usage

@@ -4,7 +4,10 @@ use strict;
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
-use FindBin;
+use FindBin qw($RealBin);
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 my $dir;
 my $thread;
@@ -25,7 +28,6 @@ GetOptions(
    'c|core=s'      => \$core,
 );
 
-my $bindir=getBinDirectory();
 
 if ($dir=~ /.+\/$/){my $temp= chop($dir);}
 my ($name,$path,$suffix)=fileparse("$tree",qr/\.[^.]*/);
@@ -331,9 +333,3 @@ ExecuteAFile (fileToExecute,inputRedirect);
 $pm->wait_all_children;
 }
 
-sub getBinDirectory
-{
-my @t=split '/',"$FindBin::RealBin";
-my $path=join '/',@t;
-return ($path);
-}

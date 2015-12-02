@@ -18,6 +18,7 @@ my $time=shift;
 my $data=shift;
 my $reference=shift;
 my $log=shift;
+my $project=shift;
 my $list=$dir.'/working_list.txt';
 my $wdir=$dir.'/results';
 my $progress=0;
@@ -25,6 +26,14 @@ my $alignment=0;
 my %refcheck;
 
 if ($time==1){
+
+   my @overwrite=glob("$wdir/RAxML_*.$project\_all");
+   @overwrite=glob("$wdir/RAxML_*.$project\_cds");
+   if (scalar @overwrite >0){
+      print "*WARNING* RAxML trees with the name $project already exist. They will be overwritten.\n";
+      foreach (@overwrite){`rm $_`;}
+   }
+   
    if (-e $log && !-z $log){
       open (LOG,"$log")||die "$!";
       while (<LOG>){
@@ -34,6 +43,7 @@ if ($time==1){
          if (/Read Mapping complete/){$progress=3;}
          if (/SNP alignment complete/){$progress=4;$alignment=1;}
          if (/Tree phylogeny complete/ && $alignment==1){$progress=5;}
+#         if (!/Tree phylogeny complete/ && -e "$wdir/RAxML_*.$project"){`rm $wdir/RAxML_*.$project`;}
       }
    }
 
@@ -178,13 +188,13 @@ my $gapdir=$dir.'/gaps';
 my $repeatdir=$dir.'/stats';
 my %query;
 my $line=0;
-my $gapfile;
+my $all_gapfile;
 my $gap_start;
 my $gap_end;
 
-if ($type=~/map/){$gapfile="$dir\/$project\_mapping_gaps.txt";}
-elsif ($type=~/snp/){$gapfile="$dir\/$project\_all_gaps.txt";}
-open (GAP,">$gapfile")||die "$!";
+if ($type=~/map/){$all_gapfile="$dir\/$project\_mapping_gaps.txt";}
+elsif ($type=~/snp/){$all_gapfile="$dir\/$project\_all_gaps.txt";}
+open (GAP,">$all_gapfile")||die "$!";
 
 open (LIST,"$list")||die "$!";
 while (<LIST>){
@@ -213,10 +223,10 @@ while (my $gaps= readdir(DIR)){
          my $query=$1;
          my $tmp= $query.'_read';
          if (exists $query{$tmp}){
-            $line=0;
             my $gap_file= "$gapdir/$gaps";
+            $line=0;
             open (IN,$gap_file)|| die "$!";
-#         print "Read Mapping Gaps\n";
+        # print "Read Mapping Gaps $gaps\n";
             while (<IN>){
                chomp;
                $line++;
@@ -233,7 +243,7 @@ while (my $gaps= readdir(DIR)){
                print GAP "$name\t$gap_start\t$gap_end\t$length\tREADS_$query\n";
             }
             close IN;
-            if ($line == 1){`rm $gapfile`; $line=0;}
+            if ($line == 1){`rm $gap_file`; $line=0;}
          }
       }
    }
@@ -259,7 +269,7 @@ while (my $repeats= readdir(REPEAT)){
 #   last OUTER;
 }
 closedir REPEAT;
-return $gapfile;
+return $all_gapfile;
 }
 
 # Identify CDS coords 
@@ -297,9 +307,9 @@ while(<IN>){
    if (!/^#/){
       my ($name,$source,$method,$start,$stop,$score,$strand,$phase,$field)=split "\t",$_;
 #      my ($name,$method,$start,$stop,$score,$strand,$phase,$field)=split "\t",$_;
-      my @group=split ";",$field;
+      my @group=split ";",$field if ($field);
 
-      if ($method=~/CDS/){
+      if ($method and $method=~/CDS/){
          $start=$start+$permutation;
          $stop=$stop+$permutation;
 
@@ -312,6 +322,7 @@ while(<IN>){
 }
 
 my $prev=0;
+my $last=0;
 foreach my $begin (sort{$a<=>$b} keys %CDS){
    my $end=$CDS{$begin};
    if ($first){
@@ -334,30 +345,19 @@ foreach my $begin (sort{$a<=>$b} keys %CDS){
 
    $gap_start=$end+1;
    $prev=$end+2;
+   $last=$end;
 }
+   if ($last < $source_end){
+      $gap_start = $last+1;
+      print OUT "$name\t$gap_start\t$source_end\tnoncoding\n";
+   }
 }
 
 sub clean
 {
 my $dir=shift;
 print "\nHERE IS WHERE I CLEAN THIS MESS\n";
-my @cleanup=glob("$dir/*.pileup");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*.bam");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*.bcf");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*.mgaps");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*.ntref");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*.sam");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*.delta");
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
-@cleanup=glob("$dir/*filter");
-#foreach (@cleanup){print "$_\n";}
-if (scalar @cleanup >0){foreach (@cleanup){`rm $_`;}}
+system("rm -f $dir/*.pileup $dir/*.bam $dir/*.bcf $dir/*.mgaps $dir/*.ntref $dir/*.sam $dir/*.delta $dir/*.filter");
 }
 
 #-------------------------------------------------------------------------
@@ -376,7 +376,7 @@ my $log=shift;
 my $outdir=$indir.'/results';
 
 print "\n";
-my $nucmer="$bindir/runNUCmer.pl -q $indir -d $outdir -t $thread -l $list -c $code 2>$error > $log\n\n";
+my $nucmer="runNUCmer.pl -q $indir -d $outdir -t $thread -l $list -c $code 2>$error > $log\n\n";
 print $nucmer;
 if (system ($nucmer)){die "Error running $nucmer.\n";}
 }
@@ -397,7 +397,7 @@ my $log=shift;
 my $outdir=$indir.'/results';
 
 print "\n";
-my $con_nucmer="$bindir/runContigNUCmer.pl -r $reference -q $indir -d $outdir -l $list -t $thread -y $type 2>>$error >> $log\n\n";
+my $con_nucmer="runContigNUCmer.pl -r $reference -q $indir -d $outdir -l $list -t $thread -y $type 2>>$error >> $log\n\n";
 print $con_nucmer;
 if (system ($con_nucmer)){die "Error running $con_nucmer.\n";}
 }
@@ -410,7 +410,7 @@ my $reference=shift;
 my $readgaps=shift;
 
 print "\n";
-my $remove="time $bindir/removeGaps.pl $reference $readgaps\n\n";
+my $remove="time removeGaps.pl $reference $readgaps\n\n";
 print $remove;
 if (system ($remove)){die "Error running $remove.\n";}
 }
@@ -431,7 +431,7 @@ my $type;
 
 if(!-e $reference){$indir.'/'.$name.'.fna';}
 print "\n";
-my $map="$bindir/runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a bowtie 2>>$error >> $log\n\n";
+my $map="runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a bowtie 2>>$error >> $log\n\n";
 print $map;
 if (system ($map)){die "Error running $map.\n";}
 
@@ -459,7 +459,7 @@ my $error=shift;
 my $log=shift;
 
 print "\n";
-my $SNPdb="$bindir/buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal 2>>$error >> $log\n\n";
+my $SNPdb="buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal 2>>$error >> $log\n\n";
 print $SNPdb;
 if (system ($SNPdb)){die "Error running $SNPdb.\n";}
 return ("SNP database complete");
@@ -494,13 +494,13 @@ my $log=shift;
 
 if ($tree==1||$tree==3){
    print "\n";
-   my $fasttree="$bindir/FastTree/FastTreeMP -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree >>$error\n\n";
+   my $fasttree="export OMP_NUM_THREADS=$thread; FastTreeMP -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error\n\n";
    print $fasttree;
    if (system ($fasttree)){die "Error running $fasttree.\n";}
 }
 if ($tree==2||$tree==3){
    print "\n";
-   my $raxml="$bindir/RAxMLmaster/raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -s $outdir/$name\_snp_alignment.fna -w $outdir -n $name 2>>$error >> $log\n\n";
+   my $raxml="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -s $outdir/$name\_snp_alignment.fna -w $outdir -n $name 2>>$error >> $log\n\n";
    print $raxml;
    if (system ($raxml)){die "Error running $raxml.\n";}
 }
@@ -525,25 +525,25 @@ my $error=shift;
 my $log=shift;
 
 if ($tree==1){
-   my $bootTrees="$bindir/RAxMLmaster/raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
+   my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
    print $bootTrees;
    if (system ($bootTrees)){die "Error running $bootTrees.\n";}
 
-   my $bestTree="$bindir/RAxMLmaster/raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
+   my $bestTree="raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
    print $bestTree;
    if (system ($bestTree)){die "Error running $bestTree.\n";}
 }
 
-if ($tree=>2){
-   my $bootTrees="$bindir/RAxMLmaster/raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
+if ($tree >1){
+   my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
    print $bootTrees;
    if (system ($bootTrees)){die "Error running $bootTrees.\n";}
-   my $bestTree="$bindir/RAxMLmaster/raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
+   my $bestTree="raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
    print $bestTree;
    if (system ($bestTree)){die "Error running $bestTree.\n";}
 
 }
-return ("Bootstrap complete");
+	return "Bootstrap complete";
 }
 
 sub extractGenes
@@ -561,7 +561,7 @@ my $log=shift;
 my $genedir=$dir.'/PSgenes';
 
 print "\n";
-my $extract="$bindir/extractGenes.pl -d $dir -t $thread -l $list -s $stat -f $file -p $gapfile -g $genefile 2>>$error >> $log\n\n";
+my $extract="extractGenes.pl -d $dir -t $thread -l $list -s $stat -f $file -p $gapfile -g $genefile 2>>$error >> $log\n\n";
 print $extract;
 if (system ($extract)){die "Error running $extract.\n";}
 
@@ -598,7 +598,7 @@ my $log=shift;
 my $genedir=$dir.'/PSgenes';
 
 print "\n";
-my $translate="$bindir/parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
+my $translate="parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
 print $translate;
 if (system ($translate)){die "Error running $translate.\n";}
 
@@ -616,7 +616,7 @@ my $log=shift;
 my $genedir=$dir.'/PSgenes';
 
 print "\n";
-my $align="$bindir/parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
+my $align="parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
 print $align;
 if (system ($align)){die "Error running $align.\n";}
 
@@ -634,7 +634,7 @@ my $error=shift;
 my $log=shift;
 my $genedir=$dir.'/PSgenes';
 
-my $revTrans="$bindir/parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
+my $revTrans="parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
 print $revTrans;
 if (system ($revTrans)){die "Error running $revTrans.\n";}
 
@@ -650,7 +650,7 @@ my $error=shift;
 my $log=shift;
 my $genedir=$dir.'/PSgenes';
 
-my $core="$bindir/catAlign.pl $genedir $output 2>>$error >> $log\n\n";
+my $core="catAlign.pl $genedir $output 2>>$error >> $log\n\n";
 print $core;
 if (system ($core)){die "Error running $core.\n";}
 
@@ -674,31 +674,31 @@ my $pamldir=$dir.'/paml';
 
 if ($model==0){
    print "\n";
-   my $ps="time $bindir/runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
+   my $ps="time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
    print $ps;
    if (system ($ps)){die "Error running $ps.\n";}
 
    `mv $pamldir/*/*$suffix $pamldir`;
    print "\n";
-   my $parse="time $bindir/parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
+   my $parse="time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
    print $parse;
    if (system($parse)){die "Error running $parse. \n";}
 }
 
 if ($model==2){
    print "\n";
-   my $edit="time $bindir/ParseTree.pl $tree 2>>$error >> $log\n\n";
+   my $edit="time ParseTree.pl $tree 2>>$error >> $log\n\n";
    print $edit;
    if (system ($edit)){die "Error running $edit.\n";}
 
    print "\n";
-   my $ps="time $bindir/runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
+   my $ps="time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
    print $ps;
    if (system ($ps)){die "Error running $ps.\n";}
 
    `mv $pamldir/*/*$suffix $pamldir`;
    print "\n";
-   my $parse="time $bindir/parseSitePAML.pl $pamldir 0,1,2,7,8,$NSsites 2>>$error >> $log\n\n";
+   my $parse="time parseSitePAML.pl $pamldir 0,1,2,7,8,$NSsites 2>>$error >> $log\n\n";
    print $parse;
    if (system($parse)){die "Error running $parse. \n";}
 
@@ -719,7 +719,7 @@ my $log=shift;
 
 $threads=$threads/2;
 
-my $hyphy="$bindir/runHyPhy.pl -i $dir -t $threads -r $tree -o $outtree -c $core -a bsrel 2>>$error >> $log\n\n";
+my $hyphy="runHyPhy.pl -i $dir -t $threads -r $tree -o $outtree -c $core -a bsrel 2>>$error >> $log\n\n";
 print $hyphy;
 if (system($hyphy)){die "Error running $hyphy. \n";}
 }

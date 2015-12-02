@@ -12,10 +12,13 @@
 
 use strict;
 use warnings;
-use FindBin;
+use FindBin qw($RealBin);
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
+
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 my $breaklen=200;
 my $mincluster=65;
@@ -43,7 +46,7 @@ GetOptions(
 
 &usage() unless ($query_dir);
 
-my $max_thread=`grep -c ^processor /proc/cpuinfo`;
+my $max_thread=($^O =~ /darwin/)?  `sysctl hw.ncpu | awk '{print \$2}'`:`grep -c ^processor /proc/cpuinfo`;
 if ($thread < 1 || $thread>$max_thread){
    die("-thread value must be between 1 and $max_thread.\n");
 }
@@ -66,7 +69,6 @@ my $gaps;
 my $ref_gaps;
 my $query_gaps;
 
-my $bindir= getBinDirectory();
 #$ENV{PATH}= "$bindir:/usr/local/bin:/usr/bin:/bin:/opt/apps/bin";
 read_directory($query_dir);
 run_self_nucmer(@query);
@@ -118,9 +120,9 @@ foreach my $reference(@query){
    my $stat=$outdir.'/'.$name.'_repeat_stats.txt';
    my $fasta=$outdir.'/'.$name.'_norepeats.fna';
    
-   my $command= "$bindir/get_repeat_coords.pl -l $len_cutoff -i $repeat_identity -o $coords -s $stat $reference";
+   my $command= "get_repeat_coords.pl -l $len_cutoff -i $repeat_identity -o $coords -s $stat $reference";
    if (system ($command)){die "Error running $command.\n";}
-   my $remove_repeats="$bindir/removeRepeats.pl -f $reference -c $coords -o $fasta";
+   my $remove_repeats="removeRepeats.pl -f $reference -c $coords -o $fasta";
    if (system ($remove_repeats)){die "Error running $remove_repeats.\n";}
    $pm->finish(0);
 }
@@ -153,51 +155,51 @@ while (my @combo= $iteration->()){
    my $second_fasta=$outdir.'/'.$second_name.'_norepeats.fna';
 
    print "Running nucmer on $prefix1\n";
-   my $nucmer_command1= "$bindir/MUMmer3.23/nucmer $options -p $prefix1 $first_fasta $second_fasta";
+   my $nucmer_command1= "nucmer $options -p $prefix1 $first_fasta $second_fasta  2>/dev/null";
    if (system ($nucmer_command1)){die "Error running nucmer_command1 $nucmer_command1.\n";}
 
-   my $filter_command1= "$bindir/MUMmer3.23/delta-filter -1 $identity $outdir/$prefix1.delta > $outdir/$prefix1.snpfilter";
+   my $filter_command1= "delta-filter -1 $identity $outdir/$prefix1.delta > $outdir/$prefix1.snpfilter";
    if (system ($filter_command1)){die "Error running filter_command1 $filter_command1.\n";}
 
-   my $snp_command1= "$bindir/MUMmer3.23/show-snps -CT $outdir/$prefix1.snpfilter > $outdir/$prefix1.snps";
+   my $snp_command1= "show-snps -CT $outdir/$prefix1.snpfilter > $outdir/$prefix1.snps";
    if (system ($snp_command1)){die "Error running snp_command1 $snp_command1.\n";}
-   $snp_indel= `$bindir/SNP_INDEL_count.pl $outdir/$prefix1.snps`;
+   $snp_indel= `SNP_INDEL_count.pl $outdir/$prefix1.snps`;
    $snp_indel=~ s/\n//;
    ($snp_n,$indel_n)= split /\t/,$snp_indel;    
    
-   my $filter_command2= "$bindir/MUMmer3.23/delta-filter -1 $identity $outdir/$prefix1.delta > $outdir/$prefix1.gapfilter";
+   my $filter_command2= "delta-filter -1 $identity $outdir/$prefix1.delta > $outdir/$prefix1.gapfilter";
    if (system ($filter_command2)){die "Error running filter_command2 $filter_command2.\n";}
 
-   my $coords_command1= "$bindir/MUMmer3.23/show-coords -clTr $outdir/$prefix1.gapfilter > $outdir/$prefix1.coords";
+   my $coords_command1= "show-coords -clTr $outdir/$prefix1.gapfilter > $outdir/$prefix1.coords";
    if (system ($coords_command1)){die "Error running coords_command1 $coords_command1.\n";}
-   my $gaps1= `$bindir/parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix1.coords 2>/dev/null`;
+   my $gaps1= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix1.coords 2>/dev/null`;
    ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps1;
 
    print "Running nucmer on $prefix2\n";
-   my $nucmer_command2= "$bindir/MUMmer3.23/nucmer $options -p $prefix2 $second_fasta $first_fasta";
+   my $nucmer_command2= "nucmer $options -p $prefix2 $second_fasta $first_fasta  2>/dev/null";
    if (system ($nucmer_command2)){die "Error running nucmer_command2 $nucmer_command2.\n";}
 
-   my $filter_command3= "$bindir/MUMmer3.23/delta-filter -1 $identity $outdir/$prefix2.delta > $outdir/$prefix2.snpfilter";
+   my $filter_command3= "delta-filter -1 $identity $outdir/$prefix2.delta > $outdir/$prefix2.snpfilter";
    if (system ($filter_command3)){die "Error running filter_command3 $filter_command3.\n";}
 
-   my $snp_command2= "$bindir/MUMmer3.23/show-snps -CT $outdir/$prefix2.snpfilter > $outdir/$prefix2.snps";
+   my $snp_command2= "show-snps -CT $outdir/$prefix2.snpfilter > $outdir/$prefix2.snps";
    if (system ($snp_command2)){die "Error running snp_command2 $snp_command2.\n";}
-   $snp_indel= `$bindir/SNP_INDEL_count.pl $outdir/$prefix2.snps`;
+   $snp_indel= `SNP_INDEL_count.pl $outdir/$prefix2.snps`;
    $snp_indel=~ s/\n//;
    ($snp_n,$indel_n)= split /\t/,$snp_indel;    
 
-   my $filter_command4= "$bindir/MUMmer3.23/delta-filter $identity $outdir/$prefix2.delta > $outdir/$prefix2.gapfilter";
+   my $filter_command4= "delta-filter $identity $outdir/$prefix2.delta > $outdir/$prefix2.gapfilter";
    if (system ($filter_command4)){die "Error running filter_command4 $filter_command4.\n";}
 
-   my $coords_command2= "$bindir/MUMmer3.23/show-coords -clTr $outdir/$prefix2.gapfilter > $outdir/$prefix2.coords";
+   my $coords_command2= "show-coords -clTr $outdir/$prefix2.gapfilter > $outdir/$prefix2.coords";
    if (system ($coords_command2)){die "Error running coords_command2 $coords_command2.\n";}
    
-   my $gaps2= `$bindir/parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix2.coords 2>/dev/null`;
+   my $gaps2= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix2.coords 2>/dev/null`;
 
-   my $check= `$bindir/checkNUCmer.pl -i $outdir/$first_name\_$second_name.gaps -r $reference`;
+   my $check= `checkNUCmer.pl -i $outdir/$first_name\_$second_name.gaps -r $reference`;
    if ($check==1){print "$second_name aligned < 25% of the $first_name genome\n";}
 
-   $check= `$bindir/checkNUCmer.pl -i $outdir/$second_name\_$first_name.gaps -r $query`;
+   $check= `checkNUCmer.pl -i $outdir/$second_name\_$first_name.gaps -r $query`;
    if ($check==1){print "$first_name aligned < 25% of the $second_name genome\n";}
 
    ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps2;
@@ -248,13 +250,6 @@ if (-e "$outdir/*.ntref"){unlink "$outdir/*.ntref"};
 `mv $outdir/*_coords.txt $outdir/stats`;
 `mv $outdir/*.coords $outdir/stats`;
 `mv $outdir/*norepeats.fna $outdir/temp`;
-}
-
-sub getBinDirectory
-{
-my @t = split '/', "$FindBin::RealBin";
-my $path = join '/', @t;
-return ($path);
 }
 
 sub usage
