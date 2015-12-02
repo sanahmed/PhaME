@@ -188,13 +188,13 @@ my $gapdir=$dir.'/gaps';
 my $repeatdir=$dir.'/stats';
 my %query;
 my $line=0;
-my $gapfile;
+my $all_gapfile;
 my $gap_start;
 my $gap_end;
 
-if ($type=~/map/){$gapfile="$dir\/$project\_mapping_gaps.txt";}
-elsif ($type=~/snp/){$gapfile="$dir\/$project\_all_gaps.txt";}
-open (GAP,">$gapfile")||die "$!";
+if ($type=~/map/){$all_gapfile="$dir\/$project\_mapping_gaps.txt";}
+elsif ($type=~/snp/){$all_gapfile="$dir\/$project\_all_gaps.txt";}
+open (GAP,">$all_gapfile")||die "$!";
 
 open (LIST,"$list")||die "$!";
 while (<LIST>){
@@ -223,10 +223,10 @@ while (my $gaps= readdir(DIR)){
          my $query=$1;
          my $tmp= $query.'_read';
          if (exists $query{$tmp}){
-            $line=0;
             my $gap_file= "$gapdir/$gaps";
+            $line=0;
             open (IN,$gap_file)|| die "$!";
-#         print "Read Mapping Gaps\n";
+        # print "Read Mapping Gaps $gaps\n";
             while (<IN>){
                chomp;
                $line++;
@@ -243,7 +243,7 @@ while (my $gaps= readdir(DIR)){
                print GAP "$name\t$gap_start\t$gap_end\t$length\tREADS_$query\n";
             }
             close IN;
-            if ($line == 1){`rm $gapfile`; $line=0;}
+            if ($line == 1){`rm $gap_file`; $line=0;}
          }
       }
    }
@@ -269,7 +269,7 @@ while (my $repeats= readdir(REPEAT)){
 #   last OUTER;
 }
 closedir REPEAT;
-return $gapfile;
+return $all_gapfile;
 }
 
 # Identify CDS coords 
