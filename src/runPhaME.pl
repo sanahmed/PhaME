@@ -361,7 +361,7 @@ if ($read_mapping==1){
 if ($buildSNP==1){
    if ($gsignal==1){
       &print_timeInterval($runtime,"Preparing to identify SNPs\n");
-      print "\tGenBank file provided, SNPs will be differentiated as coding vs noncoding\n";
+      print "\tGFF annotation file provided, SNPs will be differentiated as coding vs noncoding\n";
       my ($genname,$genpath,$gensuffix)=fileparse("$annotation",qr/\.[^.]*/);
       PhaME::codingRegions($outdir,$annotation,$genname);
    }
