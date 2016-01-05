@@ -4,17 +4,17 @@ use strict;
 use FindBin qw($Bin);
 use lib "$Bin";
 use File::Basename;
-use PhaME;
+use SNPphy;
 
 $|=1;
 
 =head
 
 DESCRIPTION
-   runPhaME.pl is a wrapper to run the PhaME analysis pipeline 
+   runSNPphylogeny.pl is a wrapper to run the PhaME analysis pipeline 
 
 USAGE
-   Control file "phame.ctl" needs to be copied and editted in the working director. 
+   Control file "SNPphy.ctl" needs to be copied and editted in the working director. 
    This wrapper runs the PhaME pipeline based on the settings of the control file. 
 
 REQUIREMENTS
@@ -74,7 +74,7 @@ my %read_list;
 my $mappingGaps;
 my $ptree;
 
-my $control= "phame.ctl";
+my $control= "SNPphy.ctl";
 my $bindir=getBinDirectory();
 
 ## Read in control file 
@@ -93,15 +93,15 @@ while (<CTL>){
    if (/project\s*=\s*(\S+)\s*#{0,1}.*$/){$project=$1;}
    if (/reference\s*=\s*(0|1)\s*#{0,1}.*$/){$rsignal=$1;}
    if ($rsignal==1 && /reffile\s*=\s*(\S+)\s*#{0,1}.*$/){$specie=$1;}
-   elsif($rsignal==0){
-      opendir(DIR, $refdir);
-      while (my $files= readdir(DIR)){
-         if ($files=~ /.[fna|fa|fasta|fsa]$/){$specie=$files;
-            last;
-         }
-      }
-      closedir DIR;
-   }
+#   elsif($rsignal==0){
+#      opendir(DIR, $refdir);
+#      while (my $files= readdir(DIR)){
+#         if ($files=~ /.[fna|fa|fasta|fsa]$/){$specie=$files;
+#            last;
+#         }
+#      }
+#      closedir DIR;
+#   }
    if (/cdsSNPS\s*=\s*(0|1)\s*#{0,1}.*$/){$gsignal=$1;}
 #     0=No; 1=Yes    
    if (/FirstTime\s*=\s*(1|2)\s*#{0,1}.*$/){$time=$1;}
@@ -133,7 +133,19 @@ while (<CTL>){
 close CTL;
 
 ($name,$path,$suffix)=fileparse("$specie",qr/\.[^.]*/);
-my $reference=$workdir.'/files/'.$name.'.fna';
+my $reference=$workdir.'/files/'.$name.$suffix;
+if (!-e $reference || $rsignal==0){
+   opendir(DIR, $refdir);
+   while (my $files= readdir(DIR)){
+      if ($files=~ /.(fna|fa|fasta|fsa)$/){
+         $reference="$refdir/$files";
+         last;
+      }
+   }
+   closedir DIR;
+}
+
+($name,$path,$suffix)=fileparse("$reference",qr/\.[^.]*/);
 if ($gsignal==1){$annotation="$refdir/$name.gff";}
 if ($pselection>0){$genefile="$refdir/$name.ffn";}
 
@@ -149,14 +161,14 @@ if (!-d $refdir || !-d $workdir || !-d $outdir){
 }
 
 print "\tReference:\t$reference\n";
-if (!-e "$refdir/$specie"){print "File $specie does not exist.\nPlease provide correct reference\n";}
+if (!-e "$reference"){print "File $reference does not exist.\nPlease provide correct reference\n";}
 if ($gsignal==1){
    print "\tAnnotation:\t$annotation\n";
-   if (-e $reference && !-e $annotation){print "File $name.gff.\nPlease provide correct annotation file\n";}
+   if (!-e $annotation){print "File $annotation does not exist.\nPlease provide correct annotation file\n";}
 }
 if ($pselection>0){
    print "\tGenes:\t$genefile\n";
-   if (-e $reference && !-e $genefile){print "File $name.ffn.\nPlease provide correct functional protein file\n";}
+   if (-e $reference && !-e $genefile){print "File $genefile does not exist.\nPlease provide correct functional protein file\n";}
 }
 
 print "\tCode:\t$type\n";
@@ -164,7 +176,7 @@ print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 
 &print_timeInterval($runtime,"\tChecking directories and files... ");
-my $check=SNPphy::check($workdir,$refdir,$time,$data,$name,$logfile);
+my $check=SNPphy::check($workdir,$refdir,$time,$data,$name,$logfile,$project);
 if ($data==7){$check=0;}
 #print "\nCHECK:\t$check\n";
 my $snpdir=$outdir.'/snps';
@@ -454,4 +466,3 @@ $now=time - $now;
 my $string=sprintf "%02d:%02d:%02d", int($now / 3600), int(($now % 3600) / 60), int($now % 60);
 print "[$string]  $msg";
 }
-
