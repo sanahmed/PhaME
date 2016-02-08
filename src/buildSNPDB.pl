@@ -25,6 +25,7 @@ my $reffile;
 my $refheader;
 my $coding=0;
 my $project;
+my $cutoff=0;
 my $allSNPoutfile;
 my $SNPstats;
 my $SNPcomps;
@@ -71,6 +72,7 @@ GetOptions(
    'l=s'      => \$refheader,
    'c=s'      => \$coding,
    'p=s'      => \$project,
+   't=i'      => \$cutoff,
    'help|h'   => sub{usage()},
 );
 
@@ -133,6 +135,7 @@ print_summary();
 read_directory($indir);
 
 print "Creating SNP alignment.\n";
+if ($cutoff>0){apply_cutoff();}
 create_ALLsnp_array();
 if ($coding==1){
    create_CDSsnp_array();
@@ -170,7 +173,7 @@ if ($fh->open("< $reffile")){
       unless($_){next;};
       ($header,@seq)=split /\n/,$_;
       $ref_sequence= join "",@seq;
-      #print length $ref_sequence,"\n";
+#      print length $ref_sequence,"\n";
       $reference= $header;
    }
    $/="\n";
@@ -237,6 +240,26 @@ while (my $files= readdir(DIR)){
       read_vcf_snp($snp_file);
    }
 }
+}
+
+sub apply_cutoff
+{
+my $previous=0;
+my %cutoff_positions;
+
+foreach (sort {$a<=>$b}keys %snp_location){$previous=$_;last;}
+foreach (sort {$a<=>$b}keys %snp_location){
+   my $difference=$_-$previous;
+   if ($difference<=$cutoff && $difference!=0){
+      $cutoff_positions{$_}++;
+      $cutoff_positions{$previous}++;
+      $gap_location{$_}++;
+      $gap_location{$previous}++;
+   }
+   $previous=$_;
+}
+
+print BASE "SNPs excluded due to cutoff:\t",scalar keys %cutoff_positions,"\n";
 }
 
 sub create_ALLsnp_array
@@ -338,8 +361,6 @@ my $ref=0;
 my $current_snp=0;
 my $first=0;
 my $second=0;
-my $start=0;
-my $end=0;
 
 foreach my $comparison(@header_list){
   if ($comparison=~/(.+):(.+)/){($first,$second)=($1,$2);}
@@ -355,7 +376,7 @@ foreach my $comparison(@header_list){
                elsif (defined $coding_location{$_}){
                   my $snp=$_;
                   my ($start,$end,$product)= split /,/, $coding_location{$_};
-                 # print "$start\t$end\n";
+#                  print "$start\t$end\n";
                   print STAT "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\n";
                }
             }
@@ -406,14 +427,14 @@ print CDSMAT "\n";
 print IMAT "\n";
 
 foreach my $column(@headers){
-   #print "$column\n";
+#   print "$column\n";
    if ($column!~/contig/ && $column!~/read/){
       print PMAT "$column\t";
       print CMAT "$column\t";
       print CDSMAT "$column\t";
       print IMAT "$column\t";
       foreach my $row(@headers){
-         #print "$column:$row\n";
+#         print "$column:$row\n";
          if ($column eq $row){
             print PMAT "\t";
             print CMAT "\t";
@@ -475,7 +496,7 @@ while(<$fh>){
 
    if ($ssuffix =~ /vcf/){
       my $depth=0;
-      if (/^#CHROM.+\/$reference\_(\S+)\.sort\.bam/){$query_id=$1.'_read';}
+      if (/^#CHROM.+\/$reference\_(\S+)\.sort\.bam/){$query_id=$1.'_read';} # changed pread to read
       if ($_ !~ /^#/){
          ($ref_id,$ref_pos,$tmp,$ref_base,$snp,$snp_quality,$tmp,$vcf_info,$vcf_info2,$tmp)=split /\t/,$_;
          my @values=split /;/,$vcf_info2;
@@ -594,7 +615,7 @@ my $depth=15;
 open (IN,"$snp_file")||die "$!";
 while (<IN>){
    chomp;
-   if (/^#CHROM.+\/\S+\/$reference\_(\S+)\.sort\.bam/){$query=$1.'_read';}
+   if (/^#CHROM.+\/\S+\/$reference\_(\S+)\.sort\.bam/){$query=$1.'_read';} # from pread to read
    if (!/^\#/){
       ($ref,$rpos,$id,$rbase,$qbase,$qual,$filter,$info1,$info2,$tmp)= split ("\t",$_);
 #      print "$ref\t$rpos\t$rbase\t$qbase\t$info1\t$info2\t$tmp\n";
@@ -613,7 +634,7 @@ while (<IN>){
             print AMB "$reference\t$query\t$qbase\t$temp\t$rpos\n";
          }
          else{$snp_location{$rpos}{"$reference:$query"}= $qbase;$count++;}
-         $positions{$rpos}{"$ref:$query"}='read';
+         $positions{$rpos}{"$ref:$query"}='read'; # from pread to read
       }
    }
 }
@@ -627,9 +648,8 @@ while (<CDS>){
    chomp;
    my ($id,$start,$end,$product)= split /\s+/,$_;
    for ($start..$end){$coding_location{$_}="$start,$end,$product";}
-  # if ($snp>=$start && $snp<=$end){return ($start,$end);}
+#   if ($snp>=$start && $snp<=$end){return ($start,$end);}
 }
-#return ($start,$end);
 }
 
 sub usage
