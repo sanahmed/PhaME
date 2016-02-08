@@ -26,14 +26,13 @@ my $alignment=0;
 my %refcheck;
 
 if ($time==1){
-
    my @overwrite=glob("$wdir/RAxML_*.$project\_all");
    @overwrite=glob("$wdir/RAxML_*.$project\_cds");
    if (scalar @overwrite >0){
       print "*WARNING* RAxML trees with the name $project already exist. They will be overwritten.\n";
       foreach (@overwrite){`rm $_`;}
    }
-   
+
    if (-e $log && !-z $log){
       open (LOG,"$log")||die "$!";
       while (<LOG>){
@@ -226,7 +225,7 @@ while (my $gaps= readdir(DIR)){
             my $gap_file= "$gapdir/$gaps";
             $line=0;
             open (IN,$gap_file)|| die "$!";
-        # print "Read Mapping Gaps $gaps\n";
+#         print "Read Mapping Gaps\n";
             while (<IN>){
                chomp;
                $line++;
@@ -347,10 +346,10 @@ foreach my $begin (sort{$a<=>$b} keys %CDS){
    $prev=$end+2;
    $last=$end;
 }
-   if ($last < $source_end){
-      $gap_start = $last+1;
-      print OUT "$name\t$gap_start\t$source_end\tnoncoding\n";
-   }
+if ($last < $source_end){
+   $gap_start = $last+1;
+   print OUT "$name\t$gap_start\t$source_end\tnoncoding\n";
+}
 }
 
 sub clean
@@ -420,20 +419,25 @@ sub readsMapping
 {
 my $indir=shift;
 my $bindir=shift;
-my $list=shift;
 my $thread=shift;
 my $name=shift;
 my $error=shift;
 my $log=shift;
 my $outdir=$indir."/results";
 my $reference= $outdir.'/temp/'.$name.'.fna';
+my $readslist="$indir/reads_list.txt";
+my $worklist="$indir/working_list.txt";
 my $type;
 
 if(!-e $reference){$indir.'/'.$name.'.fna';}
 print "\n";
-my $map="runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a bowtie 2>>$error >> $log\n\n";
+my $map="runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $readslist -a bowtie 2>>$error >> $log\n\n";
 print $map;
 if (system ($map)){die "Error running $map.\n";}
+
+my $exclude="removeReadSets.pl -i $outdir -r $reference -l $worklist\n\n";
+print $exclude;
+if (system ($exclude)){die "Error running $exclude.\n";}
 
 opendir (CLEAN, "$outdir");
 while (my $file= readdir(CLEAN)){
@@ -455,11 +459,12 @@ my $reference=shift;
 my $list=shift;
 my $project=shift;
 my $signal=shift;
+my $cutoff=shift;
 my $error=shift;
 my $log=shift;
 
 print "\n";
-my $SNPdb="buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal 2>>$error >> $log\n\n";
+my $SNPdb="buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal -t $cutoff 2>>$error >> $log\n\n";
 print $SNPdb;
 if (system ($SNPdb)){die "Error running $SNPdb.\n";}
 return ("SNP database complete");
@@ -494,7 +499,7 @@ my $log=shift;
 
 if ($tree==1||$tree==3){
    print "\n";
-   my $fasttree="export OMP_NUM_THREADS=$thread; FastTreeMP -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error\n\n";
+   my $fasttree="export OMP_NUM_THREADS=$thread; FastTreeMP -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree \n\n";
    print $fasttree;
    if (system ($fasttree)){die "Error running $fasttree.\n";}
 }
@@ -534,7 +539,7 @@ if ($tree==1){
    if (system ($bestTree)){die "Error running $bestTree.\n";}
 }
 
-if ($tree >1){
+if ($tree>1){
    my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
    print $bootTrees;
    if (system ($bootTrees)){die "Error running $bootTrees.\n";}
@@ -543,7 +548,7 @@ if ($tree >1){
    if (system ($bestTree)){die "Error running $bestTree.\n";}
 
 }
-	return "Bootstrap complete";
+return "Bootstrap complete";
 }
 
 sub extractGenes
