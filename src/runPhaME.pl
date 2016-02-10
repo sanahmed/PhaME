@@ -131,8 +131,8 @@ while (<CTL>){
 close CTL;
 
 ($name,$path,$suffix)=fileparse("$specie",qr/\.[^.]*/);
-my $reference=$workdir.'/files/'.$name.$suffix;
-if (!-e $reference || $rsignal==0){
+my $reference=$workdir.'/files/'.$name.'.fna';
+if ($rsignal==0){
    opendir(DIR, $refdir);
    while (my $files= readdir(DIR)){
       if ($files=~ /.(fna|fa|fasta|fsa)$/){
@@ -142,7 +142,7 @@ if (!-e $reference || $rsignal==0){
    }
    closedir DIR;
 }
-else {print "File $reference does not exist.\nPlease provide correct reference\n";}
+#else {print "File $reference does not exist.\nPlease provide correct reference\n";}
 
 ($name,$path,$suffix)=fileparse("$reference",qr/\.[^.]*/);
 if ($gsignal==1){$annotation="$refdir/$name.gff";}
