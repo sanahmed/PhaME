@@ -9,7 +9,7 @@ my $dir;
 my $stat;
 my $file;
 my $list;
-my $thread;
+my $threads;
 my %sequence;
 my $seq;
 my $header;
@@ -36,7 +36,7 @@ GetOptions(
    's|stat=s'     => \$stat,
    'f|file=s'     => \$file,
    'l|list=s'     => \$list,
-   't|thread=i'   => \$thread,
+   't|thread=i'   => \$threads,
    'g|gene=s'     => \$genefile,
    'p|gap=s'      => \$gapfile,
 );
@@ -47,7 +47,7 @@ if ($threads <1 || $threads>$maxthreads){die ("-thread value must be between 1 a
 my $genedir=$dir.'/PSgenes';
 if (!-d $genedir){`mkdir $genedir`;}
 
-my $pm=new Parallel::ForkManager($thread);
+my $pm=new Parallel::ForkManager($threads);
 $pm->run_on_finish (sub{my ($pid,$ident)=@_;});
 
 open (IN,$gapfile)|| die "$!";
