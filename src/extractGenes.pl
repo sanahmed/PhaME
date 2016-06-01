@@ -1,6 +1,10 @@
 #!/usr/bin/perl -w
 
 use strict;
+use FindBin qw($RealBin);
+use lib "$RealBin";
+use lib "$RealBin/../lib/";
+use lib "$RealBin/../ext/lib/perl5";
 use FileHandle;
 use Getopt::Long;
 use Parallel::ForkManager;
@@ -9,19 +13,18 @@ my $dir;
 my $stat;
 my $file;
 my $list;
-my $threads;
-my %sequence;
+my $threads=1;
 my $seq;
 my $header;
 my @strings;
 my $count=0;
 my ($refid,$queryid,$rpos,$qpos,$snp,$start,$end);
 my %coords;
+my %genes;
 my $fragment;
 my @header_list;
 my ($first,$second);
-my $genefile;
-my $first_line=1;
+my $gff_file;
 my $outfile;
 my @indexArray;
 my %reference;
@@ -37,7 +40,7 @@ GetOptions(
    'f|file=s'     => \$file,
    'l|list=s'     => \$list,
    't|thread=i'   => \$threads,
-   'g|gene=s'     => \$genefile,
+   'g|gene=s'     => \$gff_file,
    'p|gap=s'      => \$gapfile,
 );
 
@@ -75,19 +78,32 @@ if ($fh->open("< $file")){
    $fh->close;
 }
 
-my $fh1=FileHandle->new($genefile)|| die "$!";
-if ($fh1->open("< $genefile")){
-   $/=">";
-   while (<$fh1>){
-      $_=~ s/\>//g;
-      unless ($_){next;};
-      ($header,@strings)=split /\n/,$_;
-      $seq=join "",@strings;
-      $sequence{$header}=$seq;
-#      print "$header\n$seq\n";
-   }
-   $/="\n";
-   $fh1->close;
+my $fh1=FileHandle->new($gff_file)|| die "$!";
+if ($fh1->open("< $gff_file")){
+	while (<$fh1>){
+		chomp;
+		next if (/^#/);
+		my @array = split /\t/,$_;
+		if ( scalar(@array) ==  9 ){
+			#$id,$source,$type,$start,$end,$score,$strand,$phase,$Attributes
+			my $chromosome_id = $array[0];
+			my $type=$array[2];
+			my $start=$array[3];
+			my $end = $array[4];
+			my $strand = ($array[6] eq '+')? 1 : -1;
+			my $Attributes = $array[8];
+			if ($type eq "CDS"){
+				my %annotations=map { split /=/;} split /;/,$Attributes;
+				my $gene_id =  $annotations{"ID"} ||  $annotations{"Name"};
+				$genes{$chromosome_id}->{$gene_id}->{start} = $start;		
+				$genes{$chromosome_id}->{$gene_id}->{end} = $end;		
+				$genes{$chromosome_id}->{$gene_id}->{strand} = $strand;		
+			}	
+		}
+		
+		
+	}
+   	$fh1->close;
 }
 
 open (LIST,"$list")||die "$!";
@@ -99,21 +115,18 @@ while (<LIST>){
 close LIST;
 
 open (IN,"$stat")||die "$!";
+my $stat_header = <IN>;
 while (<IN>){
-   chomp;
-   if ($first_line){$first_line=0;}
-   else{
-      if (/^(\S+)\s+(\S+)\s+coding SNP\s+(\d+)\s+(\d+)\s+.+\s+(\S)\s+(\d+)\s+(\d+)$/){
-         ($refid,$queryid,$rpos,$qpos,$snp,$start,$end)=($1,$2,$3,$4,$5,$6,$7);
-#         print "$refid, $queryid, $rpos, $qpos, $snp, $start, $end\n";
-         if ($start==0){$start=1;}
-         if (abs $start-$end> 300){
-#            print "$start\t$end\n";
-            $coords{$start}=$end;
-            $alternative{$rpos}{"$refid:$queryid"}=$snp;
-         }
-      }
-   }
+	chomp;
+	my ($refid,$queryid,$type,$rpos,$qpos,$rbase,$qbase,$start,$end) = split /\t/,$_;
+	if ($type eq "coding SNP"){
+		if ($start==0){$start=1;}
+		if (abs $start-$end> 300){
+  	         #print "$start\t$end\n";
+			$coords{$start}=$end;
+			$alternative{$rpos}{"$refid:$queryid"}=$qbase;
+		}
+	}
 }
 close IN;
 
@@ -156,21 +169,23 @@ OUTER:foreach my $start(sort{$a<=>$b}keys %coords ){
 #   print "$index\n";
    push (@indexArray,"$index\t$start\t$end");
    $pm->start and next;
-   open (OUT,">$outfile")||die "$!";
+   open (my $fh,">$outfile")||die "$!";
 #   print "$start\t$end\n";
 
    foreach my $comparison(@header_list){
       if ($comparison=~/(.+):(.+)/){
          ($first,$second)=($1,$2);
-         print OUT ">$second\n";
+         print $fh ">$second\n";
 #          print "$comparison\t$first\n";
       }
 
-      for my $entry(keys %sequence){
-         my $gene=$sequence{$entry};
+      for my $entry (keys %{$genes{$name}}){
+	
+         if ($genes{$name}->{$entry}->{start} == $start and $genes{$name}->{$entry}->{end} == $end){
+            my $gene_len = $genes{$name}->{$entry}->{end} - $genes{$name}->{$entry}->{start} + 1;
+            my $gene=substr($reference{$name},$genes{$name}->{$entry}->{start}-1,$gene_len);
 #         print "$entry\n";
-         if ($entry=~ /.+\_$start\_$end\_(-?1)$/){
-            my $strand=$1;
+            my $strand=$genes{$name}->{$entry}->{strand};
             if ($strand<0){
                $compliment=reverse($gene);
                $compliment =~ tr/ACGTacgt/TGCAtgca/;
@@ -191,12 +206,12 @@ OUTER:foreach my $start(sort{$a<=>$b}keys %coords ){
                $compliment =~ tr/ACGTacgt/TGCAtgca/;
                $gene=$compliment;
             }
-            print OUT "$gene\n";
+            print $fh "$gene\n";
 #            print "$gene\n";
          }
       }
    }
-   close OUT;
+   close $fh;
    $pm->finish;
 }
 $pm->wait_all_children;

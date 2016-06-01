@@ -146,7 +146,7 @@ if ($rsignal==0){
 
 ($name,$path,$suffix)=fileparse("$reference",qr/\.[^.]*/);
 if ($gsignal==1){$annotation="$refdir/$name.gff";}
-if ($pselection>0){$genefile="$refdir/$name.ffn";}
+if ($pselection>0){$genefile="$refdir/$name.gff";}
 
 my $error="$outdir/$project.error";
 my $logfile="$outdir/$project\_PhaME.log";
