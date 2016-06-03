@@ -95,6 +95,7 @@ if ($fh1->open("< $gff_file")){
 			if ($type eq "CDS"){
 				my %annotations=map { split /=/;} split /;/,$Attributes;
 				my $gene_id =  $annotations{"ID"} ||  $annotations{"Name"};
+				$gene_id =~ s/\W/_/g;
 				$genes{"$start:$end"}->{id} = $gene_id;		
 				$genes{"$start:$end"}->{strand} = $strand;		
 			}	
@@ -168,6 +169,8 @@ OUTER:foreach my $coord (sort{ $coords{$a} <=> $coords{$b} }keys %coords ){
 #   print "$index\n";
    push (@indexArray,"$index\t$start\t$end");
    $pm->start and next;
+   my $gene_id=$genes{"$start:$end"}->{id};
+   $outfile = "$genedir/${gene_id}_${start}_${end}.fna";
    open (my $fh,">$outfile")||die "$!";
 #   print "$start\t$end\n";
 
