@@ -95,9 +95,8 @@ if ($fh1->open("< $gff_file")){
 			if ($type eq "CDS"){
 				my %annotations=map { split /=/;} split /;/,$Attributes;
 				my $gene_id =  $annotations{"ID"} ||  $annotations{"Name"};
-				$genes{$chromosome_id}->{$gene_id}->{start} = $start;		
-				$genes{$chromosome_id}->{$gene_id}->{end} = $end;		
-				$genes{$chromosome_id}->{$gene_id}->{strand} = $strand;		
+				$genes{"$start:$end"}->{id} = $gene_id;		
+				$genes{"$start:$end"}->{strand} = $strand;		
 			}	
 		}
 		
@@ -123,7 +122,7 @@ while (<IN>){
 		if ($start==0){$start=1;}
 		if (abs $start-$end> 300){
   	         #print "$start\t$end\n";
-			$coords{$start}=$end;
+			$coords{"$start:$end"}=$start;
 			$alternative{$rpos}{"$refid:$queryid"}=$qbase;
 		}
 	}
@@ -137,8 +136,8 @@ my $gapgenes=$dir.'/gene_gaps.txt';
 my $compliment;
 
 open (GAP,">$gapgenes")||die "$!";
-OUTER:foreach my $start(sort{$a<=>$b}keys %coords ){
-   my $end=$coords{$start};
+OUTER:foreach my $coord (sort{ $coords{$a} <=> $coords{$b} }keys %coords ){
+   my ($start,$end)= $coord =~ /(\d+):(\d+)/;
 
    foreach my $gap (keys %gaps){
       if ($gap>=$start && $gaps{$gap}<=$end){
@@ -179,18 +178,12 @@ OUTER:foreach my $start(sort{$a<=>$b}keys %coords ){
 #          print "$comparison\t$first\n";
       }
 
-      for my $entry (keys %{$genes{$name}}){
 	
-         if ($genes{$name}->{$entry}->{start} == $start and $genes{$name}->{$entry}->{end} == $end){
-            my $gene_len = $genes{$name}->{$entry}->{end} - $genes{$name}->{$entry}->{start} + 1;
-            my $gene=substr($reference{$name},$genes{$name}->{$entry}->{start}-1,$gene_len);
+      if ($genes{"$start:$end"}){
+            my $gene_len = $end - $start + 1;
+            my $gene=substr($reference{$name},$start-1,$gene_len);
 #         print "$entry\n";
-            my $strand=$genes{$name}->{$entry}->{strand};
-            if ($strand<0){
-               $compliment=reverse($gene);
-               $compliment =~ tr/ACGTacgt/TGCAtgca/;
-               $gene=$compliment;
-            }
+            my $strand=$genes{"$start:$end"}->{strand};
 #            print "$first\t$start\t$end\n";
             foreach my $position(sort {$a<=>$b}keys %alternative){
                if (defined $alternative{$position}{$comparison}){
@@ -208,7 +201,6 @@ OUTER:foreach my $start(sort{$a<=>$b}keys %coords ){
             }
             print $fh "$gene\n";
 #            print "$gene\n";
-         }
       }
    }
    close $fh;

@@ -12,6 +12,7 @@ $|=1;
 
 # set up environments
 $ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
+$ENV{PERL5LIB} = "$ENV{PERL5LIB}:$RealBin/../lib:$RealBin/../ext/lib/perl5";
 
 =head
 
@@ -392,7 +393,10 @@ if ($buildSNP==1){
 }
 
 if ($buildtree==1|| $bs==1){
-   if (($tree==2||$tree==3)&&($modeltest==1)){PhaME::modeltest($outdir,$project,$threads,$error,$logfile);}
+   if (($tree==2||$tree==3)&&($modeltest==1)){
+      my $jmodeltest_jar = "$RealBin/../ext/opt/jmodeltest-2.1.10/jModelTest.jar";
+      PhaME::modeltest($jmodeltest_jar,$outdir,$project,$threads,$error,$logfile);
+   }
    my $end=PhaME::buildTree($bindir,$outdir,$threads,$tree,"$project\_all",$error,$logfile);
    if ($gsignal==1){PhaME::buildTree($bindir,$outdir,$threads,$tree,"$project\_cds",$error,$logfile);}
    &print_timeInterval($runtime,"$end\n");
@@ -451,9 +455,11 @@ if ($ps==1){
       PhaME::paml($outdir,$bindir,$ptree,2,"BrSites",2,$core,$threads,$error,$logfile);
    }
    if ($pselection==2 || $pselection==3){
-      my $roottree=$outdir."/".$name."_cds_rooted.tree";
-      print "$roottree\n";
-      PhaME::hyphy($outdir,$bindir,$tbest,$roottree,$core,$threads,"bsrel",$error,$logfile);
+      my $rootedtree;
+      if ($tree==2||$tree==3){$rootedtree= "$outdir/RAxML_rootedTree.$project\_cds_r";}
+      if ($tree==1){$rootedtree="$outdir/$project\_rooted.fasttree";}
+      print "$rootedtree\n";
+      PhaME::hyphy($outdir,$bindir,$tbest,$rootedtree,$core,$threads,"bsrel",$error,$logfile);
    }
 }
 
