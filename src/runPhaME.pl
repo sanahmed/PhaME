@@ -457,7 +457,7 @@ if ($ps==1){
    if ($pselection==2 || $pselection==3){
       my $rootedtree;
       if ($tree==2||$tree==3){$rootedtree= "$outdir/RAxML_rootedTree.$project\_cds_r";}
-      if ($tree==1){$rootedtree="$outdir/$project\_rooted.fasttree";}
+      if ($tree==1){$rootedtree="$outdir/$project\_cds_rooted.fasttree";}
       print "$rootedtree\n";
       PhaME::hyphy($outdir,$bindir,$tbest,$rootedtree,$core,$threads,"bsrel",$error,$logfile);
    }
