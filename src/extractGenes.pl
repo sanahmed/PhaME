@@ -132,8 +132,8 @@ close IN;
 
 my $temp=keys %coords;
 my $size = length $temp;
-my $index_file=$dir.'/gene_index.txt';
-my $gapgenes=$dir.'/gene_gaps.txt';
+my $index_file=$genedir.'/gene_index.txt';
+my $gapgenes=$genedir.'/gene_gaps.txt';
 my $compliment;
 
 open (GAP,">$gapgenes")||die "$!";
@@ -162,15 +162,15 @@ OUTER:foreach my $coord (sort{ $coords{$a} <=> $coords{$b} }keys %coords ){
    }
 
    $count++;
-   $outfile=$genedir.'/Gene';
-   $outfile.=sprintf "%0${size}d", $count;
-   my $index=sprintf "%0${size}d", $count;
-   $outfile.='.fna';
-#   print "$index\n";
-   push (@indexArray,"$index\t$start\t$end");
-   $pm->start and next;
    my $gene_id=$genes{"$start:$end"}->{id};
    $outfile = "$genedir/${gene_id}_${start}_${end}.fna";
+   #$outfile=$genedir.'/Gene';
+   #$outfile.=sprintf "%0${size}d", $count;
+   my $index=sprintf "%0${size}d", $count;
+   #$outfile.='.fna';
+#   print "$index\n";
+   push (@indexArray,"$index\t$gene_id\t$start\t$end") if ($genes{"$start:$end"});
+   $pm->start and next;
    open (my $fh,">$outfile")||die "$!";
 #   print "$start\t$end\n";
 
