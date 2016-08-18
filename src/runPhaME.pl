@@ -314,6 +314,8 @@ if ($check==0){
    print "Complete\n";
 } # check=0
 
+$reference = "$workdir/files/$name.fna";
+
 if ($nucmer==1){
    open (FAS, ">$workdir/fasta_list.txt")||die "$!";
    open (CON, ">$workdir/contigs_list.txt")||die "$!";
