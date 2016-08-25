@@ -303,9 +303,9 @@ else
    echo "CMake >=3.0.0 not found. Trying to download from https://github.com/Kitware/CMake/archive/master.zip ..."
    mkdir -p ext/opt;
    mkdir -p ext/bin;
-   download_ext https://github.com/Kitware/CMake/archive/master.zip ext/opt/CMake.zip;
+   download_ext https://github.com/Kitware/CMake/archive/v3.6.0.zip ext/opt/CMake.zip;
    unzip ext/opt/CMake.zip -d ext/opt/;
-   cd ext/opt/CMake-master;
+   cd ext/opt/CMake-3.6.0;
    ./bootstrap --prefix=$rootdir/ext && make && make install
    cd $rootdir
 fi;
