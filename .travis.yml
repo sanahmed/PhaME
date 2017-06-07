@@ -1,8 +1,5 @@
 sudo: false
-language: python
-
-python:
-  - "2.7"
+language: perl
 
 perl:
   - "5.16"
@@ -24,13 +21,7 @@ before_install:
 
 
 install:
-  - pip install codecov
-  - pip install -r requirements.txt
-  - conda install --yes -c bioconda mummer
+  - ./INSTALL.sh
 
 script:
-  - nosetests --with-coverage && coverage report && coverage xml
-
-after_success:
-  - codecov
-
+  - perl src/runPhaME.pl test/phame.ctl
