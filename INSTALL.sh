@@ -12,7 +12,8 @@ exec 2>&1 # copies stderr onto stdout
 cd $ROOTDIR
 mkdir -p thirdParty
 cd thirdParty
-
+mkdir -p $ROOTDIR/bin
+export "PATH=$PATH:$ROOTDIR/bin/"
 # Minimum Required versions of dependencies
 # nucmer 3.1 is packaged in mummer 3.23
 bowtie2_VER=2.2.8
