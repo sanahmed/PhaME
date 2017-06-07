@@ -1,0 +1,36 @@
+sudo: false
+language: python
+
+python:
+  - "2.7"
+
+perl:
+  - "5.16"
+
+cache:
+  apt: true
+  directories:
+    - $HOME/miniconda
+
+before_install:
+  - wget https://repo.continuum.io/miniconda/Miniconda2-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -p $HOME/miniconda -f
+  - export PATH=$HOME/miniconda/bin:$PATH
+  - conda update --yes conda
+  - conda info -a
+  - conda install --yes -c bioconda perl-app-cpanminus=1.7039
+  - cpanm Parallel::ForkManager
+
+
+install:
+  - pip install codecov
+  - pip install -r requirements.txt
+  - conda install --yes -c bioconda mummer
+
+script:
+  - nosetests --with-coverage && coverage report && coverage xml
+
+after_success:
+  - codecov
+
