@@ -174,32 +174,32 @@ echo "--------------------------------------------------------------------------
 "
 }
 
-################################################################################
-#         Add path to bash, need this also here so cpanm could be in path
-################################################################################
-if [ -f $HOME/.bashrc ]
-then
-{
-  echo "#Added by PhaME pipeline installation" >> $HOME/.bashrc
-  echo "export PATH=$ROOTDIR/bin:$PATH" >> $HOME/.bashrc
-  source $HOME/.bashrc 
-  echo "
---------------------------------------------------------------------------------
-                           added path to .bashrc
---------------------------------------------------------------------------------
-"
-}
-else
-{
-  echo "#Added by PhaME pipeline installation" >> $HOME/.bash_profile
-  echo "export PATH=$ROOTDIR/bin:$PATH" >> $HOME/.bash_profile
-  source $HOME/.bash_profile 
-  echo "
---------------------------------------------------------------------------------
-                           added path to .bash_profile
---------------------------------------------------------------------------------
-"
-}
+# ################################################################################
+# #         Add path to bash, need this also here so cpanm could be in path
+# ################################################################################
+# if [ -f $HOME/.bashrc ]
+# then
+# {
+#   echo "#Added by PhaME pipeline installation" >> $HOME/.bashrc
+#   echo "export PATH=$ROOTDIR/bin:$PATH" >> $HOME/.bashrc
+#   source $HOME/.bashrc 
+#   echo "
+# --------------------------------------------------------------------------------
+#                            added path to .bashrc
+# --------------------------------------------------------------------------------
+# "
+# }
+# else
+# {
+#   echo "#Added by PhaME pipeline installation" >> $HOME/.bash_profile
+#   echo "export PATH=$ROOTDIR/bin:$PATH" >> $HOME/.bash_profile
+#   source $HOME/.bash_profile 
+#   echo "
+# --------------------------------------------------------------------------------
+#                            added path to .bash_profile
+# --------------------------------------------------------------------------------
+# "
+# }
 fi
 
 install_mummer()
