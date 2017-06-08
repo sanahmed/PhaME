@@ -289,6 +289,7 @@ echo "--------------------------------------------------------------------------
 "
 conda install --yes -c bioconda FastTree=$FastTree_VER -p $ROOTDIR/thirdParty/miniconda
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/FastTree $ROOTDIR/bin/FastTree
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/FastTreeMP $ROOTDIR/bin/FastTreeMP
 echo "
 --------------------------------------------------------------------------------
                            FastTree v2.1.9
