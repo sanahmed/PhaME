@@ -10,6 +10,10 @@
 
 ######################################################
 
+# set up environments
+$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
+$ENV{PERL5LIB} = "$RealBin:$RealBin/../ext/lib/perl5:$ENV{PERL5LIB}"; 
+
 use strict;
 use warnings;
 use FindBin qw($RealBin);
@@ -17,9 +21,6 @@ use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
 
-# set up environments
-$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
-$ENV{PERL5LIB} = "$RealBin:$RealBin/../ext/lib/perl5:$ENV{PERL5LIB}"; 
 my $breaklen=200;
 my $mincluster=65;
 my $diagfactor=0.12;
