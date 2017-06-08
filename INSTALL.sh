@@ -174,34 +174,6 @@ echo "--------------------------------------------------------------------------
 "
 }
 
-# ################################################################################
-# #         Add path to bash, need this also here so cpanm could be in path
-# ################################################################################
-# if [ -f $HOME/.bashrc ]
-# then
-# {
-#   echo "#Added by PhaME pipeline installation" >> $HOME/.bashrc
-#   echo "export PATH=$ROOTDIR/bin:$PATH" >> $HOME/.bashrc
-#   source $HOME/.bashrc 
-#   echo "
-# --------------------------------------------------------------------------------
-#                            added path to .bashrc
-# --------------------------------------------------------------------------------
-# "
-# }
-# else
-# {
-#   echo "#Added by PhaME pipeline installation" >> $HOME/.bash_profile
-#   echo "export PATH=$ROOTDIR/bin:$PATH" >> $HOME/.bash_profile
-#   source $HOME/.bash_profile 
-#   echo "
-# --------------------------------------------------------------------------------
-#                            added path to .bash_profile
-# --------------------------------------------------------------------------------
-# "
-# }
-# fi
-
 install_mummer()
 {
 echo "--------------------------------------------------------------------------
@@ -850,35 +822,6 @@ fi
 # done_message " Done." "";
 
 
-
-# ################################################################################
-# #                       Add path to bash
-# ################################################################################
-# if [ -f $HOME/.bashrc ]
-# then
-# {
-#   echo "#Added by PhaME pipeline installation" >> $HOME/.bashrc
-#   echo "export PATH=$ROOTDIR/thirdParty/miniconda/bin:$PATH" >> $HOME/.bashrc
-#   source $HOME/.bashrc 
-#   echo "
-# --------------------------------------------------------------------------------
-#                            added path to .bashrc
-# --------------------------------------------------------------------------------
-# "
-# }
-# else
-# {
-#   echo "#Added by PhaME pipeline installation" >> $HOME/.bash_profile
-#   echo "export PATH=$ROOTDIR/thirdParty/miniconda/bin:$PATH" >> $HOME/.bash_profile
-#   source $HOME/.bash_profile 
-#   echo "
-# --------------------------------------------------------------------------------
-#                            added path to .bash_profile
-# --------------------------------------------------------------------------------
-# "
-# }
-# fi
-
 echo "
 ================================================================================
                  PhaME installed successfully.
@@ -886,7 +829,9 @@ echo "
 Check phame.ctl for the control file
 
 Quick start:
-    bin/runPhaME.pl phame.ctl
+    perl src/runPhaME.pl test/phame.ctl
+    Please use the full path to specify the location of fasta file.
+    Read README.md for detail
 Check our github site for update:
     https://github.com/LANL-Bioinformatics/PhaME
 ";
