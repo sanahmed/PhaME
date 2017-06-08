@@ -1,4 +1,4 @@
-#!/usr/bin/perl 
+#!/usr/bin/env perl 
 ################################################################
 # Written by Sanaa Ahmed
 # Jan. 03, 2013
