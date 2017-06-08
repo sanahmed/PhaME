@@ -305,6 +305,7 @@ echo "--------------------------------------------------------------------------
 "
 conda install --yes -c bioconda RAxML=$RAxML_VER -p $ROOTDIR/thirdParty/miniconda
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/raxmlHPC $ROOTDIR/bin/raxmlHPC
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/raxmlHPC $ROOTDIR/bin/raxmlHPC-PTHREADS
 echo "
 --------------------------------------------------------------------------------
                            RAxML v8.2.9
