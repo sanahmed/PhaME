@@ -462,7 +462,7 @@ echo "--------------------------------------------------------------------------
                            installing Perl Module Parallel::ForkManager v1.17
 --------------------------------------------------------------------------------
 "
-conda install --yes -c bioconda perl-parallel-forkmanager=$perl_Parllel_ForkManager_VER
+cpanm Parallel::ForkManager@$perl_Parllel_ForkManager_VER -l $ROOTDIR/ext
 echo "
 --------------------------------------------------------------------------------
                            Parallel::ForkManager v1.17 installed
