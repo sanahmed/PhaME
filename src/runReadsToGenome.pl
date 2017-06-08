@@ -1,4 +1,4 @@
-#! /usr/bin/perl
+#!/usr/bin/env perl -w
 # required: 1. R
 #           2. samtools 0.1.18 mt 
 #           3. bwa 0.6 sampe patched  

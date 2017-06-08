@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl -w
 
 #A program to translate a nucleotide sequence to an amino acid sequence
 
