@@ -23,7 +23,7 @@ cpanm_VER=1.7039
 FastTree_VER=2.1.9
 mafft_VER=7.305
 miniconda_VER=4.2.12
-mummer_VER=3.1
+mummer_VER=3.23
 muscle_VER=3.8.31
 paml_VER=4.9
 R_VER=3.3.1
@@ -208,7 +208,7 @@ echo "--------------------------------------------------------------------------
                            installing mummer v3.23 or nucmer 3.21
 --------------------------------------------------------------------------------
 "
-conda install --yes -c bioconda mummer -p $ROOTDIR/thirdParty/miniconda
+conda install --yes -c bioconda mummer=$mummer_VER -p $ROOTDIR/thirdParty/miniconda
 ln -sf $ROOTDIR/thirdParty/miniconda/opt/mummer-$mummer_VER/nucmer $ROOTDIR/bin/nucmer
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/mummer $ROOTDIR/bin/mummer
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/delta-filter $ROOTDIR/bin/delta-filter
