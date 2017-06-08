@@ -11,7 +11,7 @@ use PhaME;
 $|=1;
 
 # set up environments
-$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
+$ENV{PATH}="$RealBin:$RealBin/../bin:$ENV{PATH}";
 $ENV{PERL5LIB} = ($ENV{PERL5LIB})?"$ENV{PERL5LIB}:$RealBin/../lib:$RealBin/../ext/lib/perl5":"$RealBin/../lib:$RealBin/../ext/lib/perl5";
 
 =head
