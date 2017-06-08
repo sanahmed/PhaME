@@ -778,8 +778,8 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule Parallel::ForkManager )
 then
-  perl_Parallel_ForkManager_installed_VER=`cpan -D Parallel::ForkManager 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
-  if ( echo $perl_Parallel_ForkManager_installed_VER $perl_Parallel_ForkManager_VER | awk '{if($2>=$3) exit 0; else exit 1}')
+  perl_Parallel_ForkManager_installed_VER=`perl -MParallel::ForkManager -e 'print $Parallel::ForkManager::VERSION ."\n";'`
+  if ( echo $perl_Parallel_ForkManager_installed_VER $perl_Parallel_ForkManager_VER | awk '{if($1>=$2) exit 0; else exit 1}')
   then
     echo " - found Perl module Parallel::ForkManager $perl_Parallel_ForkManager_installed_VER"
   else
