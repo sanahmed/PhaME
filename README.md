@@ -1,4 +1,6 @@
-# Phylogenetic and Molecular Evolution (PhaME) analysis tool
+## Phylogenetic and Molecular Evolution (PhaME) analysis tool
+
+[![Build Status](https://travis-ci.org/mshakya/PhaME-1.svg?branch=master)](https://travis-ci.org/mshakya/PhaME-1)
 
 Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/or reads. 
 Uses SNP multiple sequence alignment to construct a phylogenetic tree. 
