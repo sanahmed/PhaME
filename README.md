@@ -22,7 +22,7 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * SAMtools version 0.1.19 and vcftools - Convert BAM files created by Bowtie
 
-* FastTree version >=2.1.8- Contruction of phylogenetic tree
+* FastTree version >=2.1.8- Construction of phylogenetic tree
 
 * RAxML version >=8.0.26 - Maximum likelihood construction of phylogenetic tree
 
@@ -43,7 +43,7 @@ PhaME was tested successfully on our Linux servers (Ubuntu 14.04.3 LTS).
 
 You can use "git" to obtain the package:
 
-    $ git clone https://github.com/LANL-Bioinformatics/PhaME.git
+    $ git clone https://github.com/mshakya/PhaME-1.git
 
 ### Installing PhaME
 
@@ -53,8 +53,7 @@ You can use "git" to obtain the package:
 --------------------------------------------------------------
 ### Running PhaME
 
-#### Prepare the input files
-INPUT files required
+#### Input files
 
 * A directory with reference files which have the following file suffixes
   - *.fasta
@@ -72,15 +71,15 @@ INPUT files required
      - *_R1.fastq *_R2.fastq
      - *_R1.fq *_R2.fq
      
-  - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/LANL-Bioinformatics/PhaME/master/phame.ctl))
+  - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
 
 #### Test run
 
-* Please modify the values of 'refdir' and 'workdir' in the test/phame.ctl file to corresponding absolute PhaME installed path.
+* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the test/phame.ctl file to corresponding absolute path.
 
 * From the PhaME directory 
 
-    $ bin/runPhaME.pl test/phame.ctl
+    $ src/runPhaME.pl test/phame.ctl
 
 #### OUTPUT files
 
