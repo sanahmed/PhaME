@@ -658,7 +658,7 @@ fi
 if ( checkPerlModule Getopt::Long )
 then
   echo " - found Perl module Getopt::Long"
-  perl_Getopt_Long_installed_VER=`perl -MGetOpt::Long -e 'print $GetOpt::Long::VERSION ."\n";'`
+  perl_Getopt_Long_installed_VER=`perl -MGetopt::Long -e 'print $Getopt::Long::VERSION ."\n";'`
   if ( echo $perl_Getopt_Long_installed_VER $perl_Getopt_Long_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module Getopt::Long $perl_Getopt_Long_installed_VER"
