@@ -4,7 +4,7 @@
     reference = 1  # 0:pick a random reference; 1:use given reference
       reffile = KJ660347.fasta  # reference filename 
 
-      project = ebola_test  # main alignment file name
+      project = ebolatest  # main alignment file name
 
       cdsSNPS = 1  # 0:no cds SNPS; 1:cds SNPs
 
