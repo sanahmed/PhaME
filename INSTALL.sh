@@ -638,27 +638,28 @@ else
   install_mafft
 fi
 ################################################################################
-# if ( checkSystemInstallation codeml )
-# then
-#   paml_installed_VER=`evolver \0 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
-#   if ( echo $paml_installed_VER $paml_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
-#   then 
-#     echo " - found paml $paml_installed_VER"
-#   else 
-#     echo "Required version of paml $paml_VER was not found"
-#     install_paml
-#   fi
-# else
-#   echo "paml is not found"
-#   install_paml
-# fi
+if ( checkSystemInstallation codeml )
+then
+  paml_installed_VER=`evolver \0 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
+  if ( echo $paml_installed_VER $paml_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+  then 
+    echo " - found paml $paml_installed_VER"
+  else 
+    echo "Required version of paml $paml_VER was not found"
+    install_paml
+  fi
+else
+  echo "paml is not found"
+  install_paml
+fi
 
 ################################################################################
 #                                 Perl modules
 ################################################################################
+
 if ( checkPerlModule Getopt::Long )
 then
-  perl_Getopt_Long_installed_VER=`cpan -D Getopt::Long 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
+  perl_Getopt_Long_installed_VER=`perl -MGetOpt::Long -e 'print $GetOpt::Long::VERSION ."\n";'`
   if ( echo $perl_Getopt_Long_installed_VER $perl_Getopt_Long_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module Getopt::Long $perl_Getopt_Long_installed_VER"
@@ -675,7 +676,7 @@ fi
 
 if ( checkPerlModule Time::HiRes )
 then
-  perl_Time_HiRes_installed_VER=`cpan -D Time::HiRes 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
+  perl_Time_HiRes_installed_VER=`perl -MTime::HiRes -e 'print $Time::HiRes::VERSION ."\n";'`
   if ( echo $perl_Time_HiRes_installed_VER $perl_Time_HiReS_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module Time::HiRes $perl_Time_HiRes_installed_VER"
@@ -690,7 +691,7 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule File::Path )
 then
-  perl_File_Path_installed_VER=`cpan -D File::Path 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
+  perl_File_Path_installed_VER=`perl -MFile::Path -e 'print $File::Path::VERSION ."\n";'`
   if ( echo $perl_File_Path_installed_VER $perl_File_Path_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module File::Path $perl_File_Path_installed_VER"
@@ -705,7 +706,7 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule File::Basename )
 then
-  perl_File_BaseName_installed_VER=`cpan -D File::BaseName 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
+  perl_File_BaseName_installed_VER=`perl -MFile::BaseName -e 'print $File::BaseName::VERSION ."\n";'`
   if ( echo $perl_File_BaseName_installed_VER $perl_File_BaseName_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module File::BaseName $perl_File_BaseName_installed_VER"
@@ -721,7 +722,7 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule File::Copy )
 then
-  perl_File_Copy_installed_VER=`cpan -D File::Copy 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
+  perl_File_Copy_installed_VER=`perl -MFile::Copy -e 'print $File::Copy::VERSION ."\n";'`
   if ( echo $perl_File_Copy_installed_VER $perl_File_Copy_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module File::Copy $perl_File_Copy_installed_VER"
@@ -736,7 +737,8 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule IO::Handle )
 then
-  perl_IO_Handle_installed_VER=`cpan -D IO::Handle 2>&1 | grep 'Installed' | perl -nle 'print $& if m{Installed: \d+\.\d+}'`
+  perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'
+  perl_IO_Handle_installed_VER=`perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'`
   if ( echo $perl_IO_Handle_installed_VER $perl_IO_Handle_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module IO::Handle $perl_IO_Handle_installed_VER"
