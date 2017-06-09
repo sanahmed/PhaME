@@ -705,7 +705,7 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule File::Basename )
 then
-  perl_File_BaseName_installed_VER=`perl -MFile::BaseName -e 'print $File::BaseName::VERSION ."\n";'`
+  perl_File_BaseName_installed_VER=`perl -MFile::Basename -e 'print $File::Basename::VERSION ."\n";'`
   if ( echo $perl_File_BaseName_installed_VER $perl_File_BaseName_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
     echo " - found Perl module File::BaseName $perl_File_BaseName_installed_VER"
