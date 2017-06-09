@@ -13,7 +13,6 @@ install:
 script:
   - PWD=$(pwd)
   - REPWD=$(sed 's/\//\\\//g' <<< $PWD | sed 's/\-/\\\-/g')
-  - sed -i 's/test/$REPWD/g' test/phame.ctl
-  - sed -i 's/test/$REPWD/g' test/phame.ctl
+  - sed -i "s/test/$REPWD\/test/g" test/phame.ctl
   - perl src/runPhaME.pl test/phame.ctl
 
