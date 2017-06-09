@@ -638,20 +638,20 @@ else
   install_mafft
 fi
 ################################################################################
-if ( checkSystemInstallation codeml )
-then
-  paml_installed_VER=`evolver \0 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
-  if ( echo $paml_installed_VER $paml_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
-  then 
-    echo " - found paml $paml_installed_VER"
-  else 
-    echo "Required version of paml $paml_VER was not found"
-    install_paml
-  fi
-else
-  echo "paml is not found"
-  install_paml
-fi
+# if ( checkSystemInstallation codeml )
+# then
+#   paml_installed_VER=`evolver \0 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
+#   if ( echo $paml_installed_VER $paml_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+#   then 
+#     echo " - found paml $paml_installed_VER"
+#   else 
+#     echo "Required version of paml $paml_VER was not found"
+#     install_paml
+#   fi
+# else
+#   echo "paml is not found"
+#   install_paml
+# fi
 
 ################################################################################
 #                                 Perl modules
