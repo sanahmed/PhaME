@@ -139,7 +139,7 @@ checkLocalInstallation()
 
 checkPerlModule()
 {
-   perl -e "use lib \"$rootdir/lib\"; use $1;"
+   perl -e "use $1";
    return $?
 }
 
@@ -328,8 +328,6 @@ echo "
 --------------------------------------------------------------------------------
 "
 }
-
-
 
 install_perl_Getopt_Long()
 {
