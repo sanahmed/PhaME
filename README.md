@@ -18,15 +18,15 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * MUMmer version 3.23 - Pairwise alignment using NUCmer 
 
-* Bowtie version >=2.1.0 - Mapping of reads
+* Bowtie version >=2.2.8 - Mapping of reads
 
-* SAMtools version 0.1.19 and vcftools - Convert BAM files created by Bowtie
+* SAMtools version 1.3.1 and vcftools - Convert BAM files created by Bowtie
 
-* FastTree version >=2.1.8- Construction of phylogenetic tree
+* FastTree version >=2.1.9 - Construction of phylogenetic tree
 
-* RAxML version >=8.0.26 - Maximum likelihood construction of phylogenetic tree
+* RAxML version >=8.2.9 - Maximum likelihood construction of phylogenetic tree
 
-* mafft version >=7.0 - For optional evolutionary analyses
+* mafft version >=7.305 - For optional evolutionary analyses
 
 * pal2nal version >=14 - For optional evolutionary analyses
 
@@ -34,7 +34,24 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * HyPhy version >=2.2 - For optional evolutionary analyses
 
-The C/C++ compiling enviroment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
+* bwa VER >= 0.7.15
+
+* cmake VER >= 3.0.1
+
+--------------------------------------------------------------
+## PERL PACKAGES
+
+File_Basename_VER=2.85
+File_Path_VER=2.09
+Getopt_Long_VER=2.45
+IO_Handle_VER=1.28
+Parllel_ForkManager_VER=1.17
+statistics_Distributions=1.02
+Time_BaseName=2.85
+Time_HiRes=1.9726
+Statistics_Distributions_VER=1.02
+
+The C/C++ compiling enviroNment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
 
 --------------------------------------------------------------
 ### Obtaining PhaME
