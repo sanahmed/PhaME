@@ -37,7 +37,7 @@ my $file=$ARGV[0];
 &Usage unless (-e $file);
 
 my $command="nucmer --maxmatch --nosimplify --prefix=seq_seq$$ $file $file 2>/dev/null";
-print "Running self-nucmer on $file.\n";
+print "Running self-nucmer on $file\n";
 if (system ("$command")) {die "$command"}; 
 # apply identity cutoff and lenght cutoff and use awk to skip self-hits
 my $command="show-coords -r -I $identity -L $len_cutoff -T seq_seq$$.delta | awk \'\$1 != \$3 || \$2 != \$4 && \$8==\$9 {print}\' > seq_seq$$.coords";
