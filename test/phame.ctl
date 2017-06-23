@@ -1,5 +1,5 @@
-       refdir = /users/311300/PhaME-1/test/ref  # directory where reference files are located
-      workdir = /users/311300/PhaME-1/test # directory where contigs/reads files are located and output is stored
+       refdir = test/ref  # directory where reference files are located
+      workdir = test # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference
       reffile = KJ660347.fasta  # reference filename 
@@ -28,7 +28,7 @@
 
       threads = 4  # Number of threads to use
 
-       cutoff = 0.99  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
+       cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
 * When using data option 1,2,5 need a complete reference to align/map to. 
 * Use data option 7 when need to extract SNPs using a sublist of already aligned genomes. 
