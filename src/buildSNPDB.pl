@@ -76,6 +76,7 @@ GetOptions(
    'l=s'      => \$refheader,
    'c=s'      => \$coding,
    'p=s'      => \$project,
+   'g=f'      => \$gap_cutoff,
    'help|h'   => sub{usage()},
 );
 
@@ -207,10 +208,11 @@ close IN;
 
 foreach my $query (keys %query_gaps){
    my $total_gap_length = $query_gaps{$query};
-   if ( ($total_gap_length/(length $ref_sequence)) > $gap_cutoff){
+   if ( 1 - ($total_gap_length/(length $ref_sequence)) < $gap_cutoff){
        $skip_query{$query}=1;
        my $total_covered_percentage = sprintf("%.2f%%", (1 - ($total_gap_length/(length $ref_sequence)))*100);
-       print "Warnings: $query covered only $total_covered_percentage of the $reference. It will not use in building SNP tree\n";
+       my $total_covered = sprintf("%.5f", (1 - ($total_gap_length/(length $ref_sequence))));
+	   print "Warnings: $query covered only $total_covered of the $reference (<cutoff = $gap_cutoff). It will not be used to build SNP tree and matrix.\n";
    }
 }
 
