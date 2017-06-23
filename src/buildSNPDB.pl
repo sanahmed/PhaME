@@ -76,6 +76,7 @@ GetOptions(
    'l=s'      => \$refheader,
    'c=s'      => \$coding,
    'p=s'      => \$project,
+   'g=f'      => \$gap_cutoff,
    'help|h'   => sub{usage()},
 );
 

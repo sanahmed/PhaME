@@ -464,9 +464,10 @@ my $project=shift;
 my $signal=shift;
 my $error=shift;
 my $log=shift;
+my $gap_cutoff=shift;
 
 print "\n";
-my $SNPdb="buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal 2>>$error >> $log\n\n";
+my $SNPdb="buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal -g $gap_cutoff 2>>$error >> $log\n\n";
 print $SNPdb;
 if (system ($SNPdb)){die "Error running $SNPdb.\n";}
 return ("SNP database complete");

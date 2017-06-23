@@ -379,7 +379,7 @@ if ($buildSNP==1){
    }
    &print_timeInterval($runtime,"Identifying SNPs\n");
    PhaME::identifyGaps($outdir,"$workdir/working_list.txt",$name,"snp",$project);
-   my $end=PhaME::buildSNPDB($outdir,$bindir,$reference,"$workdir/working_list.txt",$project,$gsignal,$error,$logfile);
+   my $end=PhaME::buildSNPDB($outdir,$bindir,$reference,"$workdir/working_list.txt",$project,$gsignal,$error,$logfile,$cutoff);
    &print_timeInterval($runtime,"$end\n");
 }
 
