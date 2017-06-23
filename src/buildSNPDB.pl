@@ -211,7 +211,7 @@ foreach my $query (keys %query_gaps){
    if ( ($total_gap_length/(length $ref_sequence)) < $gap_cutoff){
        $skip_query{$query}=1;
        my $total_covered_percentage = sprintf("%.2f%%", (1 - ($total_gap_length/(length $ref_sequence)))*100);
-       print "Warnings: $query covered only $total_covered_percentage of the $reference. It will not use in building SNP tree\n";
+       print "Warnings: $query covered only $total_covered_percentage of the $reference (< $gap_cutoff * 100). It will not be used to build SNP tree and matrix.\n";
    }
 }
 
