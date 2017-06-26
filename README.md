@@ -14,11 +14,11 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 --------------------------------------------------------------
 ## SYSTEM REQUIREMENTS
 
-* Perl version >5.8
+* Perl version > 5.16
 
 * MUMmer version 3.23 - Pairwise alignment using NUCmer 
 
-* Bowtie version >=2.2.8 - Mapping of reads
+* Bowtie2 version >=2.2.8 - Mapping of reads
 
 * SAMtools version 1.3.1 and vcftools - Convert BAM files created by Bowtie
 
@@ -41,15 +41,15 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 --------------------------------------------------------------
 ## PERL PACKAGES
 
-File_Basename_VER=2.85
-File_Path_VER=2.09
-Getopt_Long_VER=2.45
-IO_Handle_VER=1.28
-Parllel_ForkManager_VER=1.17
-statistics_Distributions=1.02
-Time_BaseName=2.85
-Time_HiRes=1.9726
-Statistics_Distributions_VER=1.02
+File::Basename = 2.85
+File::Path = 2.09
+Getopt::Long = 2.45
+IO::Handle = 1.28
+Parllel::ForkManager = 1.17
+Statistics::Distributions = 1.02
+Time::BaseName = 2.85
+Time::HiRes = 1.9726
+Statistics::Distributions = 1.02
 
 The C/C++ compiling enviroNment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
 
@@ -70,7 +70,7 @@ You can use "git" to obtain the package:
 
 #### Input files
 
-* A directory with reference files which have the following file suffixes
+* A directory with reference files (complete genomes) which have the following file suffixes
   - *.fasta
   - *.fna
   - *.fa
@@ -90,7 +90,7 @@ You can use "git" to obtain the package:
 
 #### Test run
 
-* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the test/phame.ctl file to corresponding absolute path.
+* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the test/phame.ctl file to corresponding **absolute path**
 
 * From the PhaME directory 
 
@@ -99,7 +99,11 @@ You can use "git" to obtain the package:
 #### OUTPUT files
 
 * Summary
-  - A SNP alignment file
+  - SNP alignment files
+      - (all SNPs) `project`_all_snp_alignment.fna
+      - (CDS SNPs) `project`_cds_snp_alignment.fna
+      - (intergenic SNPs) `project`_int_snp_alignment.fna
+
   - A newick tree file
   - Text file containing the size of gaps, the core genome size, the average genome size, number of whole genome SNPs, and coding region SNPs.
   - A pairwise list of all SNPs and coordinates between references and samples
