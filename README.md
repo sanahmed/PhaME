@@ -41,15 +41,15 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 --------------------------------------------------------------
 ## PERL PACKAGES
 
-File::Basename = 2.85
-File::Path = 2.09
-Getopt::Long = 2.45
-IO::Handle = 1.28
-Parllel::ForkManager = 1.17
-Statistics::Distributions = 1.02
-Time::BaseName = 2.85
-Time::HiRes = 1.9726
-Statistics::Distributions = 1.02
+* File::Basename = 2.85
+* File::Path = 2.09
+* Getopt::Long = 2.45
+* IO::Handle = 1.28
+* Parllel::ForkManager = 1.17
+* Statistics::Distributions = 1.02
+* Time::BaseName = 2.85
+* Time::HiRes = 1.9726
+* Statistics::Distributions = 1.02
 
 The C/C++ compiling enviroNment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
 
@@ -90,43 +90,66 @@ You can use "git" to obtain the package:
 
 #### Test run
 
-* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the test/phame.ctl file to corresponding **absolute path**
+* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the test/phame.ctl file to corresponding **absolute path**.
 
 * From the PhaME directory 
 
-    $ src/runPhaME.pl test/phame.ctl
+```
+    src/runPhaME.pl test/phame.ctl
 
+```
+--------------------------------------------------------------
 #### OUTPUT files
 
-* Summary
+* Summary files
   - SNP alignment files
-      - (all SNPs) `project`_all_snp_alignment.fna
-      - (CDS SNPs) `project`_cds_snp_alignment.fna
-      - (intergenic SNPs) `project`_int_snp_alignment.fna
+    - all SNPs
+      - `project`_all_snp_alignment.fna
+    - CDS SNPs
+      - `project`_cds_snp_alignment.fna* 
+    - intergenic SNPs
+      - `project`_int_snp_alignment.fna*
 
-  - A newick tree file
-  - Text file containing the size of gaps, the core genome size, the average genome size, number of whole genome SNPs, and coding region SNPs.
+          *only when a gff file is given
+
+  - Newick tree file
+    - RAxML tree using all SNPs
+      - bootstrap mapped Maximum Likelihood trees
+        - RAxML_bipartitionsBranchLabels.`project`_all_best
+        - RAxML_bipartitions.`project`_all_best 
+      - bootstraps
+        - RAxML_bootstrap.`project`_all_b
+      - best ML tree
+        - RAxML_bestTree.`project`_all
+    - RAxML tree using only CDS SNPs
+      - best ML tree
+        - RAxML_bestTree.`project`_all
+
+  - Text file containing:
+    - the size of gaps
+      - `project`_all_gaps.txt
+    - the core genome size, the average genome size, number of whole genome SNPs, and coding region SNPs.
   - A pairwise list of all SNPs and coordinates between references and samples
   - A matrix file that lists the number of SNPs present between genomes
   
 * Directories structure
-  - working directory/files
-      - permutated versions of references (concatenated chromosomes)
-  - working directory/results
-      - All output files generated
-  - working directory/results/snps
-      - SNP coordinate files generated from NUCmer and Bowtie
-  - working directory/results/gaps
+  - `working directory`/files
+      - permuted versions of references (concatenated chromosomes)
+  - `working directory`/results
+      - All output files
+  - `working directory`/results/snps
+      - SNP coordinate files generated from NUCmer and bowtie
+  - `working directory`/results/gaps
       - Gap coordinate files generated from NUCmer and bowtie
-  - working directory/results/stats
+  - `working directory`/results/stats
       - Intermediate stat files generated when parsing NUCmer and Bowtie results
-  - working directory/results/temp
+  - `working directory`/results/temp
       - Temporary files generated
-  - working directory/results/PSgenes
+  - `working directory`/results/PSgenes
       - All gene fasta files  that contain at least 1 SNP
-  - working directory/results/paml
+  - `working directory`/results/paml
       - PAML results
-  - working directory/results/hyphy
+  - `working directory`/results/hyphy
       - HyPhy results
 
 

@@ -185,6 +185,7 @@ ln -sf $ROOTDIR/thirdParty/miniconda/opt/mummer-$mummer_VER/nucmer $ROOTDIR/bin/
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/mummer $ROOTDIR/bin/mummer
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/delta-filter $ROOTDIR/bin/delta-filter
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/show-snps $ROOTDIR/bin/show-snps
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/show-coords $ROOTDIR/bin/show-coords
 # conda install --yes -c bioconda mummer=$mummer_VER -p $ROOTDIR/thirdParty/miniconda
 echo "
 ------------------------------------------------------------------------------
