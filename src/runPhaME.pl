@@ -315,6 +315,7 @@ if ($check==0){
    print "Complete\n";
 } # check=0
 
+$name =~ s/\W/_/g; # Replacing special characters with _
 $reference = "$workdir/files/$name.fna";
 
 if ($nucmer==1){
