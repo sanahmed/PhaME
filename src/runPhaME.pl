@@ -50,13 +50,13 @@ my $reference;
 my $name;
 my $path;
 my $suffix;
-my $gsignal=0;
+my $gsignal=0; # sequence should be parsed (1) for CDSor not (0), depends on gff
 my $time=1;
 my $data=0;
 my $reads=2;
 my $tree=2;
 my $modeltest=0;
-my $bsignal=0;
+my $bsignal=0; # bootstrap (1) or not (0).
 my $bootstrap=100;
 my $pselection=0;
 my $code=0;
@@ -408,7 +408,7 @@ if (-e $tparsimony){`mv $tparsimony $outdir/`;}
 if (-e $tresult){`mv $tresult $outdir/`;}
 if (-e $tbest){`mv $tbest $outdir/`;}
 if ($tree==2||$tree==3){$tbest=$outdir."/RAxML_bestTree.$project\_cds";}
-if ($tree==1){$tbest=$outdir."/$project\.fasttree";}
+if ($tree==1){$tbest=$outdir."/$project\_all\.fasttree";}
 
 my $pamldir;
 if ($ps==1){
@@ -420,7 +420,7 @@ if ($ps==1){
       if (!-d $pamldir){`mkdir -p $pamldir`;}
       `cp $tbest $pamldir`;
       if ($tree==2||$tree==3){$ptree= $pamldir."/RAxML_bestTree.$project\_cds";}
-      if ($tree==1){$ptree=$pamldir."$outdir./$project\.fasttree";}
+      if ($tree==1){$ptree=$pamldir."$outdir./$project\_all\.fasttree";}
       elsif ($tree==0){print "Need to build a tree before any evolutionary analyses can be performed.\n"; exit;}
    }
    my $gapfile=$outdir."/$project\_gaps.txt";
