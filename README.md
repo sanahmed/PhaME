@@ -90,7 +90,7 @@ You can use "git" to obtain the package:
 
 #### Test run
 
-* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the test/phame.ctl file to corresponding **absolute path**.
+* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the `test/phame.ctl` file to corresponding **absolute path**.
 
 * From the PhaME directory 
 
@@ -105,7 +105,7 @@ You can use "git" to obtain the package:
   - SNP alignment files
     - all SNPs
       - `project`_all_snp_alignment.fna
-    - CDS SNPs
+    - SNPs in CDS (coding sequence)
       - `project`_cds_snp_alignment.fna* 
     - intergenic SNPs
       - `project`_int_snp_alignment.fna*
@@ -124,14 +124,36 @@ You can use "git" to obtain the package:
     - RAxML tree using only CDS SNPs
       - best ML tree
         - RAxML_bestTree.`project`_all
+    - FastTree using all SNPs
+      - `project`_all.fasttree
+    - FastTree using SNPs from coding sequence
+      - `project`_cds.fasttree
 
   - Text file containing:
-    - the size of gaps
+    - the size of gaps between `reference` and other genomes.
       - `project`_all_gaps.txt
-    - the core genome size, the average genome size, number of whole genome SNPs, and coding region SNPs.
+    - summary file containing information on the core genome size, total SNPs, etc.
+      - `project`_summaryStatistics.txt 
+    - the average genome size
+    - number of whole genome SNPs
+    - and coding region SNPs
   - A pairwise list of all SNPs and coordinates between references and samples
+    - `project`_comparison.txt
+    - `project`_stats.txt (also contains if SNPs are in coding or non-coding regions)
   - A matrix file that lists the number of SNPs present between genomes
-  
+    - all core regions
+      - `project`_snp_coreMatrix.txt
+    - CDS only
+      - `project`_snp_CDSmatrix.txt
+    - intergenic only
+      - `project`_snp_intergenicMatrix.txt
+
+* Log file
+  - `project`_PhaME.log
+
+* Error file
+  - `project`.error 
+
 * Directories structure
   - `working directory`/files
       - permuted versions of references (concatenated chromosomes)
@@ -167,7 +189,7 @@ bioRxiv doi: http://dx.doi.org/10.1101/032250
 --------------------------------------------------------------
 ## Contact
 
-Ahmed, Sanaa Afroz <sahmed at lanl.gov>
+[Migun Shakya](mailto:migun@lanl.gov)
 
 --------------------------------------------------------------
 ## ACKNOWLEDGEMENTS
