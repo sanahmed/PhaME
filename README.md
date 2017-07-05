@@ -103,7 +103,7 @@ You can use "git" to obtain the package:
 
 * Summary files
   - SNP alignment files
-    - all SNPs
+    - all detected SNPs
       - `project`_all_snp_alignment.fna
     - SNPs in CDS (coding sequence)
       - `project`_cds_snp_alignment.fna* 
@@ -137,7 +137,7 @@ You can use "git" to obtain the package:
     - the average genome size
     - number of whole genome SNPs
     - and coding region SNPs
-  - A pairwise list of all SNPs and coordinates between references and samples
+  - A pairwise list of all compared position with coordinates between references and samples
     - `project`_comparison.txt
     - `project`_stats.txt (also contains if SNPs are in coding or non-coding regions)
   - A matrix file that lists the number of SNPs present between genomes
