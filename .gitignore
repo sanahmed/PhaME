@@ -1,2 +1,5 @@
 test/results/
 test/.DS_Store
+test/contigs_list.txt
+test/fasta_list.txt
+test/working_list.txt
