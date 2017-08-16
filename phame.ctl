@@ -16,7 +16,6 @@
         reads = 2  # 1: single reads; 2: paired reads; 3: both types present;
 
          tree = 0  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
-    modelTest = 0  # 0:no; 1:yes;  # Only used when building a tree using RAxML
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
             N = 100  # Number of bootstraps to run *See below    
  
