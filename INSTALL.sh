@@ -783,26 +783,6 @@ fi
 
 ################################################################################
 
-
-
-
-
-
-# echo "Checking jModeltest ..."
-# if [ -f "$ROOTDIR/ext/opt/jmodeltest-2.1.10/jModelTest.jar" ]
-# then
-#   echo "jModeltest found";
-# else
-#   echo "jModeltest not found. Trying to download from https://github.com/ddarriba/jmodeltest2/files/157117/jmodeltest-2.1.10.tar.gz ...";
-#   mkdir -p ext/opt;
-#   mkdir -p ext/bin;
-#   download_ext https://github.com/ddarriba/jmodeltest2/files/157117/jmodeltest-2.1.10.tar.gz ext/opt/jmodeltest-2.1.10.tar.gz;
-#   cd ext/opt/
-#   tar xvzf jmodeltest-2.1.10.tar.gz
-#   cd $ROOTDIR
-# fi
-
-
 # echo "Checking HyPhy ..."
 
 # HyPhy_VER=`echo -e "1\n2\n3" | HYPHYMP  2>&1 | grep HYPHY | perl -nle 'print $& if m{\d+\.\d+}'`;
