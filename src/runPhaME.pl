@@ -41,8 +41,8 @@ AUTHOR
    sahmed@lanl.gov
 =cut
 
-my $refdir;
-my $workdir;
+my $refdir; # variable storing directory with reference sequence
+my $workdir; # variable storing directory where all analysis will be done
 my $outdir;
 my $project;
 my $rsignal=0;
@@ -113,7 +113,8 @@ while (<CTL>){
    if (/\s+reads\s*=\s*(1|2|3)\s*#{0,1}.*$/){$reads=$1;}
    if (/tree\s*=\s*(0|1|2|3)\s*#{0,1}.*$/){$tree=$1;}
 #     0=no tree; 1=fasttree; 2=raxml; 3=both
-   if (/modelTest\s*=\s*(0|1)\s*#{0,1}.*$/){$modeltest=$1;}
+   # no more testing for the model, GTR should be sufficient.
+   # if (/modelTest\s*=\s*(0|1)\s*#{0,1}.*$/){$modeltest=$1;}   
    if (/bootstrap\s*=\s*(0|1)\s*#{0,1}.*$/){$bsignal=$1;}
    if (/N\s*=\s*(\d+)\s*#{0,1}.*$/){$bootstrap=$1;}
    if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/){$pselection=$1;}
@@ -385,10 +386,10 @@ if ($buildSNP==1){
 }
 
 if ($buildtree==1|| $bs==1){
-   if (($tree==2||$tree==3)&&($modeltest==1)){
-       my $jmodeltest_jar = "$RealBin/../ext/opt/jmodeltest-2.1.10/jModelTest.jar";
-       PhaME::modeltest($jmodeltest_jar,$outdir,$project,$threads,$error,$logfile);
-   }
+   # if (($tree==2||$tree==3)&&($modeltest==1)){
+   #     my $jmodeltest_jar = "$RealBin/../ext/opt/jmodeltest-2.1.10/jModelTest.jar";
+   #     PhaME::modeltest($jmodeltest_jar,$outdir,$project,$threads,$error,$logfile);
+   # }
    my $end=PhaME::buildTree($bindir,$outdir,$threads,$tree,"$project\_all",$error,$logfile);
    if ($gsignal==1){PhaME::buildTree($bindir,$outdir,$threads,$tree,"$project\_cds",$error,$logfile);}
    &print_timeInterval($runtime,"$end\n");

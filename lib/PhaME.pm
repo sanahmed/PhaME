@@ -473,28 +473,29 @@ if (system ($SNPdb)){die "Error running $SNPdb.\n";}
 return ("SNP database complete");
 }
 
-sub modeltest
-{
-my $jmodeljar=shift;
-my $outdir=shift;
-my $file=shift;
-my $threads=shift;
-my $error=shift;
-my $log=shift;
+# no more modeltest for nucleotide trees
+# sub modeltest
+# {
+# my $jmodeljar=shift;
+# my $outdir=shift;
+# my $file=shift;
+# my $threads=shift;
+# my $error=shift;
+# my $log=shift;
 
-my $infile=$outdir."/$file\_all_snp_alignment.fna";
-my $outfile=$outdir."/$file\_modelTest.txt";
+# my $infile=$outdir."/$file\_all_snp_alignment.fna";
+# my $outfile=$outdir."/$file\_modelTest.txt";
 
-if ( ! -e $jmodeljar) { 
-  print "No jModelTest program detected. Skip model test\n";
-  return;
-}
-my $modeltest= "java -jar $jmodeljar -d $infile -f -i -g 4 -s 11 -AIC -a -tr $threads > $outfile\n\n";
-print "\n$modeltest\n";
-if (system ($modeltest)){die "Error running $modeltest.\n";}
+# if ( ! -e $jmodeljar) { 
+#   print "No jModelTest program detected. Skip model test\n";
+#   return;
+# }
+# my $modeltest= "java -jar $jmodeljar -d $infile -f -i -g 4 -s 11 -AIC -a -tr $threads > $outfile\n\n";
+# print "\n$modeltest\n";
+# if (system ($modeltest)){die "Error running $modeltest.\n";}
 
-return ("SNP alignemnt complete");
-}
+# return ("SNP alignemnt complete");
+# }
 
 sub buildTree
 {
