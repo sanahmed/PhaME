@@ -131,6 +131,7 @@ print OUT ">$name\n";
 open (IN,$file)||die "$!";
 while (<IN>){
    chomp;
+   $_ =~ s/\r\n|\n|\r/\n/g;
    if (!/^>/){$sequence.=$_;}#print OUT $_;}
 }
 print OUT "$sequence\n";;
@@ -163,6 +164,7 @@ if ($fh->open("<$file")){
    $/=">";
    while (<$fh>){
       $_=~ s/\>//g;
+      $_ =~ s/\r\n|\n|\r/\n/g;
       unless($_){next;};
       ($header,@seq)=split /\n/,$_;
       $sequence= join "",@seq;
