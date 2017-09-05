@@ -373,6 +373,7 @@ system("rm -f $dir/*.pileup $dir/*.bam $dir/*.bcf $dir/*.mgaps $dir/*.ntref $dir
 # Run NUCmer on reference genomes 
 sub completeNUCmer
 {
+my $reference=shift;
 my $indir=shift;
 my $bindir=shift;
 my $list=shift;
@@ -383,7 +384,7 @@ my $log=shift;
 my $outdir=$indir.'/results';
 
 print "\n";
-my $nucmer="runNUCmer.pl -q $indir -d $outdir -t $thread -l $list -c $code 2>$error > $log\n\n";
+my $nucmer="runNUCmer.pl -r $reference -q $indir -d $outdir -t $thread -l $list -c $code 2>$error > $log\n\n";
 print $nucmer;
 if (system ($nucmer)){die "Error running $nucmer.\n";}
 }

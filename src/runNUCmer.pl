@@ -20,6 +20,7 @@ use Parallel::ForkManager;
 # set up environments
 $ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
+my $ref_genome;
 my $breaklen=200;
 my $mincluster=65;
 my $diagfactor=0.12;
@@ -34,8 +35,11 @@ my @query;
 my $outdir=`pwd`;
    $outdir =~ s/\n//;
 my $options="--maxmatch ";
+# my $check;
+# my $gaps2;
 
 GetOptions(
+   'r|ref_genome=s'   => \$ref_genome, # an option to specify ref file
    'q|querydir=s'   => \$query_dir,
    'd|outdir=s'     => \$outdir,
    't|thread=i'     => \$thread,
@@ -84,7 +88,7 @@ my %queries;
 if ($dir=~ /.+\/$/){my $temp= chop($dir);}
 $dir = $dir.'/files';
 
-open (IN,$list);
+open(IN, $list) || die;
 while (<IN>){
    chomp;
    $queries{$_}++;
@@ -114,6 +118,8 @@ my $pm= new Parallel::ForkManager($thread);
 $pm->run_on_finish(sub{my ($pid,$exit_code,$ident,$exit_signal,$core_dump)=@_;});
 
 foreach my $reference(@query){
+   # skip if the genome is not part of the references
+   next if $reference !~ /$ref_genome/ && $ref_genome;
    $pm->start and next;
    my ($name,$path,$suffix) = fileparse("$reference", qr/\.[^.]*/);
    my $coords=$outdir.'/'.$name.'_repeat_coords.txt';
@@ -139,11 +145,11 @@ my $pm= new Parallel::ForkManager($thread);
 
 $pm->run_on_finish(sub{my ($pid,$exit_code,$ident,$exit_signal,$core_dump)=@_;});
 
-while (my @combo= $iteration->()){
+while (my @combo = $iteration->()){
    $pm->start(@combo) and next;
    my %hash;
-   my ($first_name,$first_path,$first_suffix) = fileparse("$combo[0]", qr/\.[^.]*/);
-   my ($second_name,$second_path,$second_suffix) = fileparse("$combo[1]", qr/\.[^.]*/);
+   my ($first_name, $first_path, $first_suffix) = fileparse("$combo[0]", qr/\.[^.]*/);
+   my ($second_name, $second_path, $second_suffix) = fileparse("$combo[1]", qr/\.[^.]*/);
    my $reference= "$first_path$first_name$first_suffix";
    my $query= "$second_path$second_name$second_suffix";
    $first_name =~ s/\.fna//;
@@ -154,6 +160,8 @@ while (my @combo= $iteration->()){
    my $first_fasta=$outdir.'/'.$first_name.'_norepeats.fna';
    my $second_fasta=$outdir.'/'.$second_name.'_norepeats.fna';
 
+   #need to write a split function here to just get the equivalent of 
+   # if ($first_name !~ /$ref_genome/ && $ref_genome) {
    print "Running nucmer on $prefix1\n";
    my $nucmer_command1= "nucmer $options -p $prefix1 $first_fasta $second_fasta  2>/dev/null";
    if (system ($nucmer_command1)){die "Error running nucmer_command1 $nucmer_command1.\n";}
@@ -175,6 +183,12 @@ while (my @combo= $iteration->()){
    my $gaps1= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix1.coords 2>/dev/null`;
    ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps1;
 
+   my $check= `checkNUCmer.pl -i $outdir/$first_name\_$second_name.gaps -r $reference`;
+   if ($check==1){print "$second_name aligned < 25% of the $first_name genome\n";}
+
+# }
+
+   # if ($second_name !~ /$ref_genome/ && $ref_genome) {
    print "Running nucmer on $prefix2\n";
    my $nucmer_command2= "nucmer $options -p $prefix2 $second_fasta $first_fasta  2>/dev/null";
    if (system ($nucmer_command2)){die "Error running nucmer_command2 $nucmer_command2.\n";}
@@ -196,12 +210,10 @@ while (my @combo= $iteration->()){
    
    my $gaps2= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix2.coords 2>/dev/null`;
 
-   my $check= `checkNUCmer.pl -i $outdir/$first_name\_$second_name.gaps -r $reference`;
-   if ($check==1){print "$second_name aligned < 25% of the $first_name genome\n";}
-
    $check= `checkNUCmer.pl -i $outdir/$second_name\_$first_name.gaps -r $query`;
    if ($check==1){print "$first_name aligned < 25% of the $second_name genome\n";}
 
+# }
    ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps2;
 
    $pm->finish(0);

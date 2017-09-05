@@ -7,6 +7,7 @@ use lib "$RealBin/../lib/";
 use lib "$RealBin/../ext/lib/perl5";
 use File::Basename;
 use PhaME;
+use Cwd;
 
 $|=1;
 
@@ -20,7 +21,7 @@ DESCRIPTION
    runPhaME.pl is a wrapper to run the PhaME analysis pipeline 
 
 USAGE
-   Control file "phame.ctl" needs to be copied and editted in the working director. 
+   Control file "phame.ctl" needs to be copied and edited in the working directory. 
    This wrapper runs the PhaME pipeline based on the settings of the control file. 
 
 REQUIREMENTS
@@ -33,12 +34,13 @@ COPYRIGHT/LICENCE
 
 AVAILABILITY
    
-AUTHOR
+AUTHORS
+   Migun Shakya
    Sanaa Ahmed
+   Chienchi Lo
    2015/01/15
    B-11
    Los Alamos National Laboratory
-   sahmed@lanl.gov
 =cut
 
 my $refdir; # variable storing directory with reference sequence
@@ -91,7 +93,7 @@ while (<CTL>){
       if ($refdir=~/.+\/$/){my $temp= chop($refdir);}
    }
    if (/workdir\s*=\s*(\S+)\s*#{0,1}.*$/){
-      $workdir=$1;
+      $workdir=Cwd::abs_path($1);
       if ($workdir=~/.+\/$/){my $temp= chop($workdir);}
       $outdir=$workdir.'/results';
       if (! -e $outdir){`mkdir -p $outdir`;}
@@ -331,7 +333,7 @@ if ($nucmer==1){
    }
 
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
-   PhaME::completeNUCmer($workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   PhaME::completeNUCmer($reference, $workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
 #   &print_timeInterval($runtime,"\tNUCmer on genomes complete\n");
 }
 
