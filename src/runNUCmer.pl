@@ -35,8 +35,8 @@ my @query;
 my $outdir=`pwd`;
    $outdir =~ s/\n//;
 my $options="--maxmatch ";
-# my $check;
-# my $gaps2;
+my $check;
+my $gaps2;
 
 GetOptions(
    'r|ref_genome=s'   => \$ref_genome, # an option to specify ref file
@@ -161,7 +161,7 @@ while (my @combo = $iteration->()){
    my $second_fasta=$outdir.'/'.$second_name.'_norepeats.fna';
 
    #need to write a split function here to just get the equivalent of 
-   # if ($first_name !~ /$ref_genome/ && $ref_genome) {
+   if ($first_name !~ /$ref_genome/ && $ref_genome) {
    print "Running nucmer on $prefix1\n";
    my $nucmer_command1= "nucmer $options -p $prefix1 $first_fasta $second_fasta  2>/dev/null";
    if (system ($nucmer_command1)){die "Error running nucmer_command1 $nucmer_command1.\n";}
@@ -186,9 +186,9 @@ while (my @combo = $iteration->()){
    my $check= `checkNUCmer.pl -i $outdir/$first_name\_$second_name.gaps -r $reference`;
    if ($check==1){print "$second_name aligned < 25% of the $first_name genome\n";}
 
-# }
+}
 
-   # if ($second_name !~ /$ref_genome/ && $ref_genome) {
+   if ($second_name !~ /$ref_genome/ && $ref_genome) {
    print "Running nucmer on $prefix2\n";
    my $nucmer_command2= "nucmer $options -p $prefix2 $second_fasta $first_fasta  2>/dev/null";
    if (system ($nucmer_command2)){die "Error running nucmer_command2 $nucmer_command2.\n";}
@@ -213,7 +213,7 @@ while (my @combo = $iteration->()){
    $check= `checkNUCmer.pl -i $outdir/$second_name\_$first_name.gaps -r $query`;
    if ($check==1){print "$first_name aligned < 25% of the $second_name genome\n";}
 
-# }
+}
    ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps2;
 
    $pm->finish(0);

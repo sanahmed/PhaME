@@ -81,6 +81,7 @@ my %contig_list;
 my %read_list;
 my $mappingGaps;
 my $ptree;
+my $buildSNPdb=0;
 
 my $control= $ARGV[0] || "phame.ctl";
 my $bindir=getBinDirectory();
@@ -100,6 +101,7 @@ while (<CTL>){
    }
    if (/project\s*=\s*(\S+)\s*#{0,1}.*$/){$project=$1;}
    if (/reference\s*=\s*(0|1)\s*#{0,1}.*$/){$rsignal=$1;}
+   
    if ($rsignal==1 && /reffile\s*=\s*(\S+)\s*#{0,1}.*$/){$reference="$refdir/$1";}
    elsif($rsignal==0){
       opendir(DIR, $refdir);
@@ -108,7 +110,10 @@ while (<CTL>){
       closedir DIR;
    }
    if (/cdsSNPS\s*=\s*(0|1)\s*#{0,1}.*$/){$gsignal=$1;}
-#     0=No; 1=Yes    
+#     0=No; 1=Yes
+#  if we want to build the SNPdb or just map to reference
+   if (/buildSNPdb\s*=\s*(0|1)\s*#{0,1}.*$/){$buildSNPdb=$1;}
+   # default is NO.
    if (/FirstTime\s*=\s*(1|2)\s*#{0,1}.*$/){$time=$1;}
    if (/data\s*=\s*(\d)\s*#{0,1}.*$/){$data=$1;}
 #     0=Finished; 1=contig; 2=reads; 3=F+C; 4=F+R; 5=C+R 6=F+C+R
@@ -332,8 +337,16 @@ if ($nucmer==1){
 #      print "$names\t",$fasta_list{$names},"\n"; 
    }
 
+   if ($buildSNPdb == 1){
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
    PhaME::completeNUCmer($reference, $workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   }
+   if ($buildSNPdb == 0){
+   &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
+   PhaME::completeNUCmer("", $workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   }
+
+
 #   &print_timeInterval($runtime,"\tNUCmer on genomes complete\n");
 }
 
