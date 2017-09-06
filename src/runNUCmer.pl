@@ -213,7 +213,7 @@ while (my @combo = $iteration->()){
    $check= `checkNUCmer.pl -i $outdir/$second_name\_$first_name.gaps -r $query`;
    if ($check==1){print "$first_name aligned < 25% of the $second_name genome\n";}
 
-   
+
 }
 
 
@@ -269,7 +269,7 @@ if (-e "$outdir/*.ntref"){unlink "$outdir/*.ntref"};
 sub usage
 {
 print <<Usage;
-$0 -q <query_dir> -d <output_directory> -t <# threads> -l <file containing list of all genomes to run nucmer on> -c <code>
+$0 -r <reference genome> -q <query_dir> -d <output_directory> -t <# threads> -l <file containing list of all genomes to run nucmer on> -c <code>
 
 Usage
 exit;

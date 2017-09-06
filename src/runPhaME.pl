@@ -1,6 +1,7 @@
 #!/usr/bin/env perl
 
 use strict;
+use warnings;
 use FindBin qw($Bin $RealBin);
 use lib "$Bin";
 use lib "$RealBin/../lib/";
@@ -339,11 +340,13 @@ if ($nucmer==1){
 
    if ($buildSNPdb == 1){
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
-   PhaME::completeNUCmer($reference, $workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   PhaME::completeNUCmer($reference, $workdir, $bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
    }
-   if ($buildSNPdb == 0){
+   elsif ($buildSNPdb == 0){
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
-   PhaME::completeNUCmer("", $workdir,$bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   my $fakefile = "_";
+   PhaME::completeNUCmer($fakefile, $workdir, $bindir, "$workdir/fasta_list.txt",
+                         $type,$threads, $error, $logfile);
    }
 
 
