@@ -119,7 +119,7 @@ $pm->run_on_finish(sub{my ($pid,$exit_code,$ident,$exit_signal,$core_dump)=@_;})
 
 foreach my $reference(@query){
    # skip if the genome is not part of the references
-   next if $reference !~ /$ref_genome/ && $ref_genome;
+   # next if $reference !~ /$ref_genome/ && $ref_genome;
    $pm->start and next;
    my ($name,$path,$suffix) = fileparse("$reference", qr/\.[^.]*/);
    my $coords=$outdir.'/'.$name.'_repeat_coords.txt';
@@ -209,15 +209,17 @@ while (my @combo = $iteration->()){
    if (system ($coords_command2)){die "Error running coords_command2 $coords_command2.\n";}
    
    my $gaps2= `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix2.coords 2>/dev/null`;
-
+   ($ref_gaps,$query_gaps,undef)= split /\n/, $gaps2;
    $check= `checkNUCmer.pl -i $outdir/$second_name\_$first_name.gaps -r $query`;
    if ($check==1){print "$first_name aligned < 25% of the $second_name genome\n";}
 
+   
 }
-   ($ref_gaps,$query_gaps,undef)= split /\n/,$gaps2;
+
 
    $pm->finish(0);
 }
+
 $pm-> wait_all_children;
 
 print "NUCmer on all reference genomes complete.\n";
