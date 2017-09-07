@@ -340,13 +340,15 @@ if ($nucmer==1){
 
    if ($buildSNPdb == 1){
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
-   PhaME::completeNUCmer($reference, $workdir, $bindir,"$workdir/fasta_list.txt",$type,$threads,$error,$logfile);
+   PhaME::completeNUCmer($reference, $workdir, $bindir,
+                         "$workdir/fasta_list.txt",$type,$threads,$error,
+                         $logfile);
    }
    elsif ($buildSNPdb == 0){
    &print_timeInterval($runtime,"\tRunning NUCmer on complete genomes\n");
    my $fakefile = "_";
    PhaME::completeNUCmer($fakefile, $workdir, $bindir, "$workdir/fasta_list.txt",
-                         $type,$threads, $error, $logfile);
+                         $type, $threads, $error, $logfile);
    }
 
 
@@ -360,9 +362,17 @@ if ($contig_nucmer==1){
       print ALL "$names\n";
       print STAT "$names\tTotal_length\t",$contig_list{$names},"\n";
    }
+   if ($buildSNPdb == 1){
 
    &print_timeInterval($runtime,"Running NUCmer on contigs\n");
-   PhaME::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",$code,$threads,$reference,$time,$error,$logfile);
+   PhaME::contigNUCmer($workdir, $bindir, "$workdir/contigs_list.txt",
+                       $code, $threads, $reference, $time, $error, $logfile);
+}
+   elsif ($buildSNPdb == 0){
+   &print_timeInterval($runtime,"Running NUCmer on contigs\n");
+   PhaME::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",
+                       $code, $threads, $reference, 2, $error, $logfile);      
+   }
 #   PhaME::contigNUCmer($workdir,$bindir,"$workdir/contigs_list.txt",$threads,$reference,"2",$error);
 }
 close STAT;
