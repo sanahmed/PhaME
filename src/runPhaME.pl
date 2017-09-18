@@ -252,7 +252,7 @@ if ($time==1){
 if ($time==2 && $check==1){exit;}
 if ($check==0){print "Complete.\n";}
 
-&print_timeInterval($runtime,"\tPreparing files... ");
+&print_timeInterval($runtime,"\tPreparing files... \n");
 if ($check==0){
    `mkdir -p $workdir/files`;
    
