@@ -509,14 +509,15 @@ my $error=shift;
 my $log=shift;
 
 if ($tree==1||$tree==3){
-   print "\n";
+   print "Reconstructing phylogeny using FastTree\n";
    my $fasttree="export OMP_NUM_THREADS=$thread; FastTreeMP -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error\n\n";
    print $fasttree;
    if (system ($fasttree)){die "Error running $fasttree.\n";}
-   my $rooted_tree_cmd= "raxmlHPC-PTHREADS -T $thread -m GTRGAMMAI -f I -t $outdir/$name.fasttree -w $outdir -n $name 2>>$error >> $log\n\n";
-   eval{ system($rooted_tree_cmd);};
-   system("mv $outdir/RAxML_rootedTree.$name $outdir/${name}_rooted.fasttree") if ( -e "$outdir/RAxML_rootedTree.$name");
-   `rm $outdir/RAxML_info.$name`;
+   # removing generation of rooted tree
+   # my $rooted_tree_cmd= "raxmlHPC-PTHREADS -T $thread -m GTRGAMMAI -f I -t $outdir/$name.fasttree -w $outdir -n $name 2>>$error >> $log\n\n";
+   # eval{ system($rooted_tree_cmd);};
+   # system("mv $outdir/RAxML_rootedTree.$name $outdir/${name}_rooted.fasttree") if ( -e "$outdir/RAxML_rootedTree.$name");
+   # `rm $outdir/RAxML_info.$name`;
 }
 if ($tree==2||$tree==3){
    print "\n";
@@ -548,15 +549,17 @@ my $bootstrap=shift;
 my $error=shift;
 my $log=shift;
 
-if ($tree==1){
-   my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
-   print $bootTrees;
-   if (system ($bootTrees)){die "Error running $bootTrees.\n";}
+# This was being run for tree=1, which only makes FastTree
+# I think its OK to comment this out
+# if ($tree==1){
+#    my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
+#    print $bootTrees;
+#    if (system ($bootTrees)){die "Error running $bootTrees.\n";}
 
-   my $bestTree="raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
-   print $bestTree;
-   if (system ($bestTree)){die "Error running $bestTree.\n";}
-}
+#    my $bestTree="raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/$name\.fasttree -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
+#    print $bestTree;
+#    if (system ($bestTree)){die "Error running $bestTree.\n";}
+# }
 
 if ($tree >1){
    my $bootTrees="raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
