@@ -12,7 +12,7 @@
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 
-         data = 3  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
+         data = 0  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 2  # 1: single reads; 2: paired reads; 3: both types present;

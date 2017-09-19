@@ -16,6 +16,11 @@ script:
   - sed -i "s/test/$REPWD\/test/g" test/phame.ctl
   - perl src/runPhaME.pl test/phame.ctl
   - rm -rf test/results
+  - sed -i 's/data = 0/data = 3/g' test/phame.ctl
+  - perl src/runPhaME.pl test/phame.ctl
+  - sed -i 's/data = 3/data = 4/g' test/phame.ctl
+  - perl src/runPhaME.pl test/phame.ctl
+  - sed -i 's/data = 4/data = 6/g' test/phame.ctl
+  - perl src/runPhaME.pl test/phame.ctl  
   - sed -i 's/buildSNPdb = 0/buildSNPdb = 1/g' test/phame.ctl
   - perl src/runPhaME.pl test/phame.ctl
-
