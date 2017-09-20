@@ -3,6 +3,8 @@
 use strict;
 use warnings;
 use FileHandle;
+use File::Basename;
+use Cwd;
 
 package PhaME;
 
@@ -786,81 +788,119 @@ sub paml {
     }
 }
 
-sub PickRefGenome {
-   # A function that picks the best genome to use as reference based on
-   # ANI calculated from comparing sketches using mash (as implemented in
-   # bbmap)
-   
-    my $dir            = shift;
-    my $error          = shift;
-    my $log            = shift;
-    my $ref_list       = shift;
-    my $contig_list    = shift;
-    my $out_ref        = shift;
-    my $out_sketch     = shift;
-    my $sketch_results = shift;
+
+sub PickRefGenomeII {
+
+    # A function that picks the best genome to use as reference based on
+    # ANI calculated from comparing sketches using mash (as implemented in
+    # bbmap)
+    my $workdir       = shift;
+    my $refdir        = shift;
+    my $error         = shift;
+    my $log           = shift;
+    my $sketch_output = shift;
+    my $sketch_dir;
     my $ref_file;
     my %refs;
     my @references;
     my @contigs;
-    my $contig_file;
+    my $contigfiles;
 
-    if ( $dir =~ /.+\/$/ ) { my $temp = chop($dir); }
-    $dir = $dir . '/files';
+    if ( $workdir =~ /.+\/$/ ) { my $temp = chop($workdir); }
+    $sketch_dir = $workdir . '/sketches';
 
-    # to read in the name of reference genomes
-    open( IN, $ref_list ) || die;
-    while (<IN>) {
-        chomp;
-        $refs{$_}++;
+    opendir( WORKDIR, $workdir ) or die $!;
+    my @contigfiles
+        = grep { /\.contig$|\.contigs$|\.ctg$]$/ && -f "$workdir/$_" }
+        readdir(WORKDIR);
+    my @fullcontig = map { $workdir . '/' . $_ } @contigfiles;
+    closedir(WORKDIR);
+
+    opendir( WORKDIR, $workdir ) or die $!;
+    my @readfiles
+        = grep { /\.fastq$|\.fq$]$/ && -f "$workdir/$_" } readdir(WORKDIR);
+
+    my @forwardreads = grep !/R2\.fastq/, @readfiles;
+    my @fullread = map { $workdir . '/' . $_ } @forwardreads;
+    closedir(WORKDIR);
+
+    opendir( REFDIR, $refdir ) or die $!;
+    my @reffiles
+        = grep { /\.fna$|\.fasta$|\.fa$|\.fsa$/ && -f "$refdir/$_" }
+        readdir(REFDIR);
+    my @fullref = map { $refdir . '/' . $_ } @reffiles;
+    closedir(REFDIR);
+
+    my @inputs = ( @fullcontig, @fullread, @fullref );
+
+    # create sketch for all inputs
+    foreach (@inputs) {
+        my ( $filename, $path, $suffix )
+            = File::Basename::fileparse( $_, qr/\.[^.]*/ );
+
+        my $out_sketch = $sketch_dir . "/$filename" . ".sketch";
+
+        system(
+            "sketch.sh in=$_ out=$out_sketch  mode=single name0=$_ fname=$_ name=$_ 2>>$error >> $log\n\n"
+        );
     }
-    close IN;
 
-    # to assign files that are ref to a list
-    opendir( PARENT, $dir );
-    while ( my $files = readdir(PARENT) ) {
-        next if ( $files =~ /^..?$/ );
-        if ( $files =~ /(.+)\.fna$/ ) {
-            if ( $files =~ /contig/ ) {
-                $contig_file = $dir . '/' . $files;
-                push( @contigs, $contig_file );
-            }
-            elsif ( exists $refs{$1} ) {
-                $ref_file = $dir . '/' . $files;
-                push( @references, $ref_file );
-            }
-        }
-    }
-    closedir(PARENT);
+    # compare each sketch to each other
+    opendir( SKDIR, $sketch_dir ) or die $!;
+    my @sketchfiles
+        = grep { /\.sketch$/ && -f "$sketch_dir/$_" } readdir(SKDIR);
+    my @fullsketch = map { $sketch_dir . '/' . $_ } @sketchfiles;
+    closedir(SKDIR);
 
-    # files to concatenate
-    my $cat_files = join " ", @references;
+    my $all_sketch = join ",", @fullsketch;
 
-    # concatenate the reference file to one file
-    system("cat $cat_files > $out_ref");
-
-    # create sketch
-    system("sketch.sh in=$out_ref out=$out_sketch mode=sequence");
-
-    # compare sketch
-    my $all_contig = join ",", @contigs;
+    my $ref_sketch = $sketch_dir . "/*.sketch";
 
     system(
-        "comparesketch.sh in=$all_contig $out_sketch format=3 mode=single | tail -n +2 | uniq  > $sketch_results"
+        "comparesketch.sh ref=$all_sketch alltoall compareself=f format=3 mode=single | uniq | grep ^$refdir | sed 's/\t\t/\t/g'> $sketch_output "
+
     );
 
     my $ref_genome = `
-        awk 'NR>1{arr[\$2] += \$3 
-                     count[\$2] += 1
-                     }
-                     END{
-                        for (a in arr) {print a ',' arr[a] / count[a]}}' $sketch_results | sort -r -k 2 | head -n 1
-    `;
-   my $ref_genome1 = $dir. "/" . ( split / /, $ref_genome )[0]
- . '.fna';
-   return $ref_genome1;
+    awk 'NR>1{
+              arr[\$1] += \$3
+              count[\$1] += 1
+   }
+   END{
+      for (a in arr) {
+         print a ',' arr[a] / count[a]}}' $sketch_output | sort -r -k 2 |head -n 1`;
+
+   my $ref_genome1 = ( split / /, $ref_genome )[0];
+
+    return $ref_genome1;
 }
 
+sub combo {
+    my $by = shift;
+    return sub { () }
+        if !$by || $by =~ /\D/ || @_ < $by;
+    my @list = @_;
+
+    my @position = ( 0 .. $by - 2, $by - 2 );
+    my @stop     = @list - $by .. $#list;
+    my $end_pos  = $#position;
+    my $done     = undef;
+
+    return sub {
+        return () if $done;
+        my $cur = $end_pos;
+        {
+            if ( ++$position[$cur] > $stop[$cur] ) {
+                $position[ --$cur ]++;
+                redo if $position[$cur] > $stop[$cur];
+                my $new_pos = $position[$cur];
+                @position[ $cur .. $end_pos ] = $new_pos .. $new_pos + $by;
+            }
+        }
+        $done = 1 if $position[0] == $stop[0];
+        return @list[@position];
+        }
+}
 
 sub hyphy {
     my $dir      = shift;
