@@ -789,7 +789,7 @@ sub paml {
 }
 
 
-sub PickRefGenomeII {
+sub PickRefGenome {
 
     # A function that picks the best genome to use as reference based on
     # ANI calculated from comparing sketches using mash (as implemented in
@@ -857,7 +857,7 @@ sub PickRefGenomeII {
     my $ref_sketch = $sketch_dir . "/*.sketch";
 
     system(
-        "comparesketch.sh ref=$all_sketch alltoall compareself=f format=3 mode=single | uniq | grep ^$refdir | sed 's/\t\t/\t/g'> $sketch_output "
+        "comparesketch.sh ref=$all_sketch alltoall compareself=f format=3 mode=single | uniq | grep ^$refdir | sed 's/\t\t/\t/g'> $sketch_output"
 
     );
 

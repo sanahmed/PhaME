@@ -93,6 +93,7 @@ my $bindir = getBinDirectory();
 
 ## Read in control file
 open( CTL, "$control" ) || die "Please provide a control file";
+
 while (<CTL>) {
     if (/refdir\s*=\s*(\S+)\s*#{0,1}.*$/) {
         $refdir = $1;
@@ -104,22 +105,14 @@ while (<CTL>) {
         $outdir = $workdir . '/results';
         if ( !-e $outdir ) { `mkdir -p $outdir`; }
     }
+
     if (/project\s*=\s*(\S+)\s*#{0,1}.*$/)   { $project = $1; }
-    
 
     if (/reference\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $rsignal = $1; }
     if ( $rsignal == 1 && /reffile\s*=\s*(\S+)\s*#{0,1}.*$/ ) {
         $reference = "$refdir/$1";
     }
-    elsif ( $rsignal == 0 ) {
-        opendir( DIR, $refdir );
-        my @reffiles
-            = grep { /.[fna|fa|fasta|fsa]$/ && -f "$refdir/$_" } readdir(DIR);
-        $reference
-            = "$refdir/" . $reffiles[ int( rand( scalar(@reffiles) ) ) ];
-        closedir DIR;
-    }
-    
+
 
     if (/cdsSNPS\s*=\s*(0|1)\s*#{0,1}.*$/) { $gsignal = $1; }
 
@@ -166,14 +159,27 @@ while (<CTL>) {
 }
 close CTL;
 
+my $error   = "$outdir/$project.error";
+my $logfile = "$outdir/$project\_PhaME.log";
+
+if ( $rsignal == 0 ) {
+        opendir( DIR, $refdir );
+        my @reffiles
+            = grep { /.[fna|fa|fasta|fsa]$/ && -f "$refdir/$_" } readdir(DIR);
+        $reference
+            = "$refdir/" . $reffiles[ int( rand( scalar(@reffiles) ) ) ];
+        closedir DIR;
+    }
+elsif ( $rsignal == 2 ){
+      my $sketch_output = $workdir . "/sketch_output.txt";
+      $reference = PhaME::PickRefGenome($workdir, $refdir, $error, $logfile, $sketch_output);
+    }
 
 
 ( $name, $path, $suffix ) = fileparse( "$reference", qr/\.[^.]*/ );
 if ( $gsignal == 1 )   { $annotation = "$refdir/$name.gff"; }
 if ( $pselection > 0 ) { $genefile   = "$refdir/$name.gff"; }
 
-my $error   = "$outdir/$project.error";
-my $logfile = "$outdir/$project\_PhaME.log";
 
 &print_timeInterval( $runtime, "\tLoading information\n" );
 print "\tRefd:\t$refdir\n";
