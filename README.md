@@ -175,6 +175,17 @@ You can use "git" to obtain the package:
       - HyPhy results
 
 
+## Parameters
+
+### reference
+`reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference`
+
+### code
+`code = 1  # 0:Bacteria; 1:Virus`
+
+`Virus` sets option for nucmer alignment that is not default.
+
+`Bacteria` aligns using default option with `maxmatch` for nucmer.
 
 
 --------------------------------------------------------------

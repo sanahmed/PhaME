@@ -508,7 +508,7 @@ if ( $nucmer == 1 ) {
     elsif ( $buildSNPdb == 0 ) {
         &print_timeInterval( $runtime,
             "\tRunning NUCmer on complete genomes\n" );
-        my $fakefile = "_";
+        my $fakefile = "_________________";
         PhaME::completeNUCmer( $fakefile, $workdir, $bindir,
             "$workdir/fasta_list.txt", $type, $threads, $error, $logfile );
     }
