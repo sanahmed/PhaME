@@ -16,12 +16,14 @@ use FindBin qw($RealBin);
 use Getopt::Long;
 use File::Basename;
 use Parallel::ForkManager;
+use lib "$RealBin/../lib/";
+use lib "$RealBin/../ext/lib/perl5";
 use PhaME;
 
 # set up environments
 $ENV{PATH} = "$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
-my $ref_genome;
+my $ref_genome      = " ";
 my $breaklen        = 200;
 my $mincluster      = 65;
 my $diagfactor      = 0.12;
@@ -38,14 +40,16 @@ $outdir =~ s/\n//;
 my $options = "--maxmatch ";
 my $check;
 my $gaps2;
+my $buildSNPdb;
 
 GetOptions(
-    'r|ref_genome=s' => \$ref_genome,     # an option to specify ref file
-    'q|querydir=s'   => \$query_dir,
-    'd|outdir=s'     => \$outdir,
-    't|thread=i'     => \$thread,
-    'l|list=s'       => \$list,
-    'c|code=s'       => \$code,
+    'r|ref_genome=s' => \$ref_genome,     # string option to specify ref file
+    'b|buildSNPdb=i' => \$buildSNPdb,
+    'q|querydir=s'   => \$query_dir,      # string option to specifu query dir
+    'd|outdir=s'     => \$outdir,         # output directory
+    't|thread=i'     => \$thread,         # integer, number of threads
+    'l|list=s'       => \$list,           # string, file with list of fasta
+    'c|code=s'       => \$code,           #
     'h|help'         => sub { usage() }
 );
 
@@ -81,10 +85,18 @@ my $ref_gaps;
 my $query_gaps;
 
 #$ENV{PATH}= "$bindir:/usr/local/bin:/usr/bin:/bin:/opt/apps/bin";
+
+########################## Main ################################################
 read_directory($query_dir);
 run_self_nucmer(@query);
-run_nucmer(@query);
+if ( $buildSNPdb == 0 ) {
+    run_ref_nucmer( @query, $ref_genome );
+}
+elsif ( $buildSNPdb == 1 ) {
+    run_nucmer(@query);
+}
 cleanup();
+################################################################################
 
 sub read_directory {
     my $dir = shift;
@@ -128,8 +140,6 @@ sub run_self_nucmer {
 
     foreach my $reference (@query) {
 
-        # skip if the genome is not part of the references
-        # next if $reference !~ /$ref_genome/ && $ref_genome;
         $pm->start and next;
         my ( $name, $path, $suffix ) = fileparse( "$reference", qr/\.[^.]*/ );
         my $coords = $outdir . '/' . $name . '_repeat_coords.txt';
@@ -139,6 +149,7 @@ sub run_self_nucmer {
         my $command
             = "get_repeat_coords.pl -l $len_cutoff -i $repeat_identity -o $coords -s $stat $reference";
         if ( system($command) ) { die "Error running $command.\n"; }
+
         my $remove_repeats
             = "removeRepeats.pl -f $reference -c $coords -o $fasta";
         if ( system($remove_repeats) ) {
@@ -180,7 +191,7 @@ sub run_nucmer {
         my $second_fasta = $outdir . '/' . $second_name . '_norepeats.fna';
 
         #need to write a split function here to just get the equivalent of
-        if ( $first_name !~ /$ref_genome/ && $ref_genome ) {
+        # if ( $first_name !~ /$ref_genome/ && $ref_genome ) {
             print "Running nucmer on $prefix1\n";
             my $nucmer_command1
                 = "nucmer $options -p $prefix1 $first_fasta $second_fasta  2>/dev/null";
@@ -225,9 +236,9 @@ sub run_nucmer {
                     "$second_name aligned < 25% of the $first_name genome\n";
             }
 
-        }
+        # }
 
-        if ( $second_name !~ /$ref_genome/ && $ref_genome ) {
+        # if ( $second_name !~ /$ref_genome/ && $ref_genome ) {
             print "Running nucmer on $prefix2\n";
             my $nucmer_command2
                 = "nucmer $options -p $prefix2 $second_fasta $first_fasta  2>/dev/null";
@@ -272,7 +283,7 @@ sub run_nucmer {
                     "$first_name aligned < 25% of the $second_name genome\n";
             }
 
-        }
+        # }
 
         $pm->finish(0);
     }
@@ -280,6 +291,80 @@ sub run_nucmer {
     $pm->wait_all_children;
 
     print "NUCmer on all reference genomes complete.\n";
+}
+
+sub run_ref_nucmer {
+    my $ref_genome = shift;
+    my $iteration  = PhaME::combo( 2, @query );
+    my $pm         = new Parallel::ForkManager($thread);
+
+    $pm->run_on_finish(
+        sub {
+            my ( $pid, $exit_code, $ident, $exit_signal, $core_dump ) = @_;
+        }
+    );
+
+    while ( my @combo = $iteration->() ) {
+        $pm->start(@combo) and next;
+        my %hash;
+        my ( $second_name, $second_path, $second_suffix )
+            = fileparse( "$combo[1]", qr/\.[^.]*/ );
+        my ( $ref_name, $ref_path, $ref_suffix )
+            = fileparse( $ref_genome, qr/\.[^.]*/ );
+        $ref_name =~ s/\.fna//;
+        $second_name =~ s/\.fna//;
+        my $prefix1      = $ref_name . '__' . $second_name;
+        my $ref_fasta    = $outdir . '/' . $ref_name . '_norepeats.fna';
+        my $second_fasta = $outdir . '/' . $second_name . '_norepeats.fna';
+
+        print "Running nucmer on $prefix1\n";
+        my $nucmer_command1
+            = "nucmer $options -p $prefix1 $ref_fasta $second_fasta  2>/dev/null";
+        if ( system($nucmer_command1) ) {
+            die "Error running nucmer_command1 $nucmer_command1.\n";
+        }
+
+        my $filter_command1
+            = "delta-filter -1 $identity $outdir/$prefix1.delta > $outdir/$prefix1.snpfilter";
+        if ( system($filter_command1) ) {
+            die "Error running filter_command1 $filter_command1.\n";
+        }
+
+        my $snp_command1
+            = "show-snps -CT $outdir/$prefix1.snpfilter > $outdir/$prefix1.snps";
+        if ( system($snp_command1) ) {
+            die "Error running snp_command1 $snp_command1.\n";
+        }
+        $snp_indel = `SNP_INDEL_count.pl $outdir/$prefix1.snps`;
+        $snp_indel =~ s/\n//;
+        ( $snp_n, $indel_n ) = split /\t/, $snp_indel;
+
+        my $filter_command2
+            = "delta-filter -1 $identity $outdir/$prefix1.delta > $outdir/$prefix1.gapfilter";
+        if ( system($filter_command2) ) {
+            die "Error running filter_command2 $filter_command2.\n";
+        }
+
+        my $coords_command1
+            = "show-coords -clTr $outdir/$prefix1.gapfilter > $outdir/$prefix1.coords";
+        if ( system($coords_command1) ) {
+            die "Error running coords_command1 $coords_command1.\n";
+        }
+        my $gaps1
+            = `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix1.coords 2>/dev/null`;
+        ( $ref_gaps, $query_gaps, undef ) = split /\n/, $gaps1;
+
+        my $check
+            = `checkNUCmer.pl -i $outdir/$ref_name\_$second_name.gaps -r $ref_fasta`;
+        if ( $check == 1 ) {
+            print "$second_name aligned < 25% of the $ref_genome genome\n";
+        }
+
+        $pm->finish(0);
+    }
+        $pm->wait_all_children;
+        print "NUCmer on all reference genomes complete.\n";
+    
 }
 
 sub combo {

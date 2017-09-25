@@ -1,7 +1,7 @@
        refdir = test/ref  # directory where reference files are located
       workdir = test # directory where contigs/reads files are located and output is stored
 
-    reference = 1  # 0:pick a random reference; 1:use given reference
+    reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
       reffile = KJ660347.fasta  # reference filename 
 
       project = ebola  # main alignment file name

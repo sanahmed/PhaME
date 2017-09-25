@@ -429,11 +429,12 @@ sub completeNUCmer {
     my $thread    = shift;
     my $error     = shift;
     my $log       = shift;
+    my $buildSNPdb = shift;
     my $outdir    = $indir . '/results';
 
     print "\n";
     my $nucmer
-        = "runNUCmer.pl -r $reference -q $indir -d $outdir -t $thread -l $list -c $code 2>$error > $log\n\n";
+        = "runNUCmer.pl -r $reference -q $indir -d $outdir -t $thread -l $list -c $code -b $buildSNPdb 2>$error > $log\n\n";
     print $nucmer;
     if ( system($nucmer) ) { die "Error running $nucmer.\n"; }
 }

@@ -106,13 +106,12 @@ while (<CTL>) {
         if ( !-e $outdir ) { `mkdir -p $outdir`; }
     }
 
-    if (/project\s*=\s*(\S+)\s*#{0,1}.*$/)   { $project = $1; }
+    if (/project\s*=\s*(\S+)\s*#{0,1}.*$/) { $project = $1; }
 
     if (/reference\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $rsignal = $1; }
     if ( $rsignal == 1 && /reffile\s*=\s*(\S+)\s*#{0,1}.*$/ ) {
         $reference = "$refdir/$1";
     }
-
 
     if (/cdsSNPS\s*=\s*(0|1)\s*#{0,1}.*$/) { $gsignal = $1; }
 
@@ -163,23 +162,22 @@ my $error   = "$outdir/$project.error";
 my $logfile = "$outdir/$project\_PhaME.log";
 
 if ( $rsignal == 0 ) {
-        opendir( DIR, $refdir );
-        my @reffiles
-            = grep { /.[fna|fa|fasta|fsa]$/ && -f "$refdir/$_" } readdir(DIR);
-        $reference
-            = "$refdir/" . $reffiles[ int( rand( scalar(@reffiles) ) ) ];
-        closedir DIR;
-    }
-elsif ( $rsignal == 2 ){
-      my $sketch_output = $workdir . "/sketch_output.txt";
-      $reference = PhaME::PickRefGenome($workdir, $refdir, $error, $logfile, $sketch_output);
-    }
-
+    opendir( DIR, $refdir );
+    my @reffiles
+        = grep { /.[fna|fa|fasta|fsa]$/ && -f "$refdir/$_" } readdir(DIR);
+    $reference
+        = "$refdir/" . $reffiles[ int( rand( scalar(@reffiles) ) ) ];
+    closedir DIR;
+}
+elsif ( $rsignal == 2 ) {
+    my $sketch_output = $workdir . "/sketch_output.txt";
+    $reference = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
+        $sketch_output );
+}
 
 ( $name, $path, $suffix ) = fileparse( "$reference", qr/\.[^.]*/ );
 if ( $gsignal == 1 )   { $annotation = "$refdir/$name.gff"; }
 if ( $pselection > 0 ) { $genefile   = "$refdir/$name.gff"; }
-
 
 &print_timeInterval( $runtime, "\tLoading information\n" );
 print "\tRefd:\t$refdir\n";
@@ -393,8 +391,9 @@ if ( $time == 1 ) {
     }
 }
 if ( $time == 2 && $check == 1 ) { exit; }
-if ( $check == 0 ) { print "Complete.\n";
- }
+if ( $check == 0 ) {
+    print "Complete.\n";
+}
 
 &print_timeInterval( $runtime, "\tPreparing files... \n" );
 if ( $check == 0 ) {
@@ -499,21 +498,11 @@ if ( $nucmer == 1 ) {
         #      print "$names\t",$fasta_list{$names},"\n";
     }
 
-    if ( $buildSNPdb == 1 ) {
-        &print_timeInterval( $runtime,
-            "\tRunning NUCmer on complete genomes\n" );
-        PhaME::completeNUCmer( $reference, $workdir, $bindir,
-            "$workdir/fasta_list.txt", $type, $threads, $error, $logfile );
-    }
-    elsif ( $buildSNPdb == 0 ) {
-        &print_timeInterval( $runtime,
-            "\tRunning NUCmer on complete genomes\n" );
-        my $fakefile = "_________________";
-        PhaME::completeNUCmer( $fakefile, $workdir, $bindir,
-            "$workdir/fasta_list.txt", $type, $threads, $error, $logfile );
-    }
-
-    #   &print_timeInterval($runtime,"\tNUCmer on genomes complete\n");
+    &print_timeInterval( $runtime, "\tRunning NUCmer on complete genomes\n" );
+    PhaME::completeNUCmer( $reference, $workdir, $bindir,
+        "$workdir/fasta_list.txt", $type, $threads, $error, $logfile,
+        $buildSNPdb );
+    &print_timeInterval( $runtime, "\tNUCmer on genomes complete\n" );
 }
 
 if ( $contig_nucmer == 1 ) {
