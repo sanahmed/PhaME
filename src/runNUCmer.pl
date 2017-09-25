@@ -23,7 +23,7 @@ use PhaME;
 # set up environments
 $ENV{PATH} = "$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
-my $ref_genome      = " ";
+my $ref_genome;
 my $breaklen        = 200;
 my $mincluster      = 65;
 my $diagfactor      = 0.12;
@@ -294,7 +294,8 @@ sub run_nucmer {
 }
 
 sub run_ref_nucmer {
-    my $ref_genome = shift;
+    # my $ref_genome = shift;
+    print "Aligning to the reference genome "."$ref_genome\n\n";
     my $iteration  = PhaME::combo( 2, @query );
     my $pm         = new Parallel::ForkManager($thread);
 
