@@ -70,6 +70,8 @@ You can use "git" to obtain the package:
 
 #### Input files
 
+Please avoid filenames that have multiple `.`.
+
 * A directory with reference files (complete genomes) which have the following file suffixes
   - *.fasta
   - *.fna
