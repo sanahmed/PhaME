@@ -79,7 +79,6 @@ You can use "git" to obtain the package:
 * A working directory 
   - Contig files with the following file suffixes
      - *.contig
-     - *.ctg
      - *.contigs
      
   - Reads files with the following file suffixes
