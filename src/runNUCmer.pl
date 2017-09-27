@@ -106,7 +106,7 @@ sub read_directory {
     if ( $dir =~ /.+\/$/ ) { my $temp = chop($dir); }
     $dir = $dir . '/files';
 
-    open( IN, $list ) || die;
+    open( IN, "<", $list ) || die;
     while (<IN>) {
         chomp;
         $queries{$_}++;
@@ -294,7 +294,6 @@ sub run_nucmer {
 }
 
 sub run_ref_nucmer {
-    # my $ref_genome = shift;
     print "Aligning to the reference genome "."$ref_genome\n\n";
     my $iteration  = PhaME::combo( 2, @query );
     my $pm         = new Parallel::ForkManager($thread);
@@ -305,22 +304,21 @@ sub run_ref_nucmer {
         }
     );
 
-    while ( my @combo = $iteration->() ) {
-        $pm->start(@combo) and next;
-        my %hash;
-        my ( $second_name, $second_path, $second_suffix )
-            = fileparse( "$combo[1]", qr/\.[^.]*/ );
+    foreach my $full_genome (@query) {
+        $pm->start and next;
+        my ( $full_genome_name, $full_genome_path, $full_genome_suffix )
+            = fileparse( "$full_genome", qr/\.[^.]*/ );
         my ( $ref_name, $ref_path, $ref_suffix )
             = fileparse( $ref_genome, qr/\.[^.]*/ );
         $ref_name =~ s/\.fna//;
-        $second_name =~ s/\.fna//;
-        my $prefix1      = $ref_name . '__' . $second_name;
+        $full_genome_name =~ s/\.fna//;
+        my $prefix1      = $ref_name . '__' . $full_genome_name;
         my $ref_fasta    = $outdir . '/' . $ref_name . '_norepeats.fna';
-        my $second_fasta = $outdir . '/' . $second_name . '_norepeats.fna';
+        my $full_genome_fasta = $outdir . '/' . $full_genome_name . '_norepeats.fna';    
 
         print "Running nucmer on $prefix1\n";
         my $nucmer_command1
-            = "nucmer $options -p $prefix1 $ref_fasta $second_fasta  2>/dev/null";
+            = "nucmer $options -p $prefix1 $ref_fasta $full_genome_fasta  2>/dev/null";
         if ( system($nucmer_command1) ) {
             die "Error running nucmer_command1 $nucmer_command1.\n";
         }
@@ -356,9 +354,9 @@ sub run_ref_nucmer {
         ( $ref_gaps, $query_gaps, undef ) = split /\n/, $gaps1;
 
         my $check
-            = `checkNUCmer.pl -i $outdir/$ref_name\_$second_name.gaps -r $ref_fasta`;
+            = `checkNUCmer.pl -i $outdir/$ref_name\_$full_genome_name.gaps -r $ref_fasta`;
         if ( $check == 1 ) {
-            print "$second_name aligned < 25% of the $ref_genome genome\n";
+            print "$full_genome_name aligned < 25% of the $ref_genome genome\n";
         }
 
         $pm->finish(0);
