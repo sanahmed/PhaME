@@ -129,12 +129,21 @@ Please avoid filenames that have multiple `.`.
       - `project`_all.fasttree
     - FastTree using SNPs from coding sequence
       - `project`_cds.fasttree
-
   - Text file containing:
     - the size of gaps between `reference` and other genomes.
       - `project`_all_gaps.txt
-    - summary file containing information on the core genome size, total SNPs, etc.
+    - A tab delimited summary file containing information on the core genome size, total SNPs, etc.
       - `project`_summaryStatistics.txt 
+        - Most rows are genome name (first column), attribute name (second column), and corresponding value (third column)
+          - `Total_length` for genome size (total base pair) of the corresponding genome (first column)
+          - `Gap_legnth` for total gaps in the corresponding genome (first column)
+        - One row labeled `REPEAT` (first column) and `Gap_length`(second column) actually correspond to repeat size (third column) of reference genome.
+        - `Reference used` shows the name of the reference genome used.
+        - `Total gap length:` shows the length of total gaps in the alignment.
+        - `Core genome length:` shows the length of genomes that were aligned.
+        - `Total SNPs:` shows the length of SNPs.
+        - `CDS SNPs:` shows the subset of SNPs from Total SNPs that fall within coding regions.
+           
     - the average genome size
     - number of whole genome SNPs
     - and coding region SNPs
