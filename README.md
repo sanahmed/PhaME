@@ -143,7 +143,6 @@ Please avoid filenames that have multiple `.`.
         - `Core genome length:` shows the length of genomes that were aligned.
         - `Total SNPs:` shows the length of SNPs.
         - `CDS SNPs:` shows the subset of SNPs from Total SNPs that fall within coding regions.
-           
     - the average genome size
     - number of whole genome SNPs
     - and coding region SNPs
@@ -157,10 +156,8 @@ Please avoid filenames that have multiple `.`.
       - `project`_snp_CDSmatrix.txt
     - intergenic only
       - `project`_snp_intergenicMatrix.txt
-
 * Log file
   - `project`_PhaME.log
-
 * Error file
   - `project`.error 
 
@@ -189,6 +186,10 @@ Please avoid filenames that have multiple `.`.
 
 ### reference
 `reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference`
+  0, picks a random genome to be reference from the reference folder.
+  1, user specified reference
+  2, uses the genome that has the best ANI among all genomes. Calculated using mash implementation in bbmap.
+
 
 ### code
 `code = 1  # 0:Bacteria; 1:Virus`
