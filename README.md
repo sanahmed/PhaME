@@ -199,6 +199,12 @@ Please avoid filenames that have multiple `.`.
 `Bacteria` aligns using default option with `maxmatch` for nucmer.
 
 
+### cutoff
+
+`cutoff = `X
+
+Option to remove genomes that aligned with less than X proportion (0-1) of the reference genome. 
+
 --------------------------------------------------------------
 ## CITATION
 
