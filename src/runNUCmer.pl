@@ -353,10 +353,14 @@ sub run_ref_nucmer {
             = `parseGapsNUCmer.pl $gap_cutoff $outdir/$prefix1.coords 2>/dev/null`;
         ( $ref_gaps, $query_gaps, undef ) = split /\n/, $gaps1;
 
-        my $check
+        my $aligned_percentage
             = `checkNUCmer.pl -i $outdir/$ref_name\_$full_genome_name.gaps -r $ref_fasta`;
-        if ( $check == 1 ) {
-            print "$full_genome_name aligned < 25% of the $ref_genome genome\n";
+        
+        if ( $aligned_percentage < 25 ) {
+            print "$full_genome_name aligned < 25% ($aligned_percentage) of the $ref_genome genome\n";
+        }
+        elsif ( $aligned_percentage >= 25 ) {
+            print "$full_genome_name aligned > 25% ($aligned_percentage) of the $ref_genome genome\n";
         }
 
         $pm->finish(0);

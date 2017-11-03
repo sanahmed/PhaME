@@ -7,7 +7,7 @@ use FileHandle;
 my $infile;
 my $reffile;
 my $reference;
-my $length = 0;
+my $gap_length = 0;
 
 GetOptions(
     'i=s'    => \$infile,
@@ -15,23 +15,33 @@ GetOptions(
     'h|help' => sub { usage() },
 );
 
-read_reference($reffile);
+get_length($reffile);
 read_gaps($infile);
 
-sub read_reference {
-    my ( $header, @seq, $sequence );
-    my $fh = FileHandle->new($reffile) || die "$!";
-    if ( $fh->open("< $reffile") ) {
-        $/ = ">";
-        while (<$fh>) {
-            $_ =~ s/\>//g;
-            unless ($_) { next; }
-            ( $header, @seq ) = split /\n/, $_;
-            $sequence = join "", @seq;
-            $reference = length $sequence;
-        }
-    }
+
+sub get_length {
+   # The function counts the position in a file that doesnt begin with
+   # >, so it still counts other characters that
+   # are not ATCG, but for the purpose here, it should be OK
+   my $seq = '';
+   open(my $fh, '<', $reffile);
+   while (my $row = <$fh>)
+      {
+      chomp $row;
+
+      if ($row =~ m/^>/)
+      {
+          next;
+      }
+      # remove trailing white spaces
+      $row =~ s/^\s+|\s+$//g;
+      $seq .= $row;
 }
+
+$reference = length($seq);
+
+}
+
 
 sub read_gaps {
     my $line;
@@ -41,12 +51,14 @@ sub read_gaps {
         while (<$fh>) {
             unless ($_) { next; }
             my ( $ref, $start, $end, $len, $query ) = split /\t/, $_;
-            $length += $len;
+            $gap_length += $len;
         }
     }
-    my $difference = $length / $reference;
-    if ( $difference < 0.75 )  { print "0"; }
-    if ( $difference >= 0.75 ) { print "1"; }
+    
+   my $aligned_percentage = sprintf("%.2f", (1 - ($gap_length / $reference))*100);
+   print $aligned_percentage;
+    # if ( $gap_proportion < 0.75 )  { print "0"; }
+    # if ( $gap_proportion >= 0.75 ) { print "1"; }
 }
 
 sub usage {
