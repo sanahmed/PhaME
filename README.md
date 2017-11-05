@@ -38,6 +38,8 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * cmake VER >= 3.0.1
 
+* bcftools VER >= 1.6
+
 --------------------------------------------------------------
 ## PERL PACKAGES
 

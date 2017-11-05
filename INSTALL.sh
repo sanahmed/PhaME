@@ -30,6 +30,7 @@ R_VER=3.3.1
 RAxML_VER=8.2.9
 samtools_VER=1.3.1
 perl5_VER=5.8.0
+bcftools_VER=1.6
 
 #minimum required version of Perl modules
 perl_File_Basename_VER=2.85
@@ -327,6 +328,21 @@ echo "
                            paml v4.9
 --------------------------------------------------------------------------------
 "
+}
+
+install_bcftools()
+{
+echo "--------------------------------------------------------------------------
+                           installing bcftools v$bcftools_VER
+--------------------------------------------------------------------------------
+"
+conda install --yes -c bioconda bcftools_VER=$bcftools_VER -p $ROOTDIR/thirdParty/miniconda
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/bcftools $ROOTDIR/bin/bcftools
+echo "--------------------------------------------------------------------------
+                           installed bcftools v$bcftools_VER
+--------------------------------------------------------------------------------
+"
+
 }
 
 install_perl_Getopt_Long()
@@ -634,6 +650,23 @@ then
 else
   echo "mafft was not found"
   install_mafft
+fi
+
+
+################################################################################
+if ( checkSystemInstallation bcftools )
+then
+  bcftools_installed_VER=`bcftools -v 2>&1| grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
+  if  ( echo $bcftools_installed_VER $bcftools_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+  then 
+    echo " - found bcftools $bcftools_installed_VER"
+  else
+  echo "Required version of bcftools was not found"
+  install_bcftools
+  fi
+else 
+  echo "bcftools was not found"
+  install_bcftools
 fi
 ################################################################################
 if ( checkSystemInstallation codeml )
