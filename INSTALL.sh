@@ -336,7 +336,7 @@ echo "--------------------------------------------------------------------------
                            installing bcftools v$bcftools_VER
 --------------------------------------------------------------------------------
 "
-conda install --yes -c bioconda bcftools_VER=$bcftools_VER -p $ROOTDIR/thirdParty/miniconda
+conda install --yes -c bioconda bcftools=$bcftools_VER -p $ROOTDIR/thirdParty/miniconda
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/bcftools $ROOTDIR/bin/bcftools
 echo "--------------------------------------------------------------------------
                            installed bcftools v$bcftools_VER
