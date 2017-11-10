@@ -41,6 +41,7 @@ perl_Parllel_ForkManager_VER=1.17
 perl_Time_BaseName=2.85
 perl_Time_HiRes=1.9726
 perl_Statistics_Distributions_VER=1.02
+perl_Test_Exception_VER=0.43
 
 
 
@@ -352,6 +353,19 @@ echo "--------------------------------------------------------------------------
 --------------------------------------------------------------------------------
 "
 cpanm Getopt::Long@$perl_Getopt_Long_VER
+echo "
+--------------------------------------------------------------------------------
+                           Getopt::Long v2.45 installed
+--------------------------------------------------------------------------------
+"
+}
+install_perl_Test_Exception()
+{
+echo "--------------------------------------------------------------------------
+                installing Perl Module Test::Exception v0.46
+--------------------------------------------------------------------------------
+"
+cpanm Getopt::Long@$perl_Test_Exception_VER
 echo "
 --------------------------------------------------------------------------------
                            Getopt::Long v2.45 installed
@@ -782,7 +796,22 @@ else
   echo "Perl IO::Handle is not found"
   install_perl_IO_Handle
 fi
-
+#------------------------------------------------------------------------------#
+if ( checkPerlModule Test::Exception )
+then
+  perl -MTest::Exception -e 'print $Test::Exception::VERSION ."\n";'
+  perl_Test_Exception_installed_VER=`perl -MTest::Exception -e 'print $Test::Exception::VERSION ."\n";'`
+  if ( echo $perl_Test_Exception_installed_VER $perl_Test_Exception_VER | awk '{if($2>=$3) exit 0; else exit 1}')
+  then
+    echo " - found Perl module Test::Exception $perl_Test_Exception_installed_VER"
+  else
+    echo "Required version of Test::Exception $perl_Test_Exception_VER was not found"
+    install_perl_Test_Exception
+  fi
+else
+  echo "Perl Test::Exception is not found"
+  install_perl_Test_Exception
+fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule Parallel::ForkManager )
 then
