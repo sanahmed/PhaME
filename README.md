@@ -40,6 +40,8 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * bcftools VER >= 1.6
 
+* samtools VER >= 1.6
+
 --------------------------------------------------------------
 ## PERL PACKAGES
 
