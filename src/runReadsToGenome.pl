@@ -104,7 +104,7 @@ if ( $aligner =~ /bowtie/i and !-e "$ref_file.1.bt2" ) {
 # fold sequence in 100 bp per line (samtools cannot accept > 65535 bp one line sequence)
     $ref_file = &fold($ref_file);
     print "Creating bowtie index\n";
-    print "[RUNNING] bowtie2-build $ref_file $ref_file\n";
+    print "[RUNNING:] bowtie2-build $ref_file $ref_file\n";
     `bowtie2-build $ref_file $ref_file`;
 
 }
@@ -114,7 +114,7 @@ elsif ( $aligner =~ /bwa/i and !-e "$ref_file.bwt" ) {
 # fold sequence in 100 bp per line (samtools cannot accept > 65535 bp one line sequence)
     $ref_file = &fold($ref_file);
     print "Creating bwa index\n";
-    print "[RUNNING] bwa index $ref_file\n";
+    print "[RUNNING:] bwa index $ref_file\n";
     `bwa index $ref_file`;
 }
 elsif ( $aligner =~ /snap/i ) {
@@ -228,25 +228,30 @@ elsif ($file_long) {
 }
 
 ## index reference sequence
+print "Index reference file \n\n";
+print "[RUNNING:] samtools faidx $ref_file";
 `samtools faidx $ref_file`;
 
 ## index BAM file
+print "Index BAM file \n\n";
+print "[RUNNING:] samtools index $bam_output $bam_index_output";
 `samtools index $bam_output $bam_index_output`;
 
+
 ## generate statistical numbers
-print "Generate alignment statistical numbers \n";
+print "Generate alignment statistical numbers \n\n";
+print "[RUNNING:] samtools flagstat $bam_output > $stats_output";
 `samtools flagstat $bam_output > $stats_output`;
 
 ## SNP call
-print "SNPs/Indels call...\n";
-
+print "SNPs/Indels call...\n\n";
 # `samtools mpileup -ugf $ref_file $bam_output | bcftools view -bcg - > $bcf_output `;
 print
-    "[RUNNING] samtools mpileup -ugf $ref_file $bam_output | bcftools call -vmO z -o $bcf_output\n";
+    "[RUNNING:] samtools mpileup -ugf $ref_file $bam_output | bcftools call -vmO z -o $bcf_output\n\n";
 `samtools mpileup -ugf $ref_file $bam_output | bcftools call -vmO z -o $bcf_output `;
 
 print
-    "[RUNNING] bcftools view $bcf_output | bcftools view -v snps | vcfutils.pl varFilter -a 3 -d1 -D1000 > $vcf_output\n";
+    "[RUNNING] bcftools view $bcf_output | bcftools view -v snps | vcfutils.pl varFilter -a 3 -d1 -D1000 > $vcf_output\n\n";
 `bcftools view $bcf_output | bcftools view -v snps | vcfutils.pl varFilter -a 3 -d1 -D1000 > $vcf_output`;
 
 ## derived chimera info
@@ -261,8 +266,9 @@ if ( $aligner =~ /bwa/i and $paired_files ) {
 }
 
 ## generate genome coverage plots and histograms
-# print "Generate genome coverage plots and histograms...\n";
-# `samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output >$pileup_output`;
+print "Generate genome coverage plots and histograms...\n";
+print "[RUNNING:] samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output > $pileup_output";
+`samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output > $pileup_output`;
 
 if ($paired_files) {
     ## generate proper-paired reads coverage

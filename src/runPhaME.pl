@@ -91,6 +91,7 @@ my $buildSNPdb = 0;
 my $control = $ARGV[0] || "phame.ctl";
 my $bindir = getBinDirectory();
 
+##########################################################################################
 ## Read in control file
 open( CTL, "$control" ) || die "Please provide a control file";
 
@@ -154,13 +155,15 @@ while (<CTL>) {
             die("-thread value must be between 1 and $maxthreads.\n");
         }
     }
-    if (/cutoff\s*=\s*(\d\.\d+)\s*#.*$/) { $cutoff = $1; }
+    if (/cutoff\s*=\s*(\d+\.*\d+)\s*#.*$/) { $cutoff = $1; }
 }
 close CTL;
+##########################################################################################
 
 my $error   = "$outdir/$project.error";
 my $logfile = "$outdir/$project\_PhaME.log";
 
+# Picking up reference genome if one is not picked by the user
 if ( $rsignal == 0 ) {
     opendir( DIR, $refdir );
     my @reffiles
@@ -168,6 +171,11 @@ if ( $rsignal == 0 ) {
     $reference
         = "$refdir/" . $reffiles[ int( rand( scalar(@reffiles) ) ) ];
     closedir DIR;
+
+# I add this here to just run mash regardless, but not use mash picked genome as reference
+    my $sketch_output = $workdir . "/sketch_output.txt";
+    my $mash_ref = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
+        $sketch_output );
 }
 elsif ( $rsignal == 2 ) {
     my $sketch_output = $workdir . "/sketch_output.txt";
@@ -175,11 +183,26 @@ elsif ( $rsignal == 2 ) {
         $sketch_output );
 }
 
+elsif ( $rsignal == 1 ) {
+
+# I add this here to just run mash regardless, but not use mash picked genome as reference
+    my $sketch_output = $workdir . "/sketch_output.txt";
+    my $mash_ref = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
+        $sketch_output );
+}
+
 ( $name, $path, $suffix ) = fileparse( "$reference", qr/\.[^.]*/ );
 if ( $gsignal == 1 )   { $annotation = "$refdir/$name.gff"; }
 if ( $pselection > 0 ) { $genefile   = "$refdir/$name.gff"; }
 
-&print_timeInterval( $runtime, "\tLoading information\n" );
+# Filtering out genomes based on the cutoff using ANI
+# my $sketch_output = $workdir . "/sketch_output.txt";
+# my @remove_genomes = PhaME::filter_genomes($sketch_output, $reference, $cutoff, $workdir);
+# print "Warning: These genomes will be removed as they do not pass given ANI cutoff of $cutoff% with reference:$reference";
+# print join("\n", @remove_genomes);
+
+print("\n");
+&print_timeInterval( "\n$runtime\n", "\tLoading information\n" );
 print "\tRefd:\t$refdir\n";
 print "\tWorkd:\t$workdir\n";
 print "\tOutd:\t$outdir\n";
@@ -565,8 +588,10 @@ if ( $buildSNP == 1 ) {
         PhaME::codingRegions( $outdir, $annotation, $genname );
     }
     &print_timeInterval( $runtime, "Identifying SNPs\n" );
+    &print_timeInterval( $runtime, "Starting with gaps\n" );
     PhaME::identifyGaps( $outdir, "$workdir/working_list.txt", $name, "snp",
         $project );
+    &print_timeInterval( $runtime, "Gap identification complete\n" );
     my $end
         = PhaME::buildSNPDB( $outdir, $bindir, $reference,
         "$workdir/working_list.txt", $project, $gsignal, $error, $logfile,
@@ -575,11 +600,6 @@ if ( $buildSNP == 1 ) {
 }
 
 if ( $buildtree == 1 || $bs == 1 ) {
-
-# if (($tree==2||$tree==3)&&($modeltest==1)){
-#     my $jmodeltest_jar = "$RealBin/../ext/opt/jmodeltest-2.1.10/jModelTest.jar";
-#     PhaME::modeltest($jmodeltest_jar,$outdir,$project,$threads,$error,$logfile);
-# }
     my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
         "$project\_all", $error, $logfile );
     if ( $gsignal == 1 ) {

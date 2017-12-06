@@ -4,7 +4,7 @@
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
       reffile = GCA_000008865.1_ASM886v1_genomic.fna  # reference filename 
 
-      project = ecoli  # main alignment file name
+      project = Testecoli  # main alignment file name
 
       cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
 
@@ -29,7 +29,7 @@
 
       threads = 4  # Number of threads to use
 
-       cutoff = 98  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
+       cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs/alignments from organism that have lower cutoff.
 
 * When using data option 1,2,5 need a complete reference to align/map to. 
 * Use data option 7 when need to extract SNPs using a sublist of already aligned genomes. 

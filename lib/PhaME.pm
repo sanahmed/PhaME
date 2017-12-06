@@ -233,44 +233,42 @@ sub identifyGaps {
     while ( my $gaps = readdir(DIR) ) {
 
 #   if ($gaps=~ /^$name\_(.+)\_norepeats\.gaps/ || $gaps=~ /^$name\_(.+_contig)s\.gaps/ && $gaps!~ /^$name\_norepeats/){
-        if (   $gaps =~ /^$name\_norepeats\_(.+)\_norepeats\.gaps/
-            || $gaps =~ /^$name\_(.+_contig)s?\.gaps/
-            || $gaps =~ /^$name\_(.+)\.gaps/ )
-        {
-            if ( exists $query{$1} ) {
+    if (   $gaps =~ /^$name\_norepeats\_(.+)\_norepeats\.gaps/
+        || $gaps =~ /^$name\_(.+_contig)s?\.gaps/
+        || $gaps =~ /^$name\_(.+)\.gaps/ ){
+        if ( exists $query{$1} ) {
+            $line = 0;
+            my $gapfile = "$gapdir/$gaps";
+            open( IN, $gapfile ) || die "$!";
+            #print "Nucmer Gaps\n";
+            while (<IN>) { $line++; print GAP "$_"; }
+            close IN;
+            if ( $line == 0 ) {
+                print "Empty File: $gapfile\n";
                 $line = 0;
-                my $gapfile = "$gapdir/$gaps";
-                open( IN, $gapfile ) || die "$!";
-
-                #         print "Nucmer Gaps\n";
-                while (<IN>) { $line++; print GAP "$_"; }
-                close IN;
-                if ( $line == 0 ) {
-                    print "Empty File: $gapfile\n";
-                    $line = 0;
-                }
             }
         }
-        if ( $type =~ /snp/ ) {
-
+    }
+    
+    if ( $type =~ /snp/ ) {
   #      if ($gaps=~ /^$name\_norepeats\_(.+)\_?$name?\_?[\d+\_\d+]?\.gaps$/){
-            if ( $gaps =~ /^$name\_(.+)\_$name(\_\d+\_\d+)?\.gaps$/ ) {
-                my $query = $1;
-                my @read_types = ( "_pread", "_sread", "_read" );
-                foreach my $type (@read_types) {
-                    my $tmp = $query . $type;
-                    if ( exists $query{$tmp} ) {
-                        my $gap_file = "$gapdir/$gaps";
-                        $line = 0;
-                        open( IN, $gap_file ) || die "$!";
+        if ( $gaps =~ /^$name\_(.+)\_$name(\_\d+\_\d+)?\.gaps$/ ) {
+            my $query = $1;
+            my @read_types = ( "_pread", "_sread", "_read" );
+            foreach my $type (@read_types) {
+                my $tmp = $query . $type;
+                if ( exists $query{$tmp} ) {
+                    my $gap_file = "$gapdir/$gaps";
+                    $line = 0;
+                    open( IN, $gap_file ) || die "$!";
 
                         # print "Read Mapping Gaps $gaps\n";
-                        while (<IN>) {
-                            chomp;
-                            $line++;
-                            next if (/Start\s+End\s+Length.+/);
-                            my ( $start, $end, $length, $ref ) = split "\t",
-                                $_;
+                    while (<IN>) {
+                        chomp;
+                        $line++;
+                        next if (/Start\s+End\s+Length.+/);
+                        my ( $start, $end, $length, $ref ) = split "\t",
+                        $_;
                             if ( $ref =~ /$name\_(\d+)\_(\d+)$/ ) {
                                 $gap_start = $start + $1 - 1;
                                 $gap_end   = $1 + $end - 1;
@@ -810,6 +808,7 @@ sub PickRefGenome {
 
     if ( $workdir =~ /.+\/$/ ) { my $temp = chop($workdir); }
     $sketch_dir = $workdir . '/sketches';
+    mkdir $sketch_dir unless -d $sketch_dir;
 
     opendir( WORKDIR, $workdir ) or die $!;
     my @contigfiles
@@ -877,6 +876,22 @@ sub PickRefGenome {
     return $ref_genome1;
 }
 
+
+sub FilterGenomes {
+
+    # A function that outputs list of genomes that needs to be filtered out based on cutoff.
+    my $sketch_file   = shift;
+    my $ref_genome    = shift;
+    my $cutoff = shift;
+    my @remove_list;
+    
+    $ref_genome =~ s/\//\\\//g;
+    my $x = `cat $sketch_file | grep $ref_genome |awk '{ if (\$3 < $cutoff ) print \$1, \$2 }'| sed 's/$ref_genome//g' | sed 's/ //g'`;
+    @remove_list = split(/\n/, $x);
+    return @remove_list;
+}
+
+
 sub combo {
     my $by = shift;
     return sub { () }
@@ -903,6 +918,39 @@ sub combo {
         return @list[@position];
         }
 }
+
+sub filter_genomes {
+
+    # A function that gives list of genomes whose ANI when compared to reference is less than the threshold.
+    # It needs a three column sketch file as input
+    # sketch file contains file path in specified ref directory
+    # but it outputs the path to folder where genomes are copied
+    my $sketch_file   = shift;
+    my $ref_genome    = shift;
+    my $cutoff = shift;
+    my $workdir = shift;
+    my @remove_list;
+    my @final_remove_list;
+    
+    $ref_genome =~ s/\//\\\//g;
+    my $x = `cat $sketch_file | grep $ref_genome |awk '{ if (\$3 < $cutoff ) print \$1, \$2 }'| sed 's/$ref_genome//g' | sed 's/ //g'`;
+    @remove_list = split(/\n/, $x);
+
+    foreach my $remove_file (@remove_list){
+         my($filename, $dirs, $suffix) = File::Basename::fileparse($remove_file, qr/\.[^.]*/);
+         $filename =~ s/\W/_/g;
+         $filename = $filename . ".fna";
+         push(@final_remove_list, $filename)
+
+    }
+    return uniq(@final_remove_list);
+}
+
+sub uniq {
+    my %seen;
+    grep !$seen{$_}++, @_;
+}
+
 
 sub hyphy {
     my $dir      = shift;

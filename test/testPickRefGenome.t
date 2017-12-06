@@ -6,8 +6,6 @@ use FindBin qw($Bin $RealBin);
 use lib "$RealBin/../lib/";
 use Test::More;
 
-# use Test::File;
-
 # Verify module can be included via "use" pragma
 BEGIN { use_ok('PhaME') }
 

@@ -113,9 +113,9 @@ open( GAPF,   ">$allgapfile" )     || die "$!";
 open( BASE,   ">>$basefile" )      || die "$!";
 open( PMAT,   ">$pairMatrixfile" ) || die "$!";
 open( CMAT,   ">$coreMatrixfile" ) || die "$!";
-open( CDSMAT, ">$cdsMatrixfile" )  || die "$!";
-open( IMAT,   ">$intMatrixfile" )  || die "$!";
 if ( $coding == 1 ) {
+    open( IMAT,   ">$intMatrixfile" ) || die "$!";
+    open( CDSMAT, ">$cdsMatrixfile" ) || die "$!";
     open( CDSOUT, ">$cdsSNPoutfile" ) || die "$!";
     open( INTOUT, ">$intSNPoutfile" ) || die "$!";
 }
@@ -224,7 +224,7 @@ sub read_gap {
 
 # my $total_covered_percentage = sprintf("%.2f%%", (1 - ($total_gap_length/(length $ref_sequence)))*100);
             print
-                "Warnings: $query covered only $total_covered of the $reference (<cutoff = $gap_cutoff). It will not be used to build SNP tree and matrix.\n";
+                "Warnings: $query covered only $total_covered of the $reference (<cutoff = $gap_cutoff). It will NOT be used to build SNP tree and matrix.\n";
         }
         else {
           print
