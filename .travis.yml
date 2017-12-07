@@ -13,17 +13,19 @@ install:
 script:
   - PWD=$(pwd)
   - REPWD=$(sed 's/\//\\\//g' <<< $PWD | sed 's/\-/\\\-/g')
-  - sed -i "s/test/$REPWD\/test/g" test/ebola.ctl
-  - perl src/runPhaME.pl test/ebola.ctl
-  - rm -rf test/results
-  - sed -i 's/data = 0/data = 3/g' test/ebola.ctl
-  - perl src/runPhaME.pl test/ebola.ctl
-  - rm -rf test/results
-  - sed -i 's/data = 3/data = 4/g' test/ebola.ctl
-  - perl src/runPhaME.pl test/ebola.ctl
-  - rm -rf test/results
-  - sed -i 's/data = 4/data = 6/g' test/ebola.ctl
-  - perl src/runPhaME.pl test/ebola.ctl  
-  - rm -rf test/results
-  - sed -i 's/buildSNPdb = 0/buildSNPdb = 1/g' test/ebola.ctl
-  - perl src/runPhaME.pl test/ebola.ctl
+  - sed -i "s/test/$REPWD\/test/g" test/ctl_files/ebola.ctl
+  - perl src/runPhaME.pl test/ctl_files/ebola.ctl
+  - rm -rf test/workdirs/ebola_workdir/results
+  - sed -i 's/data = 0/data = 3/g' test/ctl_files/ebola.ctl
+  - perl src/runPhaME.pl test/ctl_files/ebola.ctl
+  - rm -rf test/workdirs/ebola_workdir/results
+  - sed -i 's/data = 3/data = 4/g' test/ctl_files/ebola.ctl
+  - perl src/runPhaME.pl test/ctl_files/ebola.ctl
+  - rm -rf test/workdirs/ebola_workdir/results
+  - sed -i 's/data = 4/data = 6/g' test/ctl_files/ebola.ctl
+  - perl src/runPhaME.pl test/ctl_files/ebola.ctl  
+  - rm -rf test/workdirs/ebola_workdir/results
+  - sed -i 's/buildSNPdb = 0/buildSNPdb = 1/g' test/ctl_files/ebola.ctl
+  - perl src/runPhaME.pl test/ctl_files/ebola.ctl
+  - rm -rf test/workdirs/ebola_workdir/results
+  - perl src/runPhaME.pl ctl_files/ecoli.ctl
