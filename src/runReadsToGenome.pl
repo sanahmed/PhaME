@@ -244,7 +244,7 @@ print "[RUNNING:] samtools flagstat $bam_output > $stats_output";
 `samtools flagstat $bam_output > $stats_output`;
 
 ## SNP call
-print "SNPs/Indels call...\n\n";
+print "\nSNPs/Indels call...\n\n";
 # `samtools mpileup -ugf $ref_file $bam_output | bcftools view -bcg - > $bcf_output `;
 print
     "[RUNNING:] samtools mpileup -ugf $ref_file $bam_output | bcftools call -vmO z -o $bcf_output\n\n";
