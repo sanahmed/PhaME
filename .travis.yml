@@ -28,4 +28,4 @@ script:
   - sed -i 's/buildSNPdb = 0/buildSNPdb = 1/g' test/ctl_files/ebola.ctl
   - perl src/runPhaME.pl test/ctl_files/ebola.ctl
   - rm -rf test/workdirs/ebola_workdir/results
-  - perl src/runPhaME.pl ctl_files/ecoli.ctl
+  - perl src/runPhaME.pl test/ctl_files/ecoli.ctl
