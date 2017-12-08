@@ -267,21 +267,21 @@ if ( $aligner =~ /bwa/i and $paired_files ) {
 
 ## generate genome coverage plots and histograms
 print "Generate genome coverage plots and histograms...\n";
-print "[RUNNING:] samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output > $pileup_output";
+print "[RUNNING:] samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output > $pileup_output\n";
 `samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output > $pileup_output`;
 print "[FINISHED:] Generate genome coverage plots and histograms...\n";
 
 if ($paired_files) {
-    ## generate proper-paired reads coverage
+    ## generate proper-paired reads coverageq
     print "\nGenerate proper-paired reads coverage";
     # print "[RUNNING:] samtools view -@ $samtools_threads -u -h -f 2 $bam_output | samtools mpileup -BQ0 -d10000000 -f $ref_file - | awk '{print \$1"\\t"\$2"\\t"\$4}'  > $outDir/proper_paired$$.coverage";
     `samtools view -@ $samtools_threads -u -h -f 2 $bam_output | samtools mpileup -BQ0 -d10000000 -f $ref_file - | awk '{print \$1"\\t"\$2"\\t"\$4}'  > $outDir/proper_paired$$.coverage`;
-    print "[FINISHED:] Generate proper-paired reads coverage\n";
+    print "\n[FINISHED:] Generate proper-paired reads coverage\n";
     ## generate non-proper-paired reads coverage 2 (properpaired)+4(query unmapped)+8(mate unmapped)
     print "\nGenerate non-proper-paired reads coverage";
     # print "[RUNNING:]samtools view -@ $samtools_threads -u -h -F 14 $bam_output | samtools mpileup -ABQ0 -d10000000 -f $ref_file - | awk '{print \$1"\\t"\$2"\\t"\$4}'  > $outDir/unproper_paired$$.coverage";
     `samtools view -@ $samtools_threads -u -h -F 14 $bam_output | samtools mpileup -ABQ0 -d10000000 -f $ref_file - | awk '{print \$1"\\t"\$2"\\t"\$4}'  > $outDir/unproper_paired$$.coverage`;
-    print "[FINISHED:] Generate non-proper-paired reads coverage\n";
+    print "\n[FINISHED:] Generate non-proper-paired reads coverage\n";
 
 }
 
