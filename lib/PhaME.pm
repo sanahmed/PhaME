@@ -408,7 +408,7 @@ sub codingRegions {
 
 sub clean {
     my $dir = shift;
-    print "\nHERE IS WHERE I CLEAN THIS MESS\n";
+    print "\nCleaning up...\n";
     system(
         "rm -f $dir/*.pileup $dir/*.bam $dir/*.bcf $dir/*.mgaps $dir/*.ntref $dir/*.sam $dir/*.delta $dir/*.filter"
     );
