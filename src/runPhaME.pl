@@ -445,8 +445,8 @@ if ( $check == 0 ) {
         next if ( $files =~ /^\..?/ );
         my ( $qname, $qpath, $qsuffix ) = fileparse( "$files", qr/\.[^.]*/ );
         if ( $nucmer == 1 ) {
-            if (   $files =~ /.+\.fn|s?a?s?t?a$/
-                && $files !~ /contigs?/
+            if ( $files =~ /.+\.fn|s?a?s?t?a$/                
+                && $files !~ /\.contig$|\.contigs$|\.ctg$]$/
                 && $files !~ /fa?s?t?q/ )
             {
                 my $fasta = "$workdir/$files";
@@ -458,7 +458,7 @@ if ( $check == 0 ) {
             }
         }
         if ( $contig_nucmer == 1 ) {
-            if ( $files =~ /.+\.contigs?/ && $files !~ /fa?s?t?q/ ) {
+            if ( $files =~ /\.contig$|\.contigs$|\.ctg$]$/ && $files !~ /fa?s?t?q/ ) {
                 my $contig = $workdir . '/' . $files;
                 my ( $list, $genome_size )
                     = PhaME::prepareContig( $workdir, $contig, $qname );
@@ -468,7 +468,7 @@ if ( $check == 0 ) {
         if ( $read_mapping == 1 ) {
             if (   $files =~ /.+\.f{1}a?s?t?q$/
                 && $files !~ /.+\.f{1}n|s?a?s?t?a$/
-                && $files !~ /\.contigs?/ )
+                && $files !~ /\.contig$|\.contigs$|\.ctg$]$/ )
             {
                 my $fastq = $refdir . '/' . $files;
                 print "$qname\n";
