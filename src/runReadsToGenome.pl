@@ -192,6 +192,7 @@ if ($singleton) {
         $bwa_options    = $bwa_options . "-I ";
     }
     if ( $aligner =~ /bowtie/i ) {
+        print "[RUNNING:] bowtie2 $bowtie_options -x $ref_file -U $singleton -S $outDir/singleton$$.sam\n";
         `bowtie2 $bowtie_options -x $ref_file -U $singleton -S $outDir/singleton$$.sam`;
     }
     elsif ( $aligner =~ /bwa/i ) {
