@@ -244,7 +244,7 @@ sub identifyGaps {
             while (<IN>) { $line++; print GAP "$_"; }
             close IN;
             if ( $line == 0 ) {
-                print "Empty File: $gapfile\n";
+                print "Empty Gap Files: $gapfile\n";
                 $line = 0;
             }
         }
