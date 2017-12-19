@@ -202,7 +202,8 @@ if ($singleton) {
     elsif ( $aligner =~ /snap/i ) {
         `snap single $ref_file.snap $file_long -o $outDir/singleton$$.sam $snap_options`;
     }
-    `samtools view -@ $samtools_threads -uhS $outDir/singleton$$.sam | samtools sort -@ $samtools_threads -o $outDir/singleton$$ -T temp_single -`;
+    
+    `samtools view -@ $samtools_threads -uhS $outDir/singleton$$.sam | samtools sort -@ $samtools_threads -o $outDir/singleton$$.bam -T temp_single -`;
 }
 
 # merge bam files if there are different file type, paired, single end, long..
