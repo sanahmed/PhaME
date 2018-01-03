@@ -164,24 +164,25 @@ if ($paired_files) {
     }
     if ( $aligner =~ /bowtie/i ) {
         print
-            "[RUNNING] bowtie2 $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam\n";
+            "[RUNNING:] bowtie2 $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam\n";
         `bowtie2 $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam`;
     }
     elsif ( $aligner =~ /bwa/i ) {
         print
-            "[RUNNING] bwa aln $bwa_options $ref_file $file1 > /tmp/reads_1_$$.sai\n";
+            "[RUNNING:] bwa aln $bwa_options $ref_file $file1 > /tmp/reads_1_$$.sai\n";
         `bwa aln $bwa_options $ref_file $file1 > /tmp/reads_1_$$.sai`;
         print
-            "[RUNNING] bwa aln $bwa_options $ref_file $file2 > /tmp/reads_2_$$.sai\n";
+            "[RUNNING:] bwa aln $bwa_options $ref_file $file2 > /tmp/reads_2_$$.sai\n";
         `bwa aln $bwa_options $ref_file $file2 > /tmp/reads_2_$$.sai`;
         print
-            "[RUNNING] bwa sampe -a 100000 $ref_file /tmp/reads_1_$$.sai /tmp/reads_2_$$.sai $file1 $file2 > $outDir/paired$$.sam\n";
+            "[RUNNING:] bwa sampe -a 100000 $ref_file /tmp/reads_1_$$.sai /tmp/reads_2_$$.sai $file1 $file2 > $outDir/paired$$.sam\n";
         `bwa sampe -a 100000 $ref_file /tmp/reads_1_$$.sai /tmp/reads_2_$$.sai $file1 $file2 > $outDir/paired$$.sam`;
     }
     elsif ( $aligner =~ /snap/i ) {
         `snap paired $ref_file.snap $file1 $file2 -o $outDir/paired$$.sam $snap_options`;
     }
-    `samtools view -@ $samtools_threads -uhS $outDir/paired$$.sam | samtools sort -@ $samtools_threads -o $outDir/paired$$.bam -T temp_paired -`;
+    print "Sorting mapped pair end reads\n";
+    `samtools view -@ $samtools_threads -uhS $outDir/paired$$.sam | samtools sort -@ $samtools_threads -o $outDir/paired$$.bam -T temp_paired$$ -`;
 }
 
 if ($singleton) {
@@ -202,8 +203,8 @@ if ($singleton) {
     elsif ( $aligner =~ /snap/i ) {
         `snap single $ref_file.snap $file_long -o $outDir/singleton$$.sam $snap_options`;
     }
-    
-    `samtools view -@ $samtools_threads -uhS $outDir/singleton$$.sam | samtools sort -@ $samtools_threads -o $outDir/singleton$$.bam -T temp_single -`;
+    print "Sorting mapped single reads\n";
+    `samtools view -@ $samtools_threads -uhS $outDir/singleton$$.sam | samtools sort -@ $samtools_threads -o $outDir/singleton$$.bam -T temp_single$$ -`;
 }
 
 # merge bam files if there are different file type, paired, single end, long..
