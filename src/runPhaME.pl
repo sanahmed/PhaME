@@ -628,10 +628,11 @@ if ( -e $tbest )      { `mv $tbest $outdir/`; }
 if ( $tree == 2 || $tree == 3 ) {
     $tbest = $outdir . "/RAxML_bestTree.$project\_cds";
 }
-if ( $tree == 1 ) { $tbest = $outdir . "/$project\_all\.fasttree"; }
-
+if ( $tree == 1 ) { 
+    $tbest = $outdir . "/RAxML_bestTree.$project\_all"; }
+################################################################################
 my $pamldir;
-if ( $ps == 1 ) {
+if ( $ps == 1 ) { # if selection analysis option 1, is selected
     my $end        = 0;
     my $stats_file = $outdir . "/$project\_stats.txt";
     my $genedir    = $outdir . '/PSgenes';
@@ -643,7 +644,13 @@ if ( $ps == 1 ) {
             $ptree = $pamldir . "/RAxML_bestTree.$project\_cds";
         }
         if ( $tree == 1 ) {
-            $ptree = $pamldir . "$outdir./$project\_all\.fasttree";
+            # need to make raxml best tree
+            PhaME::buildTree( $bindir, $outdir, $threads, 2,
+            "$project\_all", $error, $logfile );
+            $pamldir = $outdir . '/paml';
+            if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
+            `cp $tbest $pamldir`;
+            $ptree = $pamldir . "/RAxML_bestTree.$project\_all";
         }
         elsif ( $tree == 0 ) {
             print
@@ -677,7 +684,7 @@ if ( $ps == 1 ) {
 
     if ( $pselection == 1 || $pselection == 3 ) {
         PhaME::paml(
-            $outdir, $bindir,  $ptree, 0, "Sites", "1,2",
+            $outdir, $bindir,  $ptree, 0, "Sites", "0,1,2,7,8",
             $core,   $threads, $error, $logfile
         );
         PhaME::paml(
