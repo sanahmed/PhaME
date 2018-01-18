@@ -570,17 +570,19 @@ sub buildTree {
 # `rm $outdir/RAxML_info.$name`;
     }
     if ( $tree == 2 || $tree == 3 ) {
+        print "Reconstructing phylogeny using raxmlHPC-PTHREADS\n";
         print "\n";
         my $raxml
             = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -s $outdir/$name\_snp_alignment.fna -w $outdir -n $name 2>>$error >> $log\n\n";
         print $raxml;
         if ( system($raxml) ) { die "Error running $raxml.\n"; }
-        my $rooted_tree_cmd
-            = "raxmlHPC-PTHREADS -T $thread -m GTRGAMMAI -f I -t $outdir/RAxML_bestTree.$name -w $outdir -n $name\_r 2>>$error >> $log\n\n";
-        print $rooted_tree_cmd;
-        if ( system($rooted_tree_cmd) ) {
-            die "Error running $rooted_tree_cmd.\n";
-        }
+        # dont need a rooted tree, removing it for now
+        #my $rooted_tree_cmd
+        #    = "raxmlHPC-PTHREADS -T $thread -m GTRGAMMAI -f I -t $outdir/RAxML_bestTree.$name -w $outdir -n $name\_r 2>>$error >> $log\n\n";
+        #print $rooted_tree_cmd;
+        #if ( system($rooted_tree_cmd) ) {
+        #    die "Error running $rooted_tree_cmd.\n";
+        #}
     }
 
     open( OUT, ">>$log" );
@@ -757,9 +759,12 @@ sub paml {
             = "time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
+        my @site_files = glob("$pamldir/*/*$suffix");
+        if (@site_files) { # @site_files is not empty...
+            `mv $pamldir/*/*$suffix $pamldir`;
+            print "\n";
+        } 
 
-        `mv $pamldir/*/*$suffix $pamldir`;
-        print "\n";
         my $parse
             = "time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
         print $parse;
