@@ -178,7 +178,7 @@ Please avoid filenames that have multiple `.`.
   - `working directory`/results/temp
       - Temporary files generated
   - `working directory`/results/PSgenes
-      - All gene fasta files  that contain at least 1 SNP
+      - All gene fasta files  that contain at least 1 SNP, along with their amino acid sequences and codon alignments
   - `working directory`/results/paml
       - PAML results
   - `working directory`/results/hyphy
