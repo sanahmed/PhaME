@@ -53,7 +53,6 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 * Statistics::Distributions = 1.02
 * Time::BaseName = 2.85
 * Time::HiRes = 1.9726
-* Statistics::Distributions = 1.02
 
 The C/C++ compiling enviroNment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
 
