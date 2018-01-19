@@ -756,7 +756,7 @@ sub paml {
     if ( $model == 0 ) {
         print "\n";
         my $ps
-            = "time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
+            = "time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
@@ -777,16 +777,22 @@ sub paml {
         print $edit;
         if ( system($edit) ) { die "Error running $edit.\n"; }
 
+        # make the tree with branch label
+        my($tree_name, $dirs, $tree_suffix) = File::Basename::fileparse($tree, qr/\.[^.]*/);
+        my $branch_labeled_tree = $pamldir . "/$tree_name"."_BranchNumber" . "$tree_suffix";
         print "\n";
         my $ps
-            = "time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix -c $core 2>>$error >> $log\n\n";
+            = "time runPAML.pl -i $dir -t $thread -r $branch_labeled_tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
+        my @site_files = glob("$pamldir/*/*$suffix");
+        if (@site_files) { # @site_files is not empty...
+            `mv $pamldir/*/*$suffix $pamldir`;
+            print "\n";
+        }
 
-        `mv $pamldir/*/*$suffix $pamldir`;
-        print "\n";
         my $parse
-            = "time parseSitePAML.pl $pamldir 0,1,2,7,8,$NSsites 2>>$error >> $log\n\n";
+            = "time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
         print $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
 
