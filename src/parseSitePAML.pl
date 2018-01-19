@@ -4,8 +4,8 @@ use strict;
 use File::Basename;
 use diagnostics;
 use FindBin qw($RealBin);
-use lib "$RealBin/../ext/lib/perl5";
-use lib "$RealBin/../lib";
+# use lib "$RealBin/../ext/lib/perl5";
+# use lib "$RealBin/../lib";
 use Statistics::Distributions;
 
 my $dir     = shift @ARGV;
@@ -69,6 +69,7 @@ foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
 
      #         print "$model:np\t$name\t$np\n$model:lnL\t$name\t$lnL\n";
                 }
+                # print $model;
                 if ( $model == 0 ) {
                     if (/^omega.+=\s*(\S+)/) {
                         $w = $1;
@@ -97,36 +98,36 @@ foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
         }
     }
 
-    if ( $files =~ /.*\.BrSites$/ ) {
-        $model = "BR";
-        my ( $name, $path, $suffix ) = fileparse( "$files", qr/\.[^.]*/ );
-        if ( $name =~ /.*_(\d+)$/ ) { $model .= $1; }
-        $site = $dir . '/' . $files;
-        if ( -s $site ) {
-            print OUT
-                "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t$name\t";
-            push @genes, $name;
-            open( IN, "$site" ) || die "$!";
-            while (<IN>) {
-                if (/^lnL\(.+np:\s*(\d+)\):\s*(-\S+)/) {
-                    ( $np, $lnL ) = ( $1, $2 );
-                    $gene{"$model:np"}{$name}  = $np;
-                    $gene{"$model:lnL"}{$name} = $lnL;
-                    print OUT "$np\t$lnL\t";
+    # if ( $files =~ /.*\.BrSites$/ ) {
+    #     $model = "BR";
+    #     my ( $name, $path, $suffix ) = fileparse( "$files", qr/\.[^.]*/ );
+    #     if ( $name =~ /.*_(\d+)$/ ) { $model .= $1; }
+    #     $site = $dir . '/' . $files;
+    #     if ( -s $site ) {
+    #         print OUT
+    #             "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t$name\t";
+    #         push @genes, $name;
+    #         open( IN, "$site" ) || die "$!";
+    #         while (<IN>) {
+    #             if (/^lnL\(.+np:\s*(\d+)\):\s*(-\S+)/) {
+    #                 ( $np, $lnL ) = ( $1, $2 );
+    #                 $gene{"$model:np"}{$name}  = $np;
+    #                 $gene{"$model:lnL"}{$name} = $lnL;
+    #                 print OUT "$np\t$lnL\t";
 
-     #               print "$model:np\t$name\t$np\n$model:lnL\t$name\t$lnL\n";
-                }
-                if (/^proportion\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
-                    ( $p0, $p1, $p2a, $p2b ) = ( $1, $2, $3, $4 );
-                }
-                if (/^foreground w\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
-                    ( $w0, $w1, $w2a, $w2b ) = ( $1, $2, $3, $4 );
-                    print OUT "$w0\t$w1\t$w2a\t$w2b\t";
-                    print OUT "$p0\t$p1\t$p2a\t$p2b\t";
-                }
-            }
-        }
-    }
+    #  #               print "$model:np\t$name\t$np\n$model:lnL\t$name\t$lnL\n";
+    #             }
+    #             if (/^proportion\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
+    #                 ( $p0, $p1, $p2a, $p2b ) = ( $1, $2, $3, $4 );
+    #             }
+    #             if (/^foreground w\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
+    #                 ( $w0, $w1, $w2a, $w2b ) = ( $1, $2, $3, $4 );
+    #                 print OUT "$w0\t$w1\t$w2a\t$w2b\t";
+    #                 print OUT "$p0\t$p1\t$p2a\t$p2b\t";
+    #             }
+    #         }
+    #     }
+    # }
 }
 close OUT;
 closedir DIR;
@@ -134,12 +135,14 @@ closedir DIR;
 
 ##############################################################################
 $outfile = $dir . '/PAMLsitesResults.txt';
-open( OUT, ">$outfile" ) || die "$!";
+open( OUT2, ">$outfile" ) || die "$!";
 
-print OUT
-    "\tM0\t\tM1a\t\tM2a\t\tM7\t\tM8\t\tMBr&Sites\t\t\tM1a-M2a\t\t\tM7-M8\n";
-print OUT
-    "Genes\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tBranch\tlnL\tnp\tp\t2lnL\tp-value\tp\t2lnL\tp-value";
+print OUT2
+    "\tM0\t\tM1a\t\tM2a\t\tM7\t\tM8\t\tMBr&Sites\t\t\tM0-M1a\t\t\tM1a-M2a\t\t\tM7-M8\n";
+print OUT2
+   "Genes\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tBranch\tlnL\tnp\tp\t2lnL\tp-value\tp\t2lnL\tp-value\tp\t2lnL\tp-value";
+my $df0;
+my $lnl0;
 my $df1;
 my $lnl1;
 my $df2;
@@ -152,12 +155,14 @@ my $dfa;
 my $lnla;
 
 foreach my $entry (@genes) {
-
-    #   print "\n$entry\t";
-    if ( $entry =~ /.+_\d+$/ ) {
-        print OUT "\n\t\t\t\t\t\t\t\t\t\t\t$entry\t";
-    }
-    else { print OUT "\n$entry\t"; }
+    #if ( $entry =~ /.+_\d+$/ ) {
+    #    print OUT "\n\t\t\t\t\t\t\t\t\t\t\t$entry\t";
+    #    print "$entry\n";
+    #}
+    #else { print OUT "\n$entry\t"; }
+    print OUT2 "\n$entry\t"; # prints the name of the gene in first column
+    undef $df0;
+    undef $lnl0;
     undef $df1;
     undef $lnl1;
     undef $df2;
@@ -170,10 +175,10 @@ foreach my $entry (@genes) {
     undef $lnla;
 
     foreach my $stat ( sort keys %gene ) {
-
-        #      print OUT "$gene{$stat}{$entry}\t";
         if ( defined $gene{$stat}{$entry} ) {
-            print OUT "$gene{$stat}{$entry}\t";
+            print OUT2 "$gene{$stat}{$entry}\t"; # prints lnl from all models and genes
+            if ( $stat =~ /0:lnL/ )  { $lnl0 = $gene{$stat}{$entry}; }
+            if ( $stat =~ /0:np/ )   { $df0  = $gene{$stat}{$entry}; }
             if ( $stat =~ /1:lnL/ )  { $lnl1 = $gene{$stat}{$entry}; }
             if ( $stat =~ /1:np/ )   { $df1  = $gene{$stat}{$entry}; }
             if ( $stat =~ /2:lnL/ )  { $lnl2 = $gene{$stat}{$entry}; }
@@ -186,9 +191,20 @@ foreach my $entry (@genes) {
             if ( $stat =~ /BR:np/ )  { $dfa  = $gene{$stat}{$entry}; }
         }
     }
-    if   ( $entry =~ /.+_\d+$/ ) { print OUT "\t\t\t\t\t\t"; }
-    else                         { print OUT "\t\t\t"; }
+    #if   ( $entry =~ /.+_\d+$/ ) { print OUT2 "\t\t\t\t\t\t"; }
+    #else                         { print OUT2 "\t\t\t"; }
+    print OUT2 "\t\t\t"; 
 
+    if ( defined $lnl0 && defined $lnl1 && defined $df0 && defined $df1 ) {
+        my $p = $df1 - $df0;
+        my $lnl = abs( 2 * ( $lnl1 - $lnl2 ) );
+        if ( $lnl < 0 ) { $lnl = sprintf( "%.5e", $lnl ); }
+        my $chisprob = Statistics::Distributions::chisqrprob( $p, $lnl );
+        if ( $chisprob < 0 || $chisprob < 0.0001 ) {
+            $chisprob = sprintf( "%.5e", $chisprob );
+        }
+        print OUT2 "$p\t$lnl\t", $chisprob, "\t";
+    }
     if ( defined $lnl1 && defined $lnl2 && defined $df1 && defined $df2 ) {
         my $p = $df2 - $df1;
         my $lnl = abs( 2 * ( $lnl2 - $lnl1 ) );
@@ -197,7 +213,7 @@ foreach my $entry (@genes) {
         if ( $chisprob < 0 || $chisprob < 0.0001 ) {
             $chisprob = sprintf( "%.5e", $chisprob );
         }
-        print OUT "$p\t$lnl\t", $chisprob, "\t";
+        print OUT2 "$p\t$lnl\t", $chisprob, "\t";
     }
     if ( defined $lnl7 && defined $lnl8 && defined $df7 && defined $df8 ) {
         my $p        = $df8 - $df7;
@@ -206,7 +222,7 @@ foreach my $entry (@genes) {
         if ( $chisprob < 0 || $chisprob < 0.0001 ) {
             $chisprob = sprintf( "%.5e", $chisprob );
         }
-        print OUT "$p\t$lnl\t", $chisprob, "\t";
+        print OUT2 "$p\t$lnl\t", $chisprob, "\t";
     }
 }
-close OUT;
+close OUT2;
