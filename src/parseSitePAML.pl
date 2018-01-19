@@ -98,7 +98,7 @@ foreach my $files ( sort { $b cmp $a } readdir(DIR) ) {
     }
 
     elsif ( $files =~ /.*\.BrSites$/ ) {
-        # $model = "BR";
+        $model = "BR";
         my ( $name, $path, $suffix ) = fileparse( "$files", qr/\.[^.]*/ );
         # if ( $name =~ /.*_(\d+)$/ ) { $model .= $1; }
         $site = $dir . '/' . $files;
@@ -106,7 +106,7 @@ foreach my $files ( sort { $b cmp $a } readdir(DIR) ) {
             # print OUT "\t";
             # print
                 # "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t$name\t";
-            push @genes, $name;
+            # push @genes, $name;
             open( IN, "$site" ) || die "$!";
             while (<IN>) {
                 if (/^lnL\(.+np:\s*(\d+)\):\s*(-\S+)/) {
@@ -140,9 +140,9 @@ $outfile = $dir . '/PAMLsitesResults.txt';
 open( OUT2, ">$outfile" ) || die "$!";
 
 print OUT2
-    "\tM0\t\tM1a\t\tM2a\t\tM7\t\tM8\t\tM0Br\t\tM0-M1a\t\t\tM1a-M2a\t\t\tM7-M8\n";
+    "\tM0\t\tM1a\t\tM2a\t\tM7\t\tM8\t\tM0Br\t\tM0-M0Br\t\tM0-M1a\t\t\tM1a-M2a\t\t\tM7-M8\n";
 print OUT2
-   "Genes\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tp\t2lnL\tp-value\tp\t2lnL\tp-value\tp\t2lnL\tp-value";
+   "Genes\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tp\t2lnL\tp-value\tp\t2lnL\tp-value\tp\t2lnL\tp-value\tp\t2lnL\tp-value";
 my $df0;
 my $lnl0;
 my $df1;
@@ -177,6 +177,7 @@ foreach my $entry (@genes) {
     undef $lnla;
 
     foreach my $stat ( sort keys %gene ) {
+        print "$stat\n";
         if ( defined $gene{$stat}{$entry} ) {
             print OUT2 "$gene{$stat}{$entry}\t"; # prints lnl from all models and genes
             if ( $stat =~ /0:lnL/ )  { $lnl0 = $gene{$stat}{$entry}; }
@@ -195,11 +196,22 @@ foreach my $entry (@genes) {
     }
     #if   ( $entry =~ /.+_\d+$/ ) { print OUT2 "\t\t\t\t\t\t"; }
     #else                         { print OUT2 "\t\t\t"; }
-    print OUT2 "\t\t"; 
+    # print OUT2 "\t\t"; 
+
+    if ( defined $lnl0 && defined $lnla && defined $df0 && defined $dfa ) {
+        my $p = $dfa - $df0;
+        my $lnl = abs( 2 * ( $lnla - $lnl0 ) );
+        if ( $lnl < 0 ) { $lnl = sprintf( "%.5e", $lnl ); }
+        my $chisprob = Statistics::Distributions::chisqrprob( $p, $lnl );
+        if ( $chisprob < 0 || $chisprob < 0.0001 ) {
+            $chisprob = sprintf( "%.5e", $chisprob );
+        }
+        print OUT2 "$p\t$lnl\t", $chisprob, "\t";
+    }
 
     if ( defined $lnl0 && defined $lnl1 && defined $df0 && defined $df1 ) {
         my $p = $df1 - $df0;
-        my $lnl = abs( 2 * ( $lnl1 - $lnl2 ) );
+        my $lnl = abs( 2 * ( $lnl1 - $lnl0 ) );
         if ( $lnl < 0 ) { $lnl = sprintf( "%.5e", $lnl ); }
         my $chisprob = Statistics::Distributions::chisqrprob( $p, $lnl );
         if ( $chisprob < 0 || $chisprob < 0.0001 ) {
