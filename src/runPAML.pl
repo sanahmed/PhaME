@@ -15,35 +15,37 @@ my $output;
 my $suffix;
 
 GetOptions(
-   'i|dir=s'      => \$dir,
-   't|thread=i'   => \$thread,
-   'r|tree=s'     => \$tree,
-   'm|model=i'    => \$model,
-   'n|nssites=s'  => \$NSsites,
-   's|suffix=s'   => \$suffix,
-#   'h|help'          => sub{usage()}
+    'i|dir=s'     => \$dir,
+    't|thread=i'  => \$thread,
+    'r|tree=s'    => \$tree,
+    'm|model=i'   => \$model,
+    'n|nssites=s' => \$NSsites,
+    's|suffix=s'  => \$suffix,
+
+    #   'h|help'          => sub{usage()}
 );
 
-my $genedir=$dir."/PSgenes";
-my $pamldir=$dir."/paml";
+my $genedir = $dir . "/PSgenes";
+my $pamldir = $dir . "/paml";
 chdir $pamldir;
 print "$genedir\n";
 
-if ($NSsites=~/,/){
-   my @temp=split ",",$NSsites;
-   $NSsites= join(' ',@temp);
+if ( $NSsites =~ /,/ ) {
+    my @temp = split ",", $NSsites;
+    $NSsites = join( ' ', @temp );
 }
 
-opendir(DIR,$genedir);
-foreach my $files(sort{$a cmp $b}readdir(DIR)){
-   if ($files=~ /(.+)\.cdn$/){
-      $seqfile=$genedir.'/'.$files;
-      my ($name,$path,$suf)=fileparse("$seqfile",qr/\.[^.]*/);
-      $output=$pamldir.'/'.$name.'.'.$suffix;
-      print "$output\n";
+opendir( DIR, $genedir );
+foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
+    if ( $files =~ /(.+)\.msa$/ ) {
+        $seqfile = $genedir . '/' . $files;
+        my ( $name, $path, $suf ) = fileparse( "$seqfile", qr/\.[^.]*/ );
+        $seqfile = $genedir . '/' . $name . '.cdn';
+        $output  = $pamldir . '/' . $name . '.' . $suffix;
+        print "$output\n";
 
-      open (OUT, "> $pamldir/codeml.ctl")||die "$!";
-      print OUT "
+        open( OUT, "> $pamldir/codeml.ctl" ) || die "$!";
+        print OUT "
       seqfile  = $seqfile   * sequence data filename
       treefile = $tree      * tree structure file name
       outfile  = $output    * main result file name
@@ -112,9 +114,8 @@ foreach my $files(sort{$a cmp $b}readdir(DIR)){
 * 7: euplotid mt., 8: alternative yeast nu. 9: ascidian mt.,
 * 10: blepharisma nu.
 * These codes correspond to transl_table 1 to 11 of GENEBANK.";
-      system("codeml");
-   }
+        system("codeml");
+    }
 }
 closedir(DIR);
-
 
