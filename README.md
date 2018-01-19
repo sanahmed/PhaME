@@ -105,7 +105,7 @@ Please avoid filenames that have multiple `.`.
 --------------------------------------------------------------
 #### OUTPUT files
 
-* Summary files
+* Summary files ( all files are found under folder `workdir/results`)
   - SNP alignment files
     - all detected SNPs
       - `project`_all_snp_alignment.fna
@@ -132,7 +132,7 @@ Please avoid filenames that have multiple `.`.
       - `project`_all.fasttree
     - FastTree using SNPs from coding sequence
       - `project`_cds.fasttree
-  - Text file containing:
+  - Other files:
     - the size of gaps between `reference` and other genomes.
       - `project`_all_gaps.txt
     - A tab delimited summary file containing information on the core genome size, total SNPs, etc.
@@ -171,10 +171,27 @@ Please avoid filenames that have multiple `.`.
       - All output files
   - `working directory`/results/snps
       - SNP coordinate files generated from NUCmer and bowtie
+      - `g1_g2.snps`: contains pairwise snps between `g1` and `g2`. For example:
+        ```
+        [P1] [SUB]   [SUB]   [P2]    [BUFF]  [DIST]  [FRM]   [TAGS]
+        127     T       C    127        22      127     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
+        149     T       C    149        6       149     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
+        155     C       A    155        6       155     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
+        ```
+
   - `working directory`/results/gaps
       - Gap coordinate files generated from NUCmer and bowtie
   - `working directory`/results/stats
       - Intermediate stat files generated when parsing NUCmer and Bowtie results
+        - `g1_g2.coords` is a table file that contains regions of genome `g1` and `g2` that were aligned.
+        - `g_repeat_coords.txt` is a table that contains region within genome `g` that were detected as similar.
+        - `g_repeat_stats.txt` contains genome size, repeat segment, and repeat length of genome `g`. For example:
+            ```
+                ZEBOV_2007_4Luebo size: 18958
+                Repeats segment #:  0
+                Repeats total length:   0 (0.00%)
+            ```
+        - `repeat_stats.txt` summary of all `g_repeat_stats.txt`.
   - `working directory`/results/temp
       - Temporary files generated
   - `working directory`/results/PSgenes
