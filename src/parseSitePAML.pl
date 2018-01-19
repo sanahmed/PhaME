@@ -37,19 +37,20 @@ foreach (@nssite) {
     if ( $_ > 1 ) { print OUT "\tM$_\t\t\t\t\t\t\t"; }
 }
 # print out columns to put information with Branch length
-print OUT "\tMBr&Sites\t\t\t\t\t\t\t\t\t\nGene\t";
+print OUT "\tM0Br\nGene\t";
 foreach (@nssite) {
     # to add columns for adding np (parameters), lnl, w, and proportions
     if ( $_ == 0 ) { print OUT "np\tlnL\tw\t"; }
     if ( $_ < 2 && $_ > 0 ) { print OUT "np\tlnL\tw0\tw1\tp0\tp1\t"; }
     if ( $_ > 1 ) { print OUT "np\tlnL\tw0\tw1\tw2\tp0\tp1\tp2\t"; }
 }
-print OUT "\tnp\tlnL\tw0\tw1\tw2a\tw2b\tp0\tp1\tp2a\tp2b\t";
+# print OUT "\tnp\tlnL\tw0\tw1\tw2a\tw2b\tp0\tp1\tp2a\tp2b\t";
+print OUT "np\tlnL\n";
 
 # open pamldir, directory named paml
 opendir( DIR, "$dir" ) || die "$!";
 
-foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
+foreach my $files ( sort { $b cmp $a } readdir(DIR) ) {
    if ( $files =~ /.*\.Sites$/ ) {
       # $model = 0;
       my ( $name, $path, $suffix ) = fileparse( "$files", qr/\.[^.]*/ );
@@ -66,8 +67,6 @@ foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
                $gene{"$model:np"}{$name}  = $np;
                $gene{"$model:lnL"}{$name} = $lnL;
                print OUT "$np\t$lnL\t";
-
-     #         print "$model:np\t$name\t$np\n$model:lnL\t$name\t$lnL\n";
                 }
                 # print $model;
                 if ( $model == 0 ) {
@@ -98,36 +97,39 @@ foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
         }
     }
 
-    # if ( $files =~ /.*\.BrSites$/ ) {
-    #     $model = "BR";
-    #     my ( $name, $path, $suffix ) = fileparse( "$files", qr/\.[^.]*/ );
-    #     if ( $name =~ /.*_(\d+)$/ ) { $model .= $1; }
-    #     $site = $dir . '/' . $files;
-    #     if ( -s $site ) {
-    #         print OUT
-    #             "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t$name\t";
-    #         push @genes, $name;
-    #         open( IN, "$site" ) || die "$!";
-    #         while (<IN>) {
-    #             if (/^lnL\(.+np:\s*(\d+)\):\s*(-\S+)/) {
-    #                 ( $np, $lnL ) = ( $1, $2 );
-    #                 $gene{"$model:np"}{$name}  = $np;
-    #                 $gene{"$model:lnL"}{$name} = $lnL;
-    #                 print OUT "$np\t$lnL\t";
+    elsif ( $files =~ /.*\.BrSites$/ ) {
+        # $model = "BR";
+        my ( $name, $path, $suffix ) = fileparse( "$files", qr/\.[^.]*/ );
+        # if ( $name =~ /.*_(\d+)$/ ) { $model .= $1; }
+        $site = $dir . '/' . $files;
+        if ( -s $site ) {
+            # print OUT "\t";
+            # print
+                # "\n\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t$name\t";
+            push @genes, $name;
+            open( IN, "$site" ) || die "$!";
+            while (<IN>) {
+                if (/^lnL\(.+np:\s*(\d+)\):\s*(-\S+)/) {
+                    ( $np, $lnL ) = ( $1, $2 );
+                    $gene{"$model:np"}{$name}  = $np;
+                    $gene{"$model:lnL"}{$name} = $lnL;
+                    print OUT "$np\t$lnL\t";
 
-    #  #               print "$model:np\t$name\t$np\n$model:lnL\t$name\t$lnL\n";
-    #             }
-    #             if (/^proportion\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
-    #                 ( $p0, $p1, $p2a, $p2b ) = ( $1, $2, $3, $4 );
-    #             }
-    #             if (/^foreground w\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
-    #                 ( $w0, $w1, $w2a, $w2b ) = ( $1, $2, $3, $4 );
-    #                 print OUT "$w0\t$w1\t$w2a\t$w2b\t";
-    #                 print OUT "$p0\t$p1\t$p2a\t$p2b\t";
-    #             }
-    #         }
-    #     }
-    # }
+     #               print "$model:np\t$name\t$np\n$model:lnL\t$name\t$lnL\n";
+                }
+                if (/^proportion\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
+                    ( $p0, $p1, $p2a, $p2b ) = ( $1, $2, $3, $4 );
+                }
+                if (/^foreground w\s*(\S+)\s*(\S+)\s*(\S*)\s*(\S*)/) {
+                    ( $w0, $w1, $w2a, $w2b ) = ( $1, $2, $3, $4 );
+                    print "$w0\t$w1\t$w2a\t$w2b\t";
+                    print "$p0\t$p1\t$p2a\t$p2b\t";
+                    # print OUT "$w0\t$w1\t$w2a\t$w2b\t";
+                    # print OUT "$p0\t$p1\t$p2a\t$p2b\t";
+                }
+            }
+        }
+    }
 }
 close OUT;
 closedir DIR;
@@ -138,9 +140,9 @@ $outfile = $dir . '/PAMLsitesResults.txt';
 open( OUT2, ">$outfile" ) || die "$!";
 
 print OUT2
-    "\tM0\t\tM1a\t\tM2a\t\tM7\t\tM8\t\tMBr&Sites\t\t\tM0-M1a\t\t\tM1a-M2a\t\t\tM7-M8\n";
+    "\tM0\t\tM1a\t\tM2a\t\tM7\t\tM8\t\tM0Br\t\tM0-M1a\t\t\tM1a-M2a\t\t\tM7-M8\n";
 print OUT2
-   "Genes\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tBranch\tlnL\tnp\tp\t2lnL\tp-value\tp\t2lnL\tp-value\tp\t2lnL\tp-value";
+   "Genes\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tlnL\tnp\tp\t2lnL\tp-value\tp\t2lnL\tp-value\tp\t2lnL\tp-value";
 my $df0;
 my $lnl0;
 my $df1;
@@ -193,7 +195,7 @@ foreach my $entry (@genes) {
     }
     #if   ( $entry =~ /.+_\d+$/ ) { print OUT2 "\t\t\t\t\t\t"; }
     #else                         { print OUT2 "\t\t\t"; }
-    print OUT2 "\t\t\t"; 
+    print OUT2 "\t\t"; 
 
     if ( defined $lnl0 && defined $lnl1 && defined $df0 && defined $df1 ) {
         my $p = $df1 - $df0;
@@ -226,3 +228,4 @@ foreach my $entry (@genes) {
     }
 }
 close OUT2;
+
