@@ -5,3 +5,16 @@ test/fasta_list.txt
 test/working_list.txt
 src/.DS_Store
 .DS_Store
+test/workdirs/ebola_comp_contigs_pread/
+test/workdirs/
+2NG.dN
+2NG.dS
+2NG.t
+4fold.nuc
+PhaME-1.sublime-project
+PhaME-1.sublime-workspace
+lnf
+rst
+rst1
+rub
+sftp-config.json
