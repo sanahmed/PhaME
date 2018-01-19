@@ -688,7 +688,7 @@ if ( $ps == 1 ) { # if selection analysis option 1, is selected
             $core,   $threads, $error, $logfile
         );
         PhaME::paml(
-            $outdir, $bindir,  $ptree, 2, "BrSites", 2,
+            $outdir, $bindir,  $ptree, 2, "BrSites", 0,
             $core,   $threads, $error, $logfile
         );
     }
