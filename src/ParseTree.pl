@@ -42,14 +42,14 @@ open( OUT, ">$branch" );
 $offset = length $rawtree;
 my $comma = rindex( $rawtree, ",", $offset );
 my $paren = rindex( $rawtree, ")", $offset );
-my $number = 1;
+my $number = 0;
 while ( $comma != -1 || $paren != -1 ) {
     if ( $paren > $comma ) {
-        substr( $rawtree, $paren, 0 ) = ":$number";
+        substr( $rawtree, $paren, 0 ) = ":#$number";
         $offset = $paren - 1;
     }
     else {
-        substr( $rawtree, $comma, 0 ) = ":$number";
+        substr( $rawtree, $comma, 0 ) = ":#$number";
         $offset = $comma - 1;
     }
     $number++;
