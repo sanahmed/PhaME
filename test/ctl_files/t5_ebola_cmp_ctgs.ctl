@@ -6,7 +6,7 @@
 
       project = t5  # main alignment file name
 
-      cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
+      cdsSNPS = 1  # 0:no cds SNPS; 1:cds SNPs
 
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 
@@ -17,11 +17,11 @@
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 2  # 1: single reads; 2: paired reads; 3: both types present;
 
-         tree = 0  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
+         tree = 1  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
             N = 100  # Number of bootstraps to run *See below    
   
-    PosSelect = 0  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+    PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
 
          code = 1  # 0:Bacteria; 1:Virus
 
