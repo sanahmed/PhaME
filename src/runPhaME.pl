@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use FindBin qw($Bin $RealBin);
 use lib "$Bin";
-use lib "$RealBin/../lib/";
+use lib "$RealBin/../lib";
 use lib "$RealBin/../ext/lib/perl5";
 use File::Basename;
 use PhaME;
