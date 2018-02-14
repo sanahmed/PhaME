@@ -11,8 +11,8 @@ exec 2>&1 # copies stderr onto stdout
 # create a directory where all dependencies will be installed
 cd $ROOTDIR
 mkdir -p thirdParty
-cd thirdParty
-mkdir -p $ROOTDIR/bin
+# cd thirdParty
+# mkdir -p $ROOTDIR/bin
 export "PATH=$PATH:$ROOTDIR/bin/"
 # Minimum Required versions of dependencies
 # nucmer 3.1 is packaged in mummer 3.23
@@ -23,14 +23,15 @@ cpanm_VER=1.7039
 FastTree_VER=2.1.9
 mafft_VER=7.305
 miniconda_VER=4.2.12
-mummer_VER=3.23
+mummer_VER=3.1
 muscle_VER=3.8.31
 paml_VER=4.9
 R_VER=3.3.1
-RAxML_VER=8.2.9
+RAxML_VER=8.2.10
 samtools_VER=1.3.1
 perl5_VER=5.8.0
 bcftools_VER=1.6
+hyphy_VER=2.3.11
 
 #minimum required version of Perl modules
 perl_File_Basename_VER=2.85
@@ -59,31 +60,30 @@ done_message () {
    fi
 }
 
-download_ext () {
-   if [ -e $2 ]; then
-      echo "$2 existed. Skiping downloading $1."
-      return;
-   fi;
+# download_ext () {
+#    if [ -e $2 ]; then
+#       echo "$2 existed. Skiping downloading $1."
+#       return;
+#    fi;
 
-   if hash curl 2>/dev/null; then
-    if [[ -n ${HTTP_PROXY} ]]; then
-          echo "Using proxy";
-          echo "curl --proxy $HTTP_PROXY -L $1 -o $2";
-          which curl
-          curl --proxy $HTTP_PROXY -L $1  -o $2;
-        else
-      echo "curl -L \$1 -o \$2";
-      #echo "Not using proxy";
-      curl -L $1 -o $2;
-    fi;
-   else
-      wget -O $2 $1;
-   fi;
+#    if hash curl_ _>_Hy.zipPhy2.3.11 https://github.com/veg/hyphy/archive/2.3.11.zip/dev/null; then
+#          echo "Using proxy";
+#           echo "curl --proxy $HTTP_PROXY -L $1 -o $2";
+#           which curl
+#           curl --proxy $HTTP_PROXY -L $1  -o $2;
+#         else
+#       echo "curl -L \$1 -o \$2";
+#       #echo "Not using proxy";
+#       curl -L $1 -o $2;
+#     fi;
+#    else
+#       wget -O $2 $1;
+#    fi;
 
-   if [ ! -r $2 ]; then
-      echo "ERROR: $1 download failed."
-   fi;
-}
+#    if [ ! -r $2 ]; then
+#       echo "ERROR: $1 download failed."
+#    fi;
+# }
 
 ################################################################################
 install_miniconda()
@@ -133,6 +133,15 @@ checkLocalInstallation()
 {
     IFS=:
     for d in $ROOTDIR/thirdParty/miniconda/bin; do
+      if test -x "$d/$1"; then return 0; fi
+    done
+    return 1
+}
+
+checkHyPhyInstallation()
+{
+    IFS=:
+    for d in $ROOTDIR/bin; do
       if test -x "$d/$1"; then return 0; fi
     done
     return 1
@@ -274,7 +283,7 @@ echo "
 install_RAxML()
 {
 echo "--------------------------------------------------------------------------
-                           Downloading RAxML v8.2.9
+                           Downloading RAxML v$RAxML_VER
 --------------------------------------------------------------------------------
 "
 conda install --yes -c bioconda RAxML=$RAxML_VER -p $ROOTDIR/thirdParty/miniconda
@@ -282,7 +291,7 @@ ln -sf $ROOTDIR/thirdParty/miniconda/bin/raxmlHPC $ROOTDIR/bin/raxmlHPC
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/raxmlHPC $ROOTDIR/bin/raxmlHPC-PTHREADS
 echo "
 --------------------------------------------------------------------------------
-                           RAxML v8.2.9
+                           RAxML v$RAxML_VER
 --------------------------------------------------------------------------------
 "
 }
@@ -343,7 +352,28 @@ echo "--------------------------------------------------------------------------
                            installed bcftools v$bcftools_VER
 --------------------------------------------------------------------------------
 "
+}
 
+install_hyphy()
+{
+echo "--------------------------------------------------------------------------
+                           installing hyphy v$hyphy_VER
+--------------------------------------------------------------------------------
+"
+#curl -o thirdParty/hyphy-2.3.11.zip https://github.com/veg/hyphy/archive/2.3.11.zip
+cd $ROOTDIR
+unzip thirdParty/hyphy-2.3.11.zip -d thirdParty/;
+cd $ROOTDIR/thirdParty/hyphy-2.3.11;
+cmake -DINSTALL_PREFIX=$ROOTDIR/thirdParty/miniconda/bin
+make MP
+make install
+make GTEST
+cd $ROOTDIR
+ln -sf $ROOTDIR/thirdParty/hyphy-2.3.11/HYPHYMP $ROOTDIR/bin/HYPHYMP
+echo "--------------------------------------------------------------------------
+                           installed hyphy v$hyphy_VER
+--------------------------------------------------------------------------------
+"
 }
 
 install_perl_Getopt_Long()
@@ -611,7 +641,7 @@ then
     echo " - found FastTree $FastTree_VER"
   else
     echo "Required version of $FastTree_VER was not found"
-      install_FastTree
+    install_FastTree
   fi
 else
     echo "FastTree was not found"
@@ -626,7 +656,7 @@ then
   then 
     echo " - found RAxML $RAxMLHPC_installed_VER"
   else
-    echo "Required version of $FastTree_VER was not found"
+    echo "Required version of $RAxML_VER was not found"
       install_RAxML
   fi  
 else
@@ -670,7 +700,7 @@ fi
 ################################################################################
 if ( checkSystemInstallation bcftools )
 then
-  bcftools_installed_VER=`bcftools -v 2>&1| grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
+  bcftools_installed_VER=`bcftools -v 2>&1| grep 'bcftools' | perl -nle 'print $& if m{\d+\.\d+}'`;
   if  ( echo $bcftools_installed_VER $bcftools_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
   then 
     echo " - found bcftools $bcftools_installed_VER"
@@ -696,6 +726,22 @@ then
 else
   echo "paml is not found"
   install_paml
+fi
+
+################################################################################
+if ( checkHyPhyInstallation HYPHYMP )
+then
+  hyphy_installed_VER=`thirdParty/hyphy-2.3.11/HYPHYMP -v 2>&1 | grep 'HYPHY' | perl -nle 'print $& if m{HYPHY \d+\.\d+.\d\d}'`;
+  if ( echo $hyphy_installed_VER $hyphy_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+  then 
+    echo " - found HyPhy $hyphy_installed_VER"
+  else 
+    echo "Required version of HyPhy $hyphy_VER was not found"
+    install_hyphy
+  fi
+else
+  echo "HyPhy was not found"
+  install_hyphy
 fi
 
 ################################################################################
@@ -760,7 +806,6 @@ then
     echo "Required version of File::BaseName $perl_File_BaseName_VER was not found"
     install_perl_File_BaseName
   fi
-  echo "Perl File::Basename is found"
 else
   echo "Perl File::Basename is not found"
   install_perl_File_Basename
@@ -783,7 +828,7 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule IO::Handle )
 then
-  perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'
+  #perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'
   perl_IO_Handle_installed_VER=`perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'`
   if ( echo $perl_IO_Handle_installed_VER $perl_IO_Handle_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
@@ -799,7 +844,7 @@ fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule Test::Exception )
 then
-  perl -MTest::Exception -e 'print $Test::Exception::VERSION ."\n";'
+  #perl -MTest::Exception -e 'print $Test::Exception::VERSION ."\n";'
   perl_Test_Exception_installed_VER=`perl -MTest::Exception -e 'print $Test::Exception::VERSION ."\n";'`
   if ( echo $perl_Test_Exception_installed_VER $perl_Test_Exception_VER | awk '{if($2>=$3) exit 0; else exit 1}')
   then
@@ -845,26 +890,10 @@ fi
 
 ################################################################################
 
-# echo "Checking HyPhy ..."
-
-# HyPhy_VER=`echo -e "1\n2\n3" | HYPHYMP  2>&1 | grep HYPHY | perl -nle 'print $& if m{\d+\.\d+}'`;
-
-# if ( hash HYPHYMP 2>/dev/null ) && ( echo $HyPhy_VER | awk '{if($_>="2.2") exit 0; else exit 1}' )
-# then
-#    echo "HyPhy >=2.2 found.";
-# else
-#    echo "HyPhy >=2.2 not found. Trying to download from https://github.com/veg/hyphy/archive/2.2.7.zip...";
-#    unzip $ROOTDIR/ext/opt/HyPhy_v227.zip -d $ROOTDIR/ext/;
-#    cd $ROOTDIR/ext/hyphy-2.2.7;
-#    cmake -DINSTALL_PREFIX=$ROOTDIR/thirdParty/miniconda/bin
-#    make MP2 && make install
-#    make GTEST
-#    ./HYPHYGTEST
-#    cd $ROOTDIR
-# fi;
-# done_message " Done." "";
 
 
+
+################################################################################
 echo "
 ================================================================================
                  PhaME installed successfully.
