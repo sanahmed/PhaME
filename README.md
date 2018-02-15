@@ -69,7 +69,17 @@ You can use "git" to obtain the package:
 
     $ cd PhaME
     $ ./INSTALL.sh
-    
+
+`INSTALL.sh` checks for dependencies that are already installed and only installs the one that are not installed or are of not specified version.
+
+`HYPHY` installation is a bit tricky as its not part of conda, and installation is not streamlined, and `PhaME` requires it to be installed in the `thirdParty` folder. However, if you have native `gcc` >=4.9, installation shoule be breeze, but if your native gcc is `4.8` or lower, you will need to install it manually. Please refer to this question that I created in hyphy repo for [details](https://github.com/veg/hyphy/issues/755). In summary, install required version of `gcc` or find out the path to `gcc` if its already installed, and also install the latest version of `libcurl`, add it to path and do this:
+
+```
+$rm -rf CMakeCache* CMakeFiles/
+$CC=/path/to/gcc CXX=/path/to/g++ cmake -DINSTALL_PREFIX=/path/to/thirdParty/hyphy/folder
+$make 
+```
+
 --------------------------------------------------------------
 ### Running PhaME
 
