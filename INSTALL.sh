@@ -11,9 +11,9 @@ exec 2>&1 # copies stderr onto stdout
 # create a directory where all dependencies will be installed
 cd $ROOTDIR
 mkdir -p thirdParty
-# cd thirdParty
-# mkdir -p $ROOTDIR/bin
-export "PATH=$PATH:$ROOTDIR/bin/"
+cd thirdParty
+mkdir -p $ROOTDIR/bin
+export PATH="$ROOTDIR/bin/":"$ROOTDIR/thirdParty/miniconda/bin/":$PATH
 # Minimum Required versions of dependencies
 # nucmer 3.1 is packaged in mummer 3.23
 bowtie2_VER=2.2.8
@@ -363,8 +363,10 @@ echo "--------------------------------------------------------------------------
 #curl -o thirdParty/hyphy-2.3.11.zip https://github.com/veg/hyphy/archive/2.3.11.zip
 cd $ROOTDIR
 unzip thirdParty/hyphy-2.3.11.zip -d thirdParty/;
+gcc -v;
+which gcc;
 cd $ROOTDIR/thirdParty/hyphy-2.3.11;
-cmake -DINSTALL_PREFIX=$ROOTDIR/thirdParty/miniconda/bin
+cmake -DINSTALL_PREFIX=$ROOTDIR/thirdParty/hyphy-2.3.11
 make MP
 make install
 make GTEST
@@ -606,7 +608,7 @@ fi
 
 if ( checkSystemInstallation bowtie2 )
 then
-bowtie2_installed_VER=`bowtie2 --version 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+\.\d+}'`;
+bowtie2_installed_VER=`bowtie2 --version 2>&1 | grep -v 'Compiler' |grep 'version' | perl -nle 'print $& if m{version \d+\.\d+\.\d+}'`;
   if (echo $bowtie2_installed_VER $bowtie2_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
   then
     echo " - found bowtie2 $bowtie2_installed_VER"
@@ -649,7 +651,7 @@ else
 fi
 
 ################################################################################
-if ( checkSystemInstallation RAxMLHPC )
+if ( checkSystemInstallation raxmlHPC )
 then
   RAxMLHPC_installed_VER=`raxmlHPC-PTHREADS -version 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+\.\d+}'`
   if ( echo $RAxMLHPC_installed_VER $RAxML_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
