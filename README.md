@@ -81,17 +81,14 @@ Please avoid filenames that have multiple `.`.
   - *.fasta
   - *.fna
   - *.fa
-  - *.gff  (optional: to analyze Coding region SNPs of a selected reference file)
-    
+  - *.gff  (optional: to analyze Coding region SNPs of a selected reference file)    
 * A working directory 
   - Contig files with the following file suffixes
      - *.contig
-     - *.contigs
-     
+     - *.contigs     
   - Reads files with the following file suffixes
      - *_R1.fastq *_R2.fastq
-     - *_R1.fq *_R2.fq
-     
+     - *_R1.fq *_R2.fq     
   - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
 
 #### Test run

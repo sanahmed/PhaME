@@ -1,24 +1,33 @@
-sudo: false
+sudo: require
 language: perl
-
 perl:
   - "5.16"
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+      -ubuntu-toolchain-r-test
+    packages:
+      - gcc-6
+      - g++ -6
+      - cmake
 
-matrix:
-  include:
-    # works on Precise and Trusty
-    - os: linux
-      addons:
-        apt:
-          sources:
-            - ubuntu-toolchain-r-test
-          packages:
-            - g++-4.9
-      env:
-         - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
+# matrix:
+#   include:
+#     # works on Precise and Trusty
+#     - os: linux
+#       addons:
+#         apt:
+#           sources:
+#             - ubuntu-toolchain-r-test
+#           packages:
+#             - g++-4.9
+#       env:
+#          - MATRIX_EVAL="CC=gcc-4.9 && CXX=g++-4.9"
 
-cache:
-  apt: true
+#cache:
+#  apt: true
 
 before_install:
     - eval "${MATRIX_EVAL}"
