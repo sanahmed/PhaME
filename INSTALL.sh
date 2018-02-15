@@ -651,7 +651,7 @@ fi
 ################################################################################
 if ( checkSystemInstallation RAxMLHPC )
 then
-  RAxMLHPC_installed_VER=`raxmlHPC -version 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+\.\d+}'`
+  RAxMLHPC_installed_VER=`raxmlHPC-PTHREADS -version 2>&1 | grep 'version' | perl -nle 'print $& if m{version \d+\.\d+\.\d+}'`
   if ( echo $RAxMLHPC_installed_VER $RAxML_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
   then 
     echo " - found RAxML $RAxMLHPC_installed_VER"
