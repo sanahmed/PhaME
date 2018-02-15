@@ -7,7 +7,7 @@ use Parallel::ForkManager;
 use FindBin qw($RealBin);
 
 # set up environments
-$ENV{PATH}="$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
+$ENV{PATH} = "$RealBin:$RealBin/../ext/bin:$RealBin/../thirdParty/hyphy-2.3.11:$ENV{PATH}";
 
 my $dir;
 my $thread;
@@ -20,18 +20,17 @@ my $tree_output;
 my $core;
 
 GetOptions(
-   'i|dir=s'       => \$dir,
-   't|thread=i'    => \$thread,
-   'r|tree=s'      => \$tree,
-   'a|analysis=s'  => \$analysis,
-   'o|output=s'    => \$tree_output,
-   'c|core=s'      => \$core,
+    'i|dir=s'      => \$dir,
+    't|thread=i'   => \$thread,
+    'r|tree=s'     => \$tree,
+    'a|analysis=s' => \$analysis,
+    'o|output=s'   => \$tree_output,
+    'c|core=s'     => \$core,
 );
 
-
-if ($dir=~ /.+\/$/){my $temp= chop($dir);}
-my ($name,$path,$suffix)=fileparse("$tree",qr/\.[^.]*/);
-if ($suffix=~ /.+\/$/){my $temp= chop($suffix);}
+if ( $dir =~ /.+\/$/ ) { my $temp = chop($dir); }
+my ( $name, $path, $suffix ) = fileparse( "$tree", qr/\.[^.]*/ );
+if ( $suffix =~ /.+\/$/ ) { my $temp = chop($suffix); }
 
 =headmy $Rscript = "$dir/Rscript$$";
 open (Rscript, ">$Rscript");
@@ -47,115 +46,138 @@ close Rscript;
 system ("R --vanilla --slave --silent < $Rscript 2>/dev/null");
 =cut
 
-my $genedir=$dir."/PSgenes";
-my $hyphydir=$dir."/hyphy";
-if (!-d $hyphydir){`mkdir $hyphydir`;}
-my $modelsFile=$hyphydir.'/models.txt';
-my $hyphy="$RealBin/../ext/lib/hyphy/TemplateBatchFiles";
+# make PSgenes folder
+my $genedir = $dir . "/PSgenes";
+
+# make hyphy folder
+my $hyphydir = $dir . "/hyphy";
+if ( !-d $hyphydir ) { `mkdir $hyphydir`; }
+
+# specify model.txt file
+my $modelsFile = $hyphydir . '/models.txt';
+
+# change directory to hyphy folder with TemplateBatchfiles
+my $hyphy = "$RealBin/../ext/lib/hyphy/TemplateBatchFiles";
+
+# this works, but cant find output file
+my $hyphy = "/Users/migunshakya/Applications/hyphy/res/TemplateBatchFiles";
+
 chdir $hyphy;
 
+# read directory that has alignment files
 read_directory($genedir);
 
-if ($analysis=~/model/i || $analysis=~/all/i){chooseModel();}
-if (-e $modelsFile){
-   open (IN,"$modelsFile")||die "Can't run SLAC analysis without models.\n";
-   while (<IN>){
-      chomp;
-      my ($gene,$model)=split /\s+/,$_;
-      $models{$gene}=$model;
-   }
-   close IN;
+# depending on analysis option, run chooseModel
+if ( $analysis =~ /model/i || $analysis =~ /all/i ) { chooseModel(); }
+if ( -e $modelsFile ) {
+    open( IN, "$modelsFile" )
+        || die "Can't run SLAC analysis without models.\n";
+    while (<IN>) {
+        chomp;
+        my ( $gene, $model ) = split /\s+/, $_;
+        $models{$gene} = $model;
+    }
+    close IN;
 }
-elsif ($analysis!~/BSrel/i && !-e $modelsFile){print "Can't run subsequent analyses (SLAC, REL, FEL) without models.\n"; exit;}
-if ($analysis=~/^SLAC/i || $analysis=~/^all/i){runSLAC();}
-if ($analysis=~/^FEL/i || $analysis=~/^all/i){runFEL();}
-if ($analysis=~/^REL/i || $analysis=~/^all/i){runREL();}
-if ($analysis=~/^BSrel/i | $analysis=~/^all/i){runBranchSiteREL();}
-
-sub read_directory
-{
-my $dir=shift;
-
-opendir(DIR,$dir);
-foreach my $file(sort{$a cmp $b}readdir(DIR)){
-   if ($file=~ /\.cdn$/){
-      $seqfile=$genedir.'/'.$file;
-      push(@geneList,$seqfile);
-   }
-}
-closedir DIR;
+elsif ( $analysis !~ /BSrel/i && !-e $modelsFile ) {
+    print "Can't run subsequent analyses (SLAC, REL, FEL) without models.\n";
+    exit;
 }
 
-sub chooseModel
-{
-my $models=$hyphydir.'/models.txt';
-if (-e $models){`rm $models`;}
+if ( $analysis =~ /^SLAC/i || $analysis =~ /^all/i ) { runSLAC(); }
+if ( $analysis =~ /^FEL/i  || $analysis =~ /^all/i ) { runFEL(); }
+if ( $analysis =~ /^REL/i  || $analysis =~ /^all/i ) { runREL(); }
+if ( $analysis =~ /^BSrel/i | $analysis =~ /^all/i ) {
+    print "Running BranchSiteREL\n";
+    runBranchSiteREL();
+}
 
-my $pm=new Parallel::ForkManager($thread);
-$pm->run_on_finish (
-   sub{
-      my ($pid,$exit_code,$ident,$exit_signal,$core_dump,$file)=@_;
-      if (defined($file)){
-         my $result=${$file};
+################################################################################
+sub read_directory {
+    my $dir = shift;
 
-         my ($name,$path,$suffix)=fileparse("$result",qr/\.[^.]*/);
-         $name=~ s/_model//;
+    opendir( DIR, $dir );
+    foreach my $file ( sort { $a cmp $b } readdir(DIR) ) {
+        if ( $file =~ /\.cdn$/ ) {
+            $seqfile = $genedir . '/' . $file;
+            push( @geneList, $seqfile );
+        }
+    }
+    closedir DIR;
+}
+################################################################################
+sub chooseModel {
+    my $models = $hyphydir . '/models.txt';
+    if ( -e $models ) { `rm $models`; }
 
-         open (OUT, ">>$models");
-         open (IN, "$result")||die "$!";
-         while (<IN>){
-            chomp;
-            if (/AIC based winner: \((\d+)\).+/){
-               print OUT "$name\t$1\n";
+    my $pm = new Parallel::ForkManager($thread);
+    $pm->run_on_finish(
+        sub {
+            my ( $pid, $exit_code, $ident, $exit_signal, $core_dump, $file )
+                = @_;
+            if ( defined($file) ) {
+                my $result = ${$file};
+
+                my ( $name, $path, $suffix )
+                    = fileparse( "$result", qr/\.[^.]*/ );
+                $name =~ s/_model//;
+
+                open( OUT, ">>$models" );
+                open( IN, "$result" ) || die "$!";
+                while (<IN>) {
+                    chomp;
+                    if (/AIC based winner: \((\d+)\).+/) {
+                        print OUT "$name\t$1\n";
+                    }
+                }
             }
-         }
-      }
-   }
-);
+        }
+    );
 
-for (my $i=0;$i<=$#geneList; $i++){
-   $pm->start($i) and next;
-   my ($name,$path,$suffix)=fileparse("$geneList[$i]",qr/\.[^.]*/);
-   my $batch=$hyphydir.'/'.$name.'_model.bf';
-   my $output=$hyphydir.'/'.$name.'_model.txt';
+    for ( my $i = 0; $i <= $#geneList; $i++ ) {
+        $pm->start($i) and next;
+        my ( $name, $path, $suffix )
+            = fileparse( "$geneList[$i]", qr/\.[^.]*/ );
+        my $batch  = $hyphydir . '/' . $name . '_model.bf';
+        my $output = $hyphydir . '/' . $name . '_model.txt';
 
-   open (OUT, "> $batch")||die "$!";
-   print OUT "
-fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"NucModelCompare.bf\"; 
+        open( OUT, "> $batch" ) || die "$!";
+        print OUT "
+        fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"NucModelCompare.bf\"; 
 
-inputRedirect={};
-inputRedirect[\"01\"]=\"Local\";
-inputRedirect[\"02\"]=\"$geneList[$i]\";
-inputRedirect[\"03\"]=\"$tree_output\";
-inputRedirect[\"04\"]=\"0.05\";
-inputRedirect[\"05\"]=\"No\";
-inputRedirect[\"06\"]=\"$output\";
+        inputRedirect={};
+        inputRedirect[\"01\"]=\"Local\";
+        inputRedirect[\"02\"]=\"$geneList[$i]\";
+        inputRedirect[\"03\"]=\"$tree_output\";
+        inputRedirect[\"04\"]=\"0.05\";
+        inputRedirect[\"05\"]=\"No\";
+        inputRedirect[\"06\"]=\"$output\";
 
-ExecuteAFile (fileToExecute,inputRedirect);
+        ExecuteAFile (fileToExecute,inputRedirect);
 ";
-   my $command="HYPHYMP $batch";
-   if (system($command)){die "Error running $command.\n";} 
+        my $command = "HYPHYMP $batch";
+        if ( system($command) ) { die "Error running $command.\n"; }
 
-   $pm->finish(0,\$output);
+        $pm->finish( 0, \$output );
+    }
+    $pm->wait_all_children;
 }
-$pm->wait_all_children;
-}
+################################################################################
+sub runSLAC {
+    my $pm = new Parallel::ForkManager($thread);
 
-sub runSLAC
-{
-my $pm=new Parallel::ForkManager($thread);
+    for ( my $i = 0; $i <= $#geneList; $i++ ) {
+        $pm->start($i) and next;
+        my ( $name, $path, $suffix )
+            = fileparse( "$geneList[$i]", qr/\.[^.]*/ );
+        my $model = $models{$name};
 
-for (my $i=0;$i<=$#geneList; $i++){
-   $pm->start($i) and next;
-   my ($name,$path,$suffix)=fileparse("$geneList[$i]",qr/\.[^.]*/);
-   my $model=$models{$name};
+        my $batch     = $hyphydir . '/' . $name . '_slac.bf';
+        my $nwkOutput = $hyphydir . '/' . $name . '_slac.nwk';
+        my $output    = $hyphydir . '/' . $name . '_slac.tab';
 
-   my $batch=$hyphydir.'/'.$name.'_slac.bf';
-   my $nwkOutput=$hyphydir.'/'.$name.'_slac.nwk';
-   my $output=$hyphydir.'/'.$name.'_slac.tab';
-   
-   open (OUT, "> $batch")||die "$!";
-   print OUT "
+        open( OUT, "> $batch" ) || die "$!";
+        print OUT "
 fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"QuickSelectionDetection.bf\"; 
 
 inputRedirect={};
@@ -178,29 +200,29 @@ inputRedirect[\"16\"]=\"Count\";
 
 ExecuteAFile (fileToExecute,inputRedirect);
 ";
-   my $command="HYPHYMP $batch";
-   if (system($command)){die "Error running $command.\n";}
+        my $command = "HYPHYMP $batch";
+        if ( system($command) ) { die "Error running $command.\n"; }
 
-   $pm->finish();
+        $pm->finish();
+    }
+    $pm->wait_all_children;
 }
-$pm->wait_all_children;
-}
+################################################################################
+sub runFEL {
+    my $pm = new Parallel::ForkManager($thread);
 
-sub runFEL
-{
-my $pm=new Parallel::ForkManager($thread);
+    for ( my $i = 0; $i <= $#geneList; $i++ ) {
+        $pm->start($i) and next;
+        my ( $name, $path, $suffix )
+            = fileparse( "$geneList[$i]", qr/\.[^.]*/ );
+        my $model = $models{$name};
 
-for (my $i=0;$i<=$#geneList; $i++){
-   $pm->start($i) and next;
-   my ($name,$path,$suffix)=fileparse("$geneList[$i]",qr/\.[^.]*/);
-   my $model=$models{$name};
+        my $batch     = $hyphydir . '/' . $name . '_fel.bf';
+        my $nwkOutput = $hyphydir . '/' . $name . '_fel.nwk';
+        my $output    = $hyphydir . '/' . $name . '_fel.lrt';
 
-   my $batch=$hyphydir.'/'.$name.'_fel.bf';
-   my $nwkOutput=$hyphydir.'/'.$name.'_fel.nwk';
-   my $output=$hyphydir.'/'.$name.'_fel.lrt';
-
-   open (OUT, "> $batch")||die "$!";
-   print OUT "
+        open( OUT, "> $batch" ) || die "$!";
+        print OUT "
 fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"QuickSelectionDetectionMF.bf\"; 
 
 inputRedirect={};
@@ -220,28 +242,28 @@ inputRedirect[\"13\"]=\"$output\";
 
 ExecuteAFile (fileToExecute,inputRedirect);
 ";
-   my $command="HYPHYMP $batch";
-   if (system($command)){die "Error running $command.\n";}
+        my $command = "HYPHYMP $batch";
+        if ( system($command) ) { die "Error running $command.\n"; }
 
-   $pm->finish();
+        $pm->finish();
+    }
+    $pm->wait_all_children;
 }
-$pm->wait_all_children;
-}
+################################################################################
+sub runREL {
+    my $pm = new Parallel::ForkManager($thread);
 
-sub runREL
-{
-my $pm=new Parallel::ForkManager($thread);
+    for ( my $i = 0; $i <= $#geneList; $i++ ) {
+        $pm->start($i) and next;
+        my ( $name, $path, $suffix )
+            = fileparse( "$geneList[$i]", qr/\.[^.]*/ );
+        my $model = $models{$name};
 
-for (my $i=0;$i<=$#geneList; $i++){
-   $pm->start($i) and next;
-   my ($name,$path,$suffix)=fileparse("$geneList[$i]",qr/\.[^.]*/);
-   my $model=$models{$name};
+        my $batch  = $hyphydir . '/' . $name . '_rel.bf';
+        my $output = $hyphydir . '/' . $name . '_rel.txt';
 
-   my $batch=$hyphydir.'/'.$name.'_rel.bf';
-   my $output=$hyphydir.'/'.$name.'_rel.txt';
-
-   open (OUT, "> $batch")||die "$!";
-   print OUT "
+        open( OUT, "> $batch" ) || die "$!";
+        print OUT "
 fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"dNdSRateAnalysis.bf\"; 
 
 inputRedirect={};
@@ -261,77 +283,35 @@ inputRedirect[\"13\"]=\"None\";
 
 ExecuteAFile (fileToExecute,inputRedirect);
 ";
-   my $command="HYPHYMP $batch";
-   if (system($command)){die "Error running $command.\n";}
+        my $command = "HYPHYMP $batch";
+        if ( system($command) ) { die "Error running $command.\n"; }
 
-   $pm->finish();
-}
-$pm->wait_all_children;
-}
-
-sub runBranchSiteREL
-{
-my $pm=new Parallel::ForkManager($thread);
-
-=head
-if (defined $core){
-   $pm->start($core) and next;
-   my ($name,$path,$suffix)=fileparse("$core",qr/\.[^.]*/);
-
-   my $batch=$hyphydir.'/'.$name.'_BSrel.bf';
-   my $output=$hyphydir.'/'.$name.'_BSrel';
-
-   open (OUT, "> $batch")||die "$!";
-   print OUT "
-fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"BranchSiteREL.bf\"; 
-
-inputRedirect={};
-inputRedirect[\"01\"]=\"Universal\";
-inputRedirect[\"02\"]=\"Yes\";
-inputRedirect[\"03\"]=\"No\";
-inputRedirect[\"04\"]=\"$core\";
-inputRedirect[\"05\"]=\"$tree_output\";
-inputRedirect[\"06\"]=\"All\";
-inputRedirect[\"07\"]=\"\";
-inputRedirect[\"08\"]=\"$output\";
-
-ExecuteAFile (fileToExecute,inputRedirect);
-";
-   my $command="HYPHYMP $batch";
-   if (system($command)){die "Error running $command.\n";}
-
-   $pm->finish();
-}
-=cut
-
-for (my $i=0;$i<=$#geneList; $i++){
-   $pm->start($i) and next;
-   my ($name,$path,$suffix)=fileparse("$geneList[$i]",qr/\.[^.]*/);
-
-   my $batch=$hyphydir.'/'.$name.'_BSrel.bf';
-   my $output=$hyphydir.'/'.$name.'_BSrel';
-
-   open (OUT, "> $batch")||die "$!";
-   print OUT "
-fileToExecute = HYPHY_BASE_DIRECTORY + DIRECTORY_SEPARATOR + \"BranchSiteREL.bf\"; 
-
-inputRedirect={};
-inputRedirect[\"01\"]=\"Universal\";
-inputRedirect[\"02\"]=\"Yes\";
-inputRedirect[\"03\"]=\"No\";
-inputRedirect[\"04\"]=\"$geneList[$i]\";
-inputRedirect[\"05\"]=\"$tree_output\";
-inputRedirect[\"06\"]=\"All\";
-inputRedirect[\"07\"]=\"\";
-inputRedirect[\"08\"]=\"$output\";
-
-ExecuteAFile (fileToExecute,inputRedirect);
-";
-   my $command="HYPHYMP $batch";
-   if (system($command)){die "Error running $command.\n";}
-
-   $pm->finish();
-}
-$pm->wait_all_children;
+        $pm->finish();
+    }
+    $pm->wait_all_children;
 }
 
+################################################################################
+sub runBranchSiteREL {
+    my $aBSREL = "$RealBin/../thirdParty/hyphy-2.3.11/res/TemplateBatchfiles/SelectionAnalyses/aBSREL.bf";
+    my $pm = new Parallel::ForkManager($thread);
+    for ( my $i = 0; $i <= $#geneList; $i++ ) {
+        $pm->start($i) and next;
+        my ( $name, $path, $suffix )
+            = fileparse( "$geneList[$i]", qr/\.[^.]*/ );
+
+        my $batch  = $hyphydir . '/' . $name . '_BSrel.bf';
+        my $output = $hyphydir . '/' . $name . '_BSrel.out';
+
+        my $command = "HYPHYMP $aBSREL 'Universal' $geneList[$i] $tree_output 'All' ";
+        print "$command\n";
+        if ( system($command) ) { die "Error running $command.\n"; }
+
+        $pm->finish();
+    }
+    $pm->wait_all_children;
+}
+
+
+
+################################################################################

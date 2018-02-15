@@ -632,13 +632,18 @@ if ( $tree == 1 ) {
     $tbest = $outdir . "/RAxML_bestTree.$project\_all"; }
 ################################################################################
 my $pamldir;
-if ( $ps == 1 ) { # if selection analysis option 1, is selected
+my $hyphydir;
+if ( $ps == 1 ) { # if selection analysis is turned ON
     my $end        = 0;
     my $stats_file = $outdir . "/$project\_stats.txt";
     my $genedir    = $outdir . '/PSgenes';
+    my $gapfile = $outdir . "/$project\_gaps.txt";
+    
+    # start making trees for PAML
     if ( $pselection == 1 || $pselection == 3 ) {
         $pamldir = $outdir . '/paml';
-        if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
+        if ( !-d $pamldir ) { 
+            `mkdir -p $pamldir`; }
         `cp $tbest $pamldir`;
         if ( $tree == 2 || $tree == 3 ) {
             $ptree = $pamldir . "/RAxML_bestTree.$project\_cds";
@@ -658,30 +663,61 @@ if ( $ps == 1 ) { # if selection analysis option 1, is selected
             exit;
         }
     }
-    my $gapfile = $outdir . "/$project\_gaps.txt";
 
+    if ( $pselection == 2 || $pselection == 3 ) {
+        $hyphydir = $outdir . '/hyphy';
+        if ( !-d $hyphydir ) { 
+            `mkdir -p $hyphydir`; }
+        `cp $tbest $hyphydir`;
+        if ( $tree == 2 || $tree == 3 ) {
+            $ptree = $hyphydir . "/RAxML_bestTree.$project\_cds";
+        }
+        if ( $tree == 1 ) {
+            # need to make raxml best tree
+            PhaME::buildTree( $bindir, $outdir, $threads, 2,
+            "$project\_all", $error, $logfile );
+            $hyphydir = $outdir . '/paml';
+            if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
+            `cp $tbest $hyphydir`;
+            $ptree = $hyphydir . "/RAxML_bestTree.$project\_all";
+        }
+        elsif ( $tree == 0 ) {
+            print
+                "Need to build a tree before any evolutionary analyses can be performed.\n";
+            exit;
+        }
+    }
+
+
+    # PREPARE FILES FOR RUNNING PAML OR HYPHY ANALYSIS
+    # start extracting genes
     $end
         = PhaME::extractGenes( $outdir, $stats_file, $reference, $bindir,
         "$workdir/working_list.txt", $threads, $gapfile, $genefile, $error,
         $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
+    # translate genes
     $end = PhaME::translateGenes( $outdir, $bindir, $threads, "translate",
         $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
+    # align genes
     $end = PhaME::alignGenes( $outdir, $bindir, $threads, "mafft", $error,
         $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
+    # reverse translate genes
     $end = PhaME::revTransGenes( $outdir, $bindir, $threads, "pal2nal",
         $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
+    # core genome cdn alignment
     my $core = $genedir . "/" . $project . "_core_genome.cdn";
     $end = PhaME::core( $outdir, $bindir, $core, $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
+    # RUN PAML
     if ( $pselection == 1 || $pselection == 3 ) {
         PhaME::paml(
             $outdir, $bindir,  $ptree, 0, "Sites", "0,1,2,7,8",
@@ -692,22 +728,16 @@ if ( $ps == 1 ) { # if selection analysis option 1, is selected
             $core,   $threads, $error, $logfile
         );
     }
+
+    # RUN HYPHY
     if ( $pselection == 2 || $pselection == 3 ) {
-        my $rootedtree;
-        if ( $tree == 2 || $tree == 3 ) {
-            $rootedtree = "$outdir/RAxML_rootedTree.$project\_cds_r";
-        }
-        if ( $tree == 1 ) {
-            $rootedtree = "$outdir/$project\_cds_rooted.fasttree";
-        }
-        print "$rootedtree\n";
         PhaME::hyphy(
-            $outdir,  $bindir, $tbest, $rootedtree, $core,
+            $outdir,  $bindir, $tbest, $ptree, $core,
             $threads, "bsrel", $error, $logfile
         );
     }
 }
-
+################################################################################
 if ($clean) { PhaME::clean($outdir); }
 
 &print_timeInterval( $runtime, "End of run!\n" );
