@@ -38,6 +38,8 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * cmake VER >= 3.0.1
 
+* gcc >= 4.9
+
 * bcftools VER >= 1.6
 
 * samtools VER >= 1.6
@@ -54,7 +56,7 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 * Time::BaseName = 2.85
 * Time::HiRes = 1.9726
 
-The C/C++ compiling enviroNment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
+The C/C++ compiling environment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
 
 --------------------------------------------------------------
 ### Obtaining PhaME
