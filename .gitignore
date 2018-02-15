@@ -18,3 +18,9 @@ rst
 rst1
 rub
 sftp-config.json
+thirdParty/miniconda/
+thirdParty/hyphy-2.3.11/
+thirdParty/messages.log
+thirdParty/evolver.out
+thirdParty/errors.log
+messages.log
