@@ -112,13 +112,10 @@ sub read_directory {
     while ( my $files = readdir(PARENT) ) {
         next if ( $files =~ /^..?$/ );
         if ($files !~ /$name/
-            && (   $files =~ /(.+)[_.]R1.*\.fa?s?t?q$/
-                || $files =~ /(.+)[_.]1.*\.fa?s?t?q$/ )
+            && (   $files =~ /(.+)[_.]R1.*\.fa?s?t?q$/ )
             )
         {
             $temp = $1 . '_pread';
-
-            #      print "$temp\n";
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
@@ -182,16 +179,11 @@ sub create_bowtie_commands {
             $read1 = $path . $1 . $2 . $3 . $4 . $suffix;
             $read2 = $path . $1 . $2 . '2' . $4 . $suffix;
         }
-        if ( $name =~ /(.+)([_.])(1)(.*)$/ ) {
-            $prefix .= "\_$1";
-            $read1 = $path . $1 . $2 . $3 . $4 . $suffix;
-            $read2 = $path . $1 . $2 . '2' . $4 . $suffix;
-        }
 
         my $bowtie_command
             = "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner";
 
-        #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
+        print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }
     elsif ( $temp =~ /sread/i ) {
@@ -200,6 +192,7 @@ sub create_bowtie_commands {
             = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner";
 
         #   print "READ1:  $read1\n$bowtie_command\n\n\n";
+        print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }
     elsif ( $temp =~ /_read/i ) {
@@ -211,16 +204,11 @@ sub create_bowtie_commands {
             $read2 = $path . $1 . $2 . '2' . $4 . $suffix;
             $readu = $path . $1 . $suffix;
         }
-        elsif ( $name =~ /(.+)([_.])(1)(.*)$/ ) {
-            $prefix .= "\_$1";
-            $read1 = $path . $1 . $2 . $3 . $4 . $suffix;
-            $read2 = $path . $1 . $2 . '2' . $4 . $suffix;
-            $readu = $path . $1 . $suffix;
-        }
 
         my $bowtie_command
             = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner";
 
+        print "[RUNNING:] $bowtie_command\n";
         #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
         push( @command, $bowtie_command );
     }
