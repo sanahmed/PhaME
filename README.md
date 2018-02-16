@@ -95,8 +95,8 @@ Please avoid filenames that have multiple `.`.
 * A working directory 
   - Contig files with the following file suffixes
      - *.contig
-     - *.contigs     
-  - Reads files with the following file suffixes
+     - *.contigs
+  - Reads files, if paired, must have `R1` and `R2` at the end, else it needs to have `.fastq` as extension.
      - *_R1.fastq *_R2.fastq
      - *_R1.fq *_R2.fq     
   - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
