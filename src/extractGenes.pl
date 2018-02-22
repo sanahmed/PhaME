@@ -51,7 +51,8 @@ my $maxthreads
 if ( $threads < 1 || $threads > $maxthreads ) {
     die("-thread value must be between 1 and $maxthreads.\n");
 }
-
+################################################################################
+# create PS gene directory if it doesnt exist
 my $genedir = $dir . '/PSgenes';
 if ( !-d $genedir ) { `mkdir $genedir`; }
 
@@ -67,7 +68,8 @@ while (<IN>) {
     #   print "$temp1\t$gapstart\t$gapend\t$length\t$temp2\n";
     if ( $length >= 100 ) { $gaps{$gapstart} = $gapend; }
 }
-
+################################################################################
+# parse fasta file
 my $fh = FileHandle->new($file) || die "$!";
 if ( $fh->open("< $file") ) {
     $/ = ">";
@@ -84,7 +86,8 @@ if ( $fh->open("< $file") ) {
     $/ = "\n";
     $fh->close;
 }
-
+################################################################################
+# parse gff file
 my $fh1 = FileHandle->new($gff_file) || die "$!";
 if ( $fh1->open("< $gff_file") ) {
     while (<$fh1>) {
@@ -112,7 +115,8 @@ if ( $fh1->open("< $gff_file") ) {
     }
     $fh1->close;
 }
-
+################################################################################
+# read in the working_list.txt file
 open( LIST, "$list" ) || die "$!";
 while (<LIST>) {
     chomp;
@@ -121,7 +125,8 @@ while (<LIST>) {
     #   print "$name:$_\n";
 }
 close LIST;
-
+################################################################################
+# read in the SNP stats file
 open( IN, "$stat" ) || die "$!";
 my $stat_header = <IN>;
 while (<IN>) {
@@ -140,6 +145,7 @@ while (<IN>) {
     }
 }
 close IN;
+################################################################################
 
 my $temp       = keys %coords;
 my $size       = length $temp;
