@@ -6,17 +6,17 @@ perl:
 matrix:
     include:
     # works on Precise and Trusty
-    - os: linux
-    - dist: trusty
-    addons:
-        apt:
-            sources:
-                - ubuntu-toolchain-r-test
-            packages:
-                - gcc-5
-                - g++-5
-    env:
-        - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
+        - os: linux
+        - dist: trusty
+        addons:
+            apt:
+                sources:
+                    - ubuntu-toolchain-r-test
+                packages:
+                    - gcc-5
+                    - g++-5
+        env:
+            - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
 
 #cache:
 #  apt: true
@@ -27,7 +27,6 @@ before_install:
     - gcc -v
     - which g++
 #    - sudo apt-get update -qq
-
 
 install:
   - ./INSTALL.sh
