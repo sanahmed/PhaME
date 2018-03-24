@@ -114,18 +114,16 @@ Please avoid filenames that have multiple `.`.
 --------------------------------------------------------------
 #### OUTPUT files
 
-* Summary files ( all files are found under folder `workdir/results`)
+Summary files ( all files are found under folder `workdir/results`)
   - SNP alignment files
     - all detected SNPs
       - `project`_all_snp_alignment.fna
     - SNPs in CDS (coding sequence)
-      - `project`_cds_snp_alignment.fna* 
+      - `project`_cds_snp_alignment.fna\* 
     - intergenic SNPs
-      - `project`_int_snp_alignment.fna*
-
-          *only when a gff file is given
-
-  - Newick tree file
+      - `project`_int_snp_alignment.fna\*
+          \*only when a gff file is given
+  - Newick tree files
     - RAxML tree using all SNPs
       - bootstrap mapped Maximum Likelihood trees
         - RAxML_bipartitionsBranchLabels.`project`_all_best
@@ -142,6 +140,8 @@ Please avoid filenames that have multiple `.`.
     - FastTree using SNPs from coding sequence
       - `project`_cds.fasttree
   - Other files:
+    - coordinates of gaps throughout the overall alignment
+      - `project`_gaps.txt
     - the size of gaps between `reference` and other genomes.
       - `project`_all_gaps.txt
     - A tab delimited summary file containing information on the core genome size, total SNPs, etc.

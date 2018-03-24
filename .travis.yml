@@ -34,5 +34,5 @@ script:
   - sh test/TestAll.sh
   - cover -test
 
-  after_success:
-     - cover -report codecov
+after_success:
+  - cover -report codecov
