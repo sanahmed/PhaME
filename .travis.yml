@@ -22,7 +22,7 @@ matrix:
 
 before_install:
     - eval "${MATRIX_EVAL}"
-    - apt-get update -qq
+    - sudo apt-get update -qq
     - if [ "$CXX" = "g++" ]; then export CXX="g++-4.9" CC="gcc-4.9"; fi
   
 addons:
