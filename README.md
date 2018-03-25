@@ -44,6 +44,8 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 * samtools VER >= 1.6
 
+* bbmap version >= 37.90
+
 --------------------------------------------------------------
 ## PERL PACKAGES
 
@@ -98,7 +100,6 @@ Please avoid filenames that have multiple `.`.
      - *.contigs
   - Reads files, if paired, must have `R1` and `R2` at the end, else it needs to have `.fastq` as extension.
      - *_R1.fastq *_R2.fastq
-     - *_R1.fq *_R2.fq     
   - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
 
 #### Test run
