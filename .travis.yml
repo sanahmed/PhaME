@@ -5,13 +5,11 @@ perl:
 
 matrix:
     include:
-    # works on Precise and Trusty
-        - os: linux
-        - dist: trusty
+      - os: linux
         addons:
-            apt:
-                sources:
-                    - ubuntu-toolchain-r-test
+          apt:
+            sources:
+              - ubuntu-toolchain-r-test
                 packages:
                     - gcc-5
                     - g++-5
@@ -22,11 +20,16 @@ matrix:
 #  apt: true
 
 before_install:
-    - eval "${MATRIX_EVAL}"
-    - which gcc
-    - gcc -v
-    - which g++
-#    - sudo apt-get update -qq
+  - eval "${MATRIX_EVAL}"
+  - which gcc
+  - gcc -v
+  - which g++
+  - sudo apt-get update -qq
+  - sudo apt-get -y install -qq g++-5
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-5 90
+  - which gcc
+  - gcc -v
+  - which g++
 
 install:
   - ./INSTALL.sh
