@@ -27,7 +27,7 @@
 
         clean = 0  # 0:no clean; 1:clean
 
-      threads = 4  # Number of threads to use
+      threads = 2  # Number of threads to use
 
        cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
