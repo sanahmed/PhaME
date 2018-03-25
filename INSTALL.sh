@@ -397,7 +397,7 @@ echo "--------------------------------------------------------------------------
                 installing Perl Module Test::Exception v0.46
 --------------------------------------------------------------------------------
 "
-cpanm Test::Exception @$perl_Test_Exception_VER
+cpanm Test::Exception@$perl_Test_Exception_VER
 echo "
 --------------------------------------------------------------------------------
                            Test::Exception v0.46 installed
