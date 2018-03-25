@@ -32,6 +32,7 @@ samtools_VER=1.3.1
 perl5_VER=5.8.0
 bcftools_VER=1.6
 hyphy_VER=2.3.11
+bbmap_VER=37.90
 
 #minimum required version of Perl modules
 perl_File_Basename_VER=2.85
@@ -59,31 +60,6 @@ done_message () {
       exit 1;
    fi
 }
-
-# download_ext () {
-#    if [ -e $2 ]; then
-#       echo "$2 existed. Skiping downloading $1."
-#       return;
-#    fi;
-
-#    if hash curl_ _>_Hy.zipPhy2.3.11 https://github.com/veg/hyphy/archive/2.3.11.zip/dev/null; then
-#          echo "Using proxy";
-#           echo "curl --proxy $HTTP_PROXY -L $1 -o $2";
-#           which curl
-#           curl --proxy $HTTP_PROXY -L $1  -o $2;
-#         else
-#       echo "curl -L \$1 -o \$2";
-#       #echo "Not using proxy";
-#       curl -L $1 -o $2;
-#     fi;
-#    else
-#       wget -O $2 $1;
-#    fi;
-
-#    if [ ! -r $2 ]; then
-#       echo "ERROR: $1 download failed."
-#    fi;
-# }
 
 ################################################################################
 install_miniconda()
@@ -203,6 +179,24 @@ echo "
 ------------------------------------------------------------------------------
 "
 }
+install_bbmap()
+{
+echo "--------------------------------------------------------------------------
+                           installing bbmap v37.90
+--------------------------------------------------------------------------------
+"
+conda install --yes -c bioconda bbmap -p $ROOTDIR/thirdParty/miniconda
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/bbmap.sh $ROOTDIR/bin/bbmap.sh
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/sketch.sh $ROOTDIR/bin/sketch.sh
+ln -sf $ROOTDIR/thirdParty/miniconda/bin/comparesketch.sh $ROOTDIR/bin/comparesketch.sh
+
+echo "
+------------------------------------------------------------------------------
+                           mummer v37.90 
+------------------------------------------------------------------------------
+"
+}
+
 
 install_cmake()
 {
@@ -574,6 +568,21 @@ else
   install_cmake
 fi
 
+################################################################################
+if ( checkSystemInstallation bbmap.sh )
+then
+  bbmap_installed_VER=`bbmap.sh -v 2>&1| grep 'version' | perl -nle 'print $& if m{version \d+\.\d+}'`;
+  if  ( echo $bbmap_installed_VER $bbmap_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+  then 
+    echo " - found bbmap $bbmap_installed_VER"
+  else
+  echo "Required version of bbmap was not found"
+  install_bbmap
+  fi
+else 
+  echo "bbmap was not found"
+  install_bbmap
+fi
 ################################################################################
 if ( checkSystemInstallation nucmer )
 then
