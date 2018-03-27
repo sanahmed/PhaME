@@ -19,6 +19,7 @@
 # 20110617 window size coverage plot
 # 20120112 add -aligner
 # qchmodcd P add proper and unproper paired comparision plot and -plot_only flag
+# 032718 made -a default for bowtie2
 
 use Getopt::Long;
 use File::Basename;
@@ -38,7 +39,7 @@ my ($file1,  $file2,     $paired_files, $prefix, $ref_file,
     $outDir, $file_long, $singleton,    $pacbio, $offset
 );
 my $bwa_options    = "-t 4 ";
-my $bowtie_options = "-p 8 -a";
+my $bowtie_options = "-p 4";
 my $snap_options   = "-t 4 -M ";
 my $aligner        = "bwa";
 my ( $window_size, $step_size ) = ( 1000, 200 );
@@ -164,8 +165,8 @@ if ($paired_files) {
     }
     if ( $aligner =~ /bowtie/i ) {
         print
-            "[RUNNING:] bowtie2 $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam\n";
-        `bowtie2 $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam`;
+            "[RUNNING:] bowtie2 -a $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam\n";
+        `bowtie2 -a $bowtie_options -x $ref_file -1 $file1 -2 $file2 -S $outDir/paired$$.sam`;
     }
     elsif ( $aligner =~ /bwa/i ) {
         print
@@ -193,8 +194,8 @@ if ($singleton) {
         $bwa_options    = $bwa_options . "-I ";
     }
     if ( $aligner =~ /bowtie/i ) {
-        print "[RUNNING:] bowtie2 $bowtie_options -x $ref_file -U $singleton -S $outDir/singleton$$.sam\n";
-        `bowtie2 $bowtie_options -x $ref_file -U $singleton -S $outDir/singleton$$.sam`;
+        print "[RUNNING:] bowtie2 -a $bowtie_options -x $ref_file -U $singleton -S $outDir/singleton$$.sam\n";
+        `bowtie2 -a $bowtie_options -x $ref_file -U $singleton -S $outDir/singleton$$.sam`;
     }
     elsif ( $aligner =~ /bwa/i ) {
         `bwa aln $bwa_options $ref_file $singleton > /tmp/singleton$$.sai`;

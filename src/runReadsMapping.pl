@@ -3,7 +3,8 @@
 ######################################################
 # Written by Sanaa Ahmed
 # Nov. 30, 2012
-
+# Modified by Migun Shakya
+# 032718 passed thread variables to bowtie
 # Given a directory containing paired read files, runs bowtie
 ######################################################
 
@@ -16,10 +17,12 @@ use Parallel::ForkManager;
 # set up environments
 $ENV{PATH} = "$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
+###############Set up variables#################################################
 my ( $indir, $reference, $prefix, $thread, $list, $aligner );
 my @command;
 my $outdir = `pwd`;
 $outdir =~ s/\n//;
+###############Set up variables#################################################
 
 GetOptions(
     'q|querydir=s'  => \$indir,
@@ -33,6 +36,7 @@ GetOptions(
 
 &usage() unless ( $indir && $aligner );
 
+####Checking the number of allowed threads######################################
 my $max_thread
     = ( $^O =~ /darwin/ )
     ? `sysctl hw.ncpu | awk '{print \$2}'`
@@ -40,7 +44,9 @@ my $max_thread
 if ( $thread < 1 || $thread > $max_thread ) {
     die("-thread value must be between than 1 and $max_thread.\n");
 }
+################################################################################
 
+####################Setting up directories######################################
 if ( !-e $outdir ) { mkdir "$outdir"; }
 if ( $outdir =~ /.+\/$/ ) { my $temp = chop($outdir); }
 chdir $outdir;
@@ -48,10 +54,12 @@ chdir $outdir;
 if ( $indir =~ /.+\/$/ ) { my $temp = chop($indir); }
 my $querydir = $indir;
 
+################################################################################
+
 read_directory($querydir);
 
+####################Setting up threads##########################################
 my $pm = new Parallel::ForkManager($thread);
-
 
 $pm->run_on_finish(    # called BEFORE the first call to start()
     sub {
@@ -70,16 +78,11 @@ $pm->run_on_finish(    # called BEFORE the first call to start()
                 }
                 else { `mv $gap_file $outdir/gaps`; }
             }
-
-            #         if ($file=~/.+\.vcf$/){
-            #            print "Moving vcf files to snps/ directory\n";
-            #            my $vcf_file=$outdir.'/'.$file;
-            #            `mv $vcf_file $outdir/snps`;
-            #         }
         }
     }
 );
 
+################################################################################
 foreach my $command (@command) {
     $pm->start and next;
     if ( system($command) ) { die "Error running $command.\n"; }
@@ -88,6 +91,7 @@ foreach my $command (@command) {
 $pm->wait_all_children;
 
 print "Read Mapping complete\n";
+################################################################################
 
 sub read_directory {
     my $dir = shift;
@@ -111,66 +115,54 @@ sub read_directory {
     opendir( PARENT, $dir );
     while ( my $files = readdir(PARENT) ) {
         next if ( $files =~ /^..?$/ );
-        if ($files !~ /$name/
-            && (   $files =~ /(.+)[_.]R1.*\.fa?s?t?q$/ )
-            )
-        {
+        if ( $files !~ /$name/
+            && ( $files =~ /(.+)[_.]R1.*\.fa?s?t?q$/ ) )
+            {
             $temp = $1 . '_pread';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp );
+                create_bowtie_commands( $query, $prefix, $temp, $thread );
             }
             $temp = $1 . '_read';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp );
+                create_bowtie_commands( $query, $prefix, $temp, $thread );
             }
             $temp = $1 . '_sread';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp );
+                create_bowtie_commands( $query, $prefix, $temp, $thread );
             }
-
         }
-
-        #  if ($files!~ /$name/ && $files=~ /(.+)[_.]1.*\.fa?s?t?q$/){
-        #    $temp=$1.'_pread';
-        #    if (exists $queries{$temp} && !exists $check{$temp}){
-        ##      $check{$temp}++;
-        #     $query=$dir.'/'.$files;
-        #    $prefix=$name;
-        #         print "$temp\n";
-        #   create_bowtie_commands($query,$prefix,$temp);
-        # }
-        # }
         if ( $files !~ /$name/ && $files =~ /(.+)\.fa?s?t?q$/ ) {
             $temp = $1 . '_sread';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp );
+                create_bowtie_commands( $query, $prefix, $temp, $thread );
+                }
             }
-        }
     }
     closedir(PARENT);
 }
-
+################################################################################
 sub create_bowtie_commands {
     my $read   = shift;
     my $prefix = shift;
     my $temp   = shift;
+    my $thread = shift;
     my $read1;
     my $read2;
     my $readu;
-
     my ( $name, $path, $suffix ) = fileparse( "$read", qr/\.[^.]*/ );
+    my $bowtie_options = '-p $thread';
     if ( $temp =~ /pread/i ) {
 
         #   print "$read\n";
@@ -181,7 +173,7 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner";
+            = "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner -bowtie_options '-p $thread'";
 
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
@@ -189,15 +181,12 @@ sub create_bowtie_commands {
     elsif ( $temp =~ /sread/i ) {
         $prefix .= "\_$name";
         my $bowtie_command
-            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner";
-
-        #   print "READ1:  $read1\n$bowtie_command\n\n\n";
+            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -bowtie_options '-p $thread'";
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }
     elsif ( $temp =~ /_read/i ) {
 
-        #   print "$read\n";
         if ( $name =~ /(.+)([_.]R)(\d)(.*)$/ ) {
             $prefix .= "\_$1";
             $read1 = $path . $1 . $2 . $3 . $4 . $suffix;
@@ -206,18 +195,30 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner";
+            = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -bowtie_options '-p $thread'";
 
         print "[RUNNING:] $bowtie_command\n";
+
         #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
         push( @command, $bowtie_command );
     }
 }
 
-sub usage {
-    print <<Usage;
-$0 -r <reference_fasta> -q <query_dir> -d <output_directory> -t <# of threads> -a <aligner bwa|bowtie>
+sub usage
+    { 
+    print <<"END";
+    Usage:perl $0 
+        -r          <reference_fasta> 
+        -q          <query_dir> , contains reads files in the format *R[1-2].fastq, if paired, elase *.fastq
+        -d          <output_directory>, if not provided will write files in current directory
+        -t          <# of threads> 
+        -l          <list file>
+        -a          <aligner bwa|bowtie>
 
-Usage
+Synopsis:
+    perl $0 -r <reference_fasta> -q <query_dir> -d <output_directory> -t <# of threads> -a <aligner bwa|bowtie>
+END
+
     exit;
 }
+
