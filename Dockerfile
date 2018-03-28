@@ -18,8 +18,9 @@ RUN mkdir -p /opt && \
 	cd /opt && git clone https://github.com/mshakya/PhaME-1.git && \
     cd PhaME-1 && bash INSTALL.sh &&
     echo 'export PATH=/opt/PhaME-1:/opt/PhaME-1/ext/miniconda/bin:$PATH' > /etc/profile.d/PhaME-1.sh && \
-    echo 'export R_LIBS=/opt/targetngs/ext/lib/R_libs' >> /etc/profile.d/PhaME-1.sh && \
+#    echo 'export R_LIBS=/opt/targetngs/ext/lib/R_libs' >> /etc/profile.d/PhaME-1.sh && \
     apt-get clean
 
 ENV PATH PhaME-1/thirdParty/miniconda/bin/:$PATH
+
 
