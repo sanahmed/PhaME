@@ -1,4 +1,4 @@
-ROM debian:8.5
+FROM debian:8.5
 
 MAINTAINER Migun Shakya <migun@lanl.gov>
 
@@ -22,4 +22,3 @@ RUN mkdir -p /opt && \
     apt-get clean
 
 ENV PATH PhaME-1/thirdParty/miniconda/bin/:$PATH
-
