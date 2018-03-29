@@ -3,34 +3,12 @@ language: perl
 perl:
   - "5.16"
 
-# matrix:
-#     include:
-#       - os: linux
-#         addons:
-#           apt:
-#             sources:
-#               - ubuntu-toolchain-r-test
-#                 packages:
-#                     - gcc-5
-#                     - g++-5
-#         env:
-#             - MATRIX_EVAL="CC=gcc-5 && CXX=g++-5"
-
-#cache:
-#  apt: true
-
 before_install:
   # - eval "${MATRIX_EVAL}"
-  - which gcc
-  - gcc -v
-  - which g++
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
   - sudo apt-get -y install -qq gcc-5 g++-5
   - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
-  - which gcc
-  - gcc -v
-  - which g++
 
 install:
   - ./INSTALL.sh
