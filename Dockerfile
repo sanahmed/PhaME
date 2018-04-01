@@ -20,9 +20,13 @@ LABEL tags="genomics"
 
 RUN apt-get -y update --fix-missing
 RUN apt-get install -y wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 \
-	libxrender1 git curl make gcc gfortran g++ grep unzip
+	libxrender1 git curl make gcc gfortran g++ grep unzip cmake libcurl4-gnutls-dev \
+	ocl-icd-opencl-dev mpich doxygen libssl-dev
+RUN apt-get -y upgrade
 RUN apt-get clean
-RUN mkdir -p /opt && cd /opt && \
-	git clone https://github.com/mshakya/PhaME-1.git && \
-    cd PhaME-1 && sh ./INSTALL.sh
-
+RUN mkdir -p /opt && cd /opt
+RUN	git clone https://github.com/mshakya/PhaME-1.git
+RUN ls
+RUN gcc -v
+RUN cmake --version
+RUN cd PhaME-1 && ls && ./INSTALL.sh
