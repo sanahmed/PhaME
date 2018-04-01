@@ -1,6 +1,7 @@
 ## Phylogenetic and Molecular Evolution (PhaME) analysis tool
 
 [![Build Status](https://travis-ci.org/mshakya/PhaME-1.svg?branch=master)](https://travis-ci.org/mshakya/PhaME-1)
+[![Waffle.io - Columns and their card count](https://badge.waffle.io/mshakya/PhaME-1.svg?columns=all)](https://waffle.io/mshakya/PhaME-1)
 
 Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/or reads. 
 Uses SNP multiple sequence alignment to construct a phylogenetic tree. 
@@ -81,6 +82,12 @@ $rm -rf CMakeCache* CMakeFiles/
 $CC=/path/to/gcc CXX=/path/to/g++ cmake -DINSTALL_PREFIX=/path/to/thirdParty/hyphy/folder
 $make 
 ```
+
+--------------------------------------------------------------
+### Running PhaME with docker
+
+To bypass the installation steps, we have provided, a docker container for PhaME. To run this you need to follow following steps
+
 
 --------------------------------------------------------------
 ### Running PhaME
