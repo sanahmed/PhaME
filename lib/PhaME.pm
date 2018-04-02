@@ -465,7 +465,7 @@ sub removeGaps {
     my $readgaps  = shift;
 
     print "\n";
-    my $remove = "removeGaps.pl $reference $readgaps\n\n";
+    my $remove = "time removeGaps.pl $reference $readgaps\n\n";
     print $remove;
     if ( system($remove) ) { die "Error running $remove.\n"; }
 }
@@ -756,7 +756,7 @@ sub paml {
     if ( $model == 0 ) {
         print "\n";
         my $ps
-            = "runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
+            = "time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
@@ -766,14 +766,14 @@ sub paml {
         } 
 
         my $parse
-            = "parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
+            = "time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
         print $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
     }
 
     if ( $model == 2 ) {
         print "\n";
-        my $edit = "ParseTree.pl $tree 2>>$error >> $log\n\n";
+        my $edit = "time ParseTree.pl $tree 2>>$error >> $log\n\n";
         print $edit;
         if ( system($edit) ) { die "Error running $edit.\n"; }
 
@@ -782,7 +782,7 @@ sub paml {
         my $branch_labeled_tree = $pamldir . "/$tree_name"."_BranchNumber" . "$tree_suffix";
         print "\n";
         my $ps
-            = "runPAML.pl -i $dir -t $thread -r $branch_labeled_tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
+            = "time runPAML.pl -i $dir -t $thread -r $branch_labeled_tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
@@ -792,7 +792,7 @@ sub paml {
         }
 
         my $parse
-            = "parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
+            = "time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
         print $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
 
