@@ -14,7 +14,7 @@ cmp test/workdirs/ebola_preads/results/t1_all_snp_alignment.fna test/truth/t1_al
 mkdir -p test/workdirs/ebola_sreads
 cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_sreads/
 perl src/runPhaME.pl test/ctl_files/t2_ebola_sreads.ctl
-cmp test/workdirs/ebola_preads/results/t2_all_snp_alignment.fna test/truth/t2_all_snp_alignment.fna
+cmp test/workdirs/ebola_sreads/results/t2_all_snp_alignment.fna test/truth/t2_all_snp_alignment.fna
 
 #3 test with just contigs
 mkdir -p test/workdirs/ebola_contigs

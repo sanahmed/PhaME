@@ -142,7 +142,16 @@ workdir/GCA_000191665.1_ecmda7_genomic.contig      workdir/GCA_001471755.1_ASM14
 ```
 
   - If your analysis includes reads files, if paired, must have `R1` and `R2` at the end, else it needs to have `.fastq` as extension.
-     - *_R1.fastq *_R2.fastq
+     - `*_`R1.fastq `*_`R2.fastq
+
+     For example, a working directory with reads folder look like this:
+
+```
+$ ls workdir/*.fastq
+workdir/GGB_SRR2000383_QC_trimmed_R1.fastq  workdir/GGB_SRR2000383_QC_trimmed_R2.fastq  workdir/GGC_SRR2164314_QC_trimmed_R1.fastq  workdir/GGC_SRR2164314_QC_trimmed_R2.fastq
+
+```
+
   - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
 
 #### Test run
