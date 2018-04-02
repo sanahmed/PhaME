@@ -86,39 +86,68 @@ $make
 --------------------------------------------------------------
 ### Running PhaME with docker
 
-To bypass the installation steps, we have provided, a docker container for PhaME. To run this you need to follow following steps
+To bypass the installation steps, we have provided a docker [image](https://stackoverflow.com/questions/23735149/what-is-the-difference-between-a-docker-image-and-a-container) for PhaME. To run PhaME from a docker image, follow these steps:
+- Install [Docker](https://docs.docker.com/install/).
+- Download the latest version of PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame-1/). 
+  ```
 
+  docker pull migun/phame-1
+  
+  ```
+
+- Check if the image is correctly downloaded.
+  ```
+  docker run 
+  ```
+
+- 
 
 --------------------------------------------------------------
 ### Running PhaME
 
 #### Input files
 
-Please avoid filenames that have multiple `.`.
+Please try to avoid filenames that have multiple `.` in their name.
 
-* A directory with reference files (complete genomes) which have the following file suffixes
-  - *.fasta
-  - *.fna
-  - *.fa
-  - *.gff  (optional: to analyze Coding region SNPs of a selected reference file)    
-* A working directory 
-  - Contig files with the following file suffixes
-     - *.contig
-     - *.contigs
-  - Reads files, if paired, must have `R1` and `R2` at the end, else it needs to have `.fastq` as extension.
+PhaME requires inputs in several folder/directory:
+* A directory with reference genomes (complete genomes) with following file suffixes
+  - `*`.fasta
+  - `*`.fna
+  - `*`.fa
+  - `*`.gff  (optional: to analyze Coding region SNPs of a selected reference file)    
+
+For example a typical folder with reference genomes look like this:
+
+```
+$ ls ref/
+
+GCA_000006925.2_ASM692v2_genomic.fna   GCA_000017745.1_ASM1774v1_genomic.fna  GCA_000026245.1_ASM2624v1_genomic.fna   GCA_000227625.1_ASM22762v1_genomic.fna
+GCA_000007405.1_ASM740v1_genomic.fna   GCA_000017765.1_ASM1776v1_genomic.fna  GCA_000026265.1_ASM2626v1_genomic.fna   GCA_000245515.1_ASM24551v1_genomic.fna
+GCA_000008865.1_ASM886v1_genomic.fna   GCA_000017985.1_ASM1798v1_genomic.fna  GCA_000026265.1_ASM2626v1_genomic.gff   GCA_000257275.1_ASM25727v1_genomic.fna
+
+```
+Each of these files represent a genome of organism. They may have multiple sequences, but are all part of one organism.
+
+* A working directory.
+  - If your analysis includes incomplete genomes or contig files, they must be in the working directory and contig file must have following suffixes.
+     - `*`.contig
+     - `*`.contigs
+    For example, a working directory with contigs folder look like this:
+```
+$ ls workdir/*.contig
+
+workdir/GCA_000155105.1_ASM15510v1_genomic.contig  workdir/GCA_000968895.2_ASM96889v2_genomic.contig   workdir/GCA_001514825.1_ASM151482v1_genomic.contig
+workdir/GCA_000190495.1_ASM19049v1_genomic.contig  workdir/GCA_000968905.2_ASM96890v2_genomic.contig   workdir/GCA_001514845.1_ASM151484v1_genomic.contig
+workdir/GCA_000191665.1_ecmda7_genomic.contig      workdir/GCA_001471755.1_ASM147175v1_genomic.contig  workdir/GCA_001514865.1_ASM151486v1_genomic.contig
+```
+
+  - If your analysis includes reads files, if paired, must have `R1` and `R2` at the end, else it needs to have `.fastq` as extension.
      - *_R1.fastq *_R2.fastq
   - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
 
 #### Test run
 
-* BEFORE RUNNING TEST: Please modify the values of `refdir` and `workdir` in the `test/phame.ctl` file to corresponding **absolute path**.
 
-* From the PhaME directory 
-
-```
-    src/runPhaME.pl test/phame.ctl
-
-```
 --------------------------------------------------------------
 #### OUTPUT files
 
