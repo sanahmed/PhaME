@@ -756,7 +756,7 @@ sub paml {
     if ( $model == 0 ) {
         print "\n";
         my $ps
-            = "time runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
+            = "runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
@@ -766,7 +766,7 @@ sub paml {
         } 
 
         my $parse
-            = "time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
+            = "parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
         print $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
     }
@@ -782,7 +782,7 @@ sub paml {
         my $branch_labeled_tree = $pamldir . "/$tree_name"."_BranchNumber" . "$tree_suffix";
         print "\n";
         my $ps
-            = "time runPAML.pl -i $dir -t $thread -r $branch_labeled_tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
+            = "runPAML.pl -i $dir -t $thread -r $branch_labeled_tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
         print $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
@@ -792,7 +792,7 @@ sub paml {
         }
 
         my $parse
-            = "time parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
+            = "parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
         print $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
 
