@@ -106,6 +106,7 @@ while (<CTL>) {
         $outdir = $workdir . '/results';
         if ( !-e $outdir ) { `mkdir -p $outdir`; }
         $workdir = Cwd::abs_path($workdir);
+        $outdir = Cwd::abs_path($outdir);
     }
 
     if (/project\s*=\s*(\S+)\s*#{0,1}.*$/) { $project = $1; }
@@ -645,7 +646,9 @@ if ( $ps == 1 ) { # if selection analysis is turned ON
         $pamldir = $outdir . '/paml';
         if ( !-d $pamldir ) { 
             `mkdir -p $pamldir`; }
+        if ($ tree == 2 || $tree == 3) {
         `cp $tbest $pamldir`;
+    }
         if ( $tree == 2 || $tree == 3 ) {
             $ptree = $pamldir . "/RAxML_bestTree.$project\_cds";
         }
