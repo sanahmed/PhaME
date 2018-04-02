@@ -3,6 +3,7 @@
 ############################# Base Docker Image ################################
 
 FROM ubuntu:16.04
+#FROM continuumio/miniconda3
 
 ############################# MAINTAINER #######################################
 
@@ -24,9 +25,9 @@ RUN apt-get install -y wget bzip2 ca-certificates libglib2.0-0 libxext6 libsm6 \
 	ocl-icd-opencl-dev mpich doxygen libssl-dev
 RUN apt-get -y upgrade
 RUN apt-get clean
-RUN mkdir -p /opt && cd /opt
 RUN	git clone https://github.com/mshakya/PhaME-1.git
-RUN ls
-RUN gcc -v
-RUN cmake --version
-RUN cd PhaME-1 && ls && ./INSTALL.sh
+WORKDIR /PhaME-1
+RUN ./INSTALL.sh
+ENV PATH="/PhaME-1/thirdParty/miniconda/bin:/PhaME-1/src:${PATH}"
+RUN sh test/TestAll.sh
+#############################ENVIRONMENT#####################################
