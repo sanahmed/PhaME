@@ -97,14 +97,15 @@ open( CTL, "$control" ) || die "Please provide a control file";
 
 while (<CTL>) {
     if (/refdir\s*=\s*(\S+)\s*#{0,1}.*$/) {
-        $refdir = $1;
+        $refdir = Cwd::abs_path($1);
         if ( $refdir =~ /.+\/$/ ) { my $temp = chop($refdir); }
     }
     if (/workdir\s*=\s*(\S+)\s*#{0,1}.*$/) {
-        $workdir = Cwd::abs_path($1);
+        $workdir = $1;
         if ( $workdir =~ /.+\/$/ ) { my $temp = chop($workdir); }
         $outdir = $workdir . '/results';
         if ( !-e $outdir ) { `mkdir -p $outdir`; }
+        $workdir = Cwd::abs_path($workdir);
     }
 
     if (/project\s*=\s*(\S+)\s*#{0,1}.*$/) { $project = $1; }
