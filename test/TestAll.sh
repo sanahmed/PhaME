@@ -2,99 +2,152 @@
 
 # PHAME = "src/runPhaME.pl" 
 
-rm -rf test/workdirs
+#rm -rf test/workdirs
 
-#1 test with just paired reads
-mkdir -p test/workdirs/ebola_preads
-cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/ebola_preads
+#1 test with just paired reads and picked reference
+mkdir -p test/workdirs/t1_ebola_preads
+cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
 perl src/runPhaME.pl test/ctl_files/t1_ebola_preads.ctl
-cmp test/workdirs/ebola_preads/results/t1_all_snp_alignment.fna test/truth/t1_all_snp_alignment.fna
+cmp test/workdirs/t1_ebola_preads/results/t1_summaryStatistics.txt test/truth/t1_summaryStatistics.txt
 
-#2 test with just single reads
-mkdir -p test/workdirs/ebola_sreads
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_sreads/
+# #2 test with just single reads and random reference
+mkdir -p test/workdirs/t2_ebola_sreads
+cp test/data/ebola_reads/*R1.fastq test/workdirs/t2_ebola_sreads/
 perl src/runPhaME.pl test/ctl_files/t2_ebola_sreads.ctl
-cmp test/workdirs/ebola_preads/results/t2_all_snp_alignment.fna test/truth/t2_all_snp_alignment.fna
+a=`grep -c ">" test/workdirs/t2_ebola_sreads/results/t2_all_snp_alignment.fna`
+b=2
+if ((a == b));then
+	echo "Test 2 finished without any errors";
+else
+	echo "There is something wrong!"
+	exit 1
+fi
 
-#3 test with just contigs
-mkdir -p test/workdirs/ebola_contigs
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs/
+#3 test with just contigs using ANI based reference
+mkdir -p test/workdirs/t3_ebola_contigs
+cp test/data/ebola_contigs/*.contigs test/workdirs/t3_ebola_contigs/
 perl src/runPhaME.pl test/ctl_files/t3_ebola_contigs.ctl
-cmp test/workdirs/ebola_contigs/results/t3_all_snp_alignment.fna test/truth/t3_all_snp_alignment.fna
+cmp test/workdirs/t3_ebola_contigs/results/t3_summaryStatistics.txt test/truth/t3_summaryStatistics.txt
 
-#4 test with just complete
-mkdir -p test/workdirs/ebola_complete
+#4 test with just complete and uses given reference, tests PAML
+mkdir -p test/workdirs/t4_ebola_complete
 perl src/runPhaME.pl test/ctl_files/t4_ebola_complete.ctl
-cmp test/workdirs/ebola_complete/results/t4_all_snp_alignment.fna test/truth/t4_all_snp_alignment.fna
+a=`wc -l < test/workdirs/t4_ebola_complete/results/paml/PAMLsitesResults.txt`
+b=9
+if ((a == b));then
+	echo "Test 4 finished without any errors";
+else
+	echo "There is something wrong!"
+	exit 1
+fi
 
-#5 test with complete and contigs
-mkdir -p test/workdirs/ebola_complete_contigs
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_complete_contigs/
+
+# #5 test with complete and contigs, uses given reference and tests HyPhy
+mkdir -p test/workdirs/t5_ebola_complete_contigs
+cp test/data/ebola_contigs/*.contigs test/workdirs/t5_ebola_complete_contigs/
 perl src/runPhaME.pl test/ctl_files/t5_ebola_cmp_ctgs.ctl
-cmp test/workdirs/ebola_complete_contigs/results/t5_all_snp_alignment.fna test/truth/t5_all_snp_alignment.fna
+a=`wc -l < test/workdirs/t5_ebola_complete_contigs/results/PSgenes/cds0_470_2689.cdn.ABSREL.json`
+b=462
+if ((a == b));then
+	echo "Test 5 finished without any errors";
+else
+	echo "There is something wrong!"
+	exit 1
+fi
 
-#6 test with complete and sread
-mkdir -p test/workdirs/ebola_complete_sread
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_complete_sread/
+#6 test with complete and sread, picks a random reference
+mkdir -p test/workdirs/t6_ebola_complete_sread
+cp test/data/ebola_reads/*R1.fastq test/workdirs/t6_ebola_complete_sread/
 perl src/runPhaME.pl test/ctl_files/t6_ebola_cmp_sreads.ctl
-cmp test/workdirs/ebola_complete_sread/results/t6_all_snp_alignment.fna test/truth/t6_all_snp_alignment.fna
+a=`grep -c ">" test/workdirs/t6_ebola_complete_sread/results/t6_all_snp_alignment.fna`
+b=11
+if ((a == b));then
+	echo "Test 6 finished without any errors";
+else
+	echo "There is something wrong!"
+	exit 1
+fi
 
-#7 test with complete and pread
-mkdir -p test/workdirs/ebola_complete_pread
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_complete_pread/
+
+#7 test with complete and pread, designated reference
+mkdir -p test/workdirs/t7_ebola_complete_pread
+cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t7_ebola_complete_pread/
 perl src/runPhaME.pl test/ctl_files/t7_ebola_cmp_preads.ctl
-cmp test/workdirs/ebola_complete_pread/results/t7_all_snp_alignment.fna test/truth/t7_all_snp_alignment.fna
+a=`grep -c ">" test/workdirs/t7_ebola_complete_pread/results/t7_cds_snp_alignment.fna`
+b=11
+if ((a == b));then
+	echo "Test 7 finished without any errors";
+else
+	echo "There is something wrong!"
+	exit 1
+fi
 
-#8 test with contigs and sread
-mkdir -p test/workdirs/ebola_contigs_sread
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread/
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs_sread/
+
+#8 test with contigs and sread, picks set reference
+mkdir -p test/workdirs/t8_ebola_contigs_sread
+cp test/data/ebola_reads/*R1.fastq test/workdirs/t8_ebola_contigs_sread/
+cp test/data/ebola_contigs/*.contigs test/workdirs/t8_ebola_contigs_sread/
 perl src/runPhaME.pl test/ctl_files/t8_ebola_ctg_sreads.ctl
-cmp test/workdirs/ebola_contigs_sread/results/t8_all_snp_alignment.fna test/truth/t8_all_snp_alignment.fna
+a=`grep -c ">" test/workdirs/t8_ebola_contigs_sread/results/t8_all_snp_alignment.fna`
+b=3
+if ((a == b));then
+	echo "Test 8 finished without any errors";
+else
+	echo "There is something wrong!"
+	exit 1
+fi
+
 
 #9 test with contigs and pread
-mkdir -p test/workdirs/ebola_contigs_pread
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_contigs_pread/
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs_pread/
+mkdir -p test/workdirs/t9_ebola_contigs_pread
+cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t9_ebola_contigs_pread/
+cp test/data/ebola_contigs/*.contigs test/workdirs/t9_ebola_contigs_pread/
 perl src/runPhaME.pl test/ctl_files/t9_ebola_ctg_preads.ctl
-cmp test/workdirs/ebola_contigs_sread/results/t8_all_snp_alignment.fna test/truth/t8_all_snp_alignment.fna
+a=`grep -c ">" test/workdirs/t9_ebola_contigs_pread/results/t9_all_snp_alignment.fna`
+b=3
+if ((a == b));then
+	echo "Test 9 finished without any errors";
+else
+	echo -e "There is something wrong!"
+	exit 1
+fi
 
 #10 test with sread and pread
-mkdir -p test/workdirs/ebola_sread_pread
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_sread_pread/
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_sread_pread/
-perl src/runPhaME.pl test/ctl_files/t10_ebola_sreads_preads.ctl
+#mkdir -p test/workdirs/t10_ebola_sread_pread
+# cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_sread_pread/
+# cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_sread_pread/
+# perl src/runPhaME.pl test/ctl_files/t10_ebola_sreads_preads.ctl
 
 
-#11 test with complete, contigs, and sread 
-mkdir -p test/workdirs/ebola_comp_contigs_sread
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_comp_contigs_sread/
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread/
-perl src/runPhaME.pl test/ctl_files/t11_ebola_comp_contigs_sread.ctl
+# #11 test with complete, contigs, and sread 
+# mkdir -p test/workdirs/ebola_comp_contigs_sread
+# cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_comp_contigs_sread/
+# cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread/
+# perl src/runPhaME.pl test/ctl_files/t11_ebola_comp_contigs_sread.ctl
 
-#12 test with complete, contigs, and pread 
-mkdir -p test/workdirs/ebola_comp_contigs_pread
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_comp_contigs_pread/
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_comp_contigs_pread/
-perl src/runPhaME.pl test/ctl_files/t12_ebola_comp_contigs_pread.ctl
+# #12 test with complete, contigs, and pread 
+# mkdir -p test/workdirs/ebola_comp_contigs_pread
+# cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_comp_contigs_pread/
+# cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_comp_contigs_pread/
+# perl src/runPhaME.pl test/ctl_files/t12_ebola_comp_contigs_pread.ctl
 
-#13 test with complete, sread, and pread 
-mkdir -p test/workdirs/ebola_comp_sread_pread
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_comp_sread_pread/
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_comp_sread_pread/
-perl src/runPhaME.pl test/ctl_files/t13_ebola_comp_sread_pread.ctl
+# #13 test with complete, sread, and pread 
+# mkdir -p test/workdirs/ebola_comp_sread_pread
+# cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_comp_sread_pread/
+# cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_comp_sread_pread/
+# perl src/runPhaME.pl test/ctl_files/t13_ebola_comp_sread_pread.ctl
 
 
-#14 test with contigs, sread, and pread 
-mkdir -p test/workdirs/ebola_contigs_sread_pread
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_contigs_sread_pread/
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread_pread/
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs_sread_pread/
-perl src/runPhaME.pl test/ctl_files/t14_ebola_contigs_sread_pread.ctl
+# #14 test with contigs, sread, and pread 
+# mkdir -p test/workdirs/ebola_contigs_sread_pread
+# cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_contigs_sread_pread/
+# cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread_pread/
+# cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs_sread_pread/
+# perl src/runPhaME.pl test/ctl_files/t14_ebola_contigs_sread_pread.ctl
 
-#15 test with complete, contigs, sread, and pread 
-mkdir -p test/workdirs/ebola_complete_contigs_sread_pread
-cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_contigs_sread_pread/
-cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread_pread/
-cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs_sread_pread/
-perl src/runPhaME.pl test/ctl_files/t15_ebola_complete_contigs_sread_pread.ctl
+# #15 test with complete, contigs, sread, and pread 
+# mkdir -p test/workdirs/ebola_complete_contigs_sread_pread
+# cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_contigs_sread_pread/
+# cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread_pread/
+# cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_contigs_sread_pread/
+# perl src/runPhaME.pl test/ctl_files/t15_ebola_complete_contigs_sread_pread.ctl
