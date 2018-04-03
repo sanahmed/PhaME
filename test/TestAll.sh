@@ -6,12 +6,14 @@ rm -rf test/workdirs
 mkdir -p test/workdirs/t1_ebola_preads
 cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
 perl src/runPhaME.pl test/ctl_files/t1_ebola_preads.ctl
-a=$(wc -l < test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna)
-b=4
+a=$(grep -c ">" < test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna)
+b=2
 if [ "$a" -eq "$b" ];then
 	echo "Test 1 finished without any errors";
 else
 	echo "Test 1: There is something wrong!"
+	echo "t1_all_snp_alignment.fna does not have 2 sequences."
+	cat test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna 
 	exit 1
 fi
 ################################################################################
