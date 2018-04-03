@@ -172,7 +172,7 @@ PhaME is run using a control file where the parameters and input folders are spe
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
             N = 100  # Number of bootstraps to run *See below    
   
-    PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+    PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both # these analysis need gff file to parse genomes to genes
 
          code = 0  # 0:Bacteria; 1:Virus
 
@@ -263,7 +263,7 @@ GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2
   - Specify the number of bootstrap trees to generate if its turned ON in `bootstrap` option.
 
 14. `PosSelect`
-  - The option to turn ON and select type of molecular evolution analysis to be done. Enter 0 to turn OFF molecular evolutionary analysis, 1 to use PAML to do molecular evolutionary analysis, 2 to use HyPhy, and 3 to use both of them. Turning this option ON will significantly slow the runtime.
+  - The option to turn ON and select type of molecular evolution analysis to be done. Enter 0 to turn OFF molecular evolutionary analysis, 1 to use PAML to do molecular evolutionary analysis, 2 to use HyPhy, and 3 to use both of them. Turning this option ON will significantly slow the runtime. If this option is turned ON, you must provide the gff file for the corresponding reference genome.
 
 15. `code`
   -  This specifies the pre-calculated parameters during genome alignments.Option 0 which is specific for bacteria uses, `Bacteria` aligns using default option with `maxmatch` for nucmer. And, option 1 which is for`Virus` sets option for nucmer alignment with `maxmatch` turned ON and `-b 200 -c 65 -d 0.12 -g 90 -l 20`.
