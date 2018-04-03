@@ -107,7 +107,7 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 #### Input files
 
-PhaME is run using a control file where the parameters and input folders are specified.
+PhaME is run using a control file where the parameters and input folders are specified. Here is how a control file looks like with the description of their options.
 
 ```
        refdir = test/data/ebola_ref  # directory where reference (Complete) files are located
@@ -147,8 +147,8 @@ PhaME is run using a control file where the parameters and input folders are spe
 ``` 
 
 PhaME requires inputs in two folder:
-1. *Reference folder*
-  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following syntax. Also, please try to avoid filenames that have multiple `.` or has special characters like `:` in their name.
+1. *refdir*
+  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following extensions. Please avoid filenames that have multiple `.` or has special characters like `:` in their name.
   - `*`.fasta
   - `*`.fna
   - `*`.fa
@@ -159,15 +159,15 @@ For example, a typical reference folder with reference genomes look like this:
 ```
 $ ls ref/
 
-GCA_000006925.2_ASM692v2_genomic.fna   GCA_000017745.1_ASM1774v1_genomic.fna  GCA_000026245.1_ASM2624v1_genomic.fna   GCA_000227625.1_ASM22762v1_genomic.fna
-GCA_000007405.1_ASM740v1_genomic.fna   GCA_000017765.1_ASM1776v1_genomic.fna  GCA_000026265.1_ASM2626v1_genomic.fna   GCA_000245515.1_ASM24551v1_genomic.fna
-GCA_000008865.1_ASM886v1_genomic.fna   GCA_000017985.1_ASM1798v1_genomic.fna  GCA_000026265.1_ASM2626v1_genomic.gff   GCA_000257275.1_ASM25727v1_genomic.fna
+GCA_000006925_2_ASM692v2_genomic.fna   GCA_000017745_1_ASM1774v1_genomic.fna  GCA_000026245_1_ASM2624v1_genomic.fna   GCA_000227625_1_ASM22762v1_genomic.fna
+GCA_000007405_1_ASM740v1_genomic.fna   GCA_000017765_1_ASM1776v1_genomic.fna  GCA_000026265_1_ASM2626v1_genomic.fna   GCA_000245515_1_ASM24551v1_genomic.fna
+GCA_000008865_1_ASM886v1_genomic.fna   GCA_000017985_1_ASM1798v1_genomic.fna  GCA_000026265_1_ASM2626v1_genomic.gff   GCA_000257275_1_ASM25727v1_genomic.fna
 
 ```
-Each of these files represent one genome. They may have multiple sequences representing multiple replicons or contigs, but are all part of one genome.
+Each of these files represent one genome. Each genome may have multiple sequences representing multiple replicons or contigs, but are all part of one genome. `gff` files corresponding to a genome must have the same exact name and in the same folder, just different extension. For example, `gff` file for genome `GCA_000006925_2_ASM692v2_genomic.fna` is `GCA_000006925_2_ASM692v2_genomic.gff`.
 
-2. *Working folder*
-  - This is the folder where intermediate and final files of analysis are written. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
+2. *workdir*
+  - This is the folder where intermediate and final files of analysis are stored. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
      - `*`.contig
      - `*`.contigs
 
@@ -175,9 +175,9 @@ Each of these files represent one genome. They may have multiple sequences repre
 ```
 $ ls workdir/*.contig
 
-workdir/GCA_000155105.1_ASM15510v1_genomic.contig  workdir/GCA_000968895.2_ASM96889v2_genomic.contig   workdir/GCA_001514825.1_ASM151482v1_genomic.contig
-workdir/GCA_000190495.1_ASM19049v1_genomic.contig  workdir/GCA_000968905.2_ASM96890v2_genomic.contig   workdir/GCA_001514845.1_ASM151484v1_genomic.contig
-workdir/GCA_000191665.1_ecmda7_genomic.contig      workdir/GCA_001471755.1_ASM147175v1_genomic.contig  workdir/GCA_001514865.1_ASM151486v1_genomic.contig
+workdir/GCA_000155105_1_ASM15510v1_genomic.contig  workdir/GCA_000968895_2_ASM96889v2_genomic.contig   workdir/GCA_001514825_1_ASM151482v1_genomic.contig
+workdir/GCA_000190495_1_ASM19049v1_genomic.contig  workdir/GCA_000968905.2_ASM96890v2_genomic.contig   workdir/GCA_001514845_1_ASM151484v1_genomic.contig
+workdir/GCA_000191665_1_ecmda7_genomic.contig      workdir/GCA_001471755_1_ASM147175v1_genomic.contig  workdir/GCA_001514865_1_ASM151486v1_genomic.contig
 ```
   If the analysis includes reads files, they must be in working folder as well. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
 
@@ -187,11 +187,69 @@ GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2
 
 ```
 
+3. `reference`
+  - This is where you specify which of the genomes in `refdir` you want to pick as a reference genome. The available options are
+    - 0: randomly pick a genome from `refdir` folder as the reference genome.
+    - 1: use the specified genome as the reference. Genome's filename is specified in the `reffile` option.
+    - 2: picks a `mid point` genome based on the average Average Nucleotide Identity (ANI) among all ganomes. It uses mash to calculate ANI.
 
+4. `reffile`
+  - This is where you specify the reference genome, if option 1 is picked in previous option. File name of the genome is written here and the program will look for that file in `reffile` folder. For example, `KJ660347.fasta` in the control file example above is found in the `reffile` folder.
+
+5. `project`
+  - The name of the project. All the important downstream output filenames will have the specified project name as their prefix.
+
+6. `cdsSNPS`
+  - This option allows users to parse SNPs based on their position into coding and non-coding sequences. It can be turned ON (0) or OFF (1). If turned ON, the picked reference genome must have a corresponding gff file. This option must be tunred ON for molecular evolution analysis.
+
+7. `buildSNPdb`
+  - This option will turn ON (1) or OFF (0) database creation, which is essentially all possible pairwise alignment of all genomes in `refdir`. Turning this ON will significantly increase the runtime.
+
+8. `FirstTime`
+  - This options default is 1, which reruns everything. The option 2, which only recalculates the SNP matrix only works when SNP database is turned ON in previous step.
+
+9. `data`
+  - Select the appropriate option based on the type of data that was included in the analysis. See the example control file above for details.
+
+10. `reads`
+  - This option is dependent on option chosen in `data`. If the analysis contains only single reads, enter 1, if paired reads enter 2, and if both are present enter 3.
+
+11. `tree`
+  - The option to generate tree. If 0 is entered, no tree is generted. If 1 is entered, only FastTree is used. If 2 is entered, only RAxML is used. If 3 is entered, both FastTree and RAxMl are used to make trees.
+
+12. `bootstrap`
+  - The option is valid if 2 or 3 is selected in `tree` option. It will calculate bootstrap trees using RAxML.
+
+13. `N`
+  - Specify the number of bootstrap trees to generate if its turned ON in `bootstrap` option.
+
+14. `PosSelect`
+  - The option to turn ON and select type of molecular evolution analysis to be done. Enter 0 to turn OFF molecular evolutionary analysis, 1 to use PAML to do molecular evolutionary analysis, 2 to use HyPhy, and 3 to use both of them. Turning this option ON will significantly slow the runtime.
+
+15. `code`
+  -  This specifies the pre-calculated parameters during genome alignments.Option 0 which is specific for bacteria uses, `Bacteria` aligns using default option with `maxmatch` for nucmer. And, option 1 which is for`Virus` sets option for nucmer alignment with `maxmatch` turned ON and `-b 200 -c 65 -d 0.12 -g 90 -l 20`.
+
+16. `clean`
+  - Turning this option ON (1) will remove intermediate files.
+
+17. `threads`
+  - Specify the number of threads to run analysis ON.
+
+18. `cutoff`
+  - This options lets user control the genomes to include based on how much of their region was included in the alignemnt against the reference genome. Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
 
 #### Test run
+After installing PhaME, you can check your installation using a suite of Test runs that I have provided. All of them can be run at a same time using:
 
+```
+$cd PhaME-1
+
+sh test/TestAll.sh
+
+```
+
+It will write all its output in `test/workdirs` folder.
 
 --------------------------------------------------------------
 #### OUTPUT files

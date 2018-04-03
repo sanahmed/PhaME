@@ -1,7 +1,7 @@
        refdir = test/data/ebola_ref  # directory where reference files are located
-      workdir = test/workdirs/ebola_contigs # directory where contigs/reads files are located and output is stored
+      workdir = test/workdirs/t3_ebola_contigs # directory where contigs/reads files are located and output is stored
 
-    reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
+    reference = 2  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
       reffile = KJ660347.fasta  # reference filename 
 
       project = t3  # main alignment file name
@@ -12,7 +12,7 @@
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 
-         data = 1  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
+         data = 3  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 2  # 1: single reads; 2: paired reads; 3: both types present;
