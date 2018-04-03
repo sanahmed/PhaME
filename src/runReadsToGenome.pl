@@ -103,7 +103,7 @@ my ( $ref_file_name, $ref_file_path, $ref_file_suffix )
 if ( $aligner =~ /bowtie/i and !-e "$ref_file.1.bt2" ) {
 
 # fold sequence in 100 bp per line (samtools cannot accept > 65535 bp one line sequence)
-    $ref_file = &fold($ref_file);
+    $ref_file = &fold($ref_file, $outDir);
     print "Creating bowtie index\n";
     print "[RUNNING:] bowtie2-build $ref_file $ref_file\n";
     `bowtie2-build $ref_file $ref_file`;
@@ -113,7 +113,7 @@ if ( $aligner =~ /bowtie/i and !-e "$ref_file.1.bt2" ) {
 elsif ( $aligner =~ /bwa/i and !-e "$ref_file.bwt" ) {
 
 # fold sequence in 100 bp per line (samtools cannot accept > 65535 bp one line sequence)
-    $ref_file = &fold($ref_file);
+    $ref_file = &fold($ref_file, $outDir);
     print "Creating bwa index\n";
     print "[RUNNING:] bwa index $ref_file\n";
     `bwa index $ref_file`;
@@ -122,7 +122,7 @@ elsif ( $aligner =~ /snap/i ) {
 
 # fold sequence in 100 bp per line (samtools cannot accept > 65535 bp one line sequence)
     print "Creating snap index\n";
-    $ref_file = &fold($ref_file);
+    $ref_file = &fold($ref_file, $outDir);
     `snap index $ref_file $ref_file.snap `;
 }
 
@@ -613,13 +613,16 @@ sub standard_deviation {
 sub fold {
 
     # fold and filter reads length by 200 bp.
-    my $file = $_[0];
+    my $file = shift;
+    my $outdir = shift;
     my $seq;
     my $seq_name;
     my $len_cutoff = 0;
     my $seq_num;
     open( IN,  $file );
-    open( OUT, ">/tmp/Contig$$.fold" );
+    my $out_fold = $outdir . "/" ."Contig$$.fold";
+    open( OUT, ">$out_fold" );
+    # open( OUT, ">/tmp/Contig$$.fold" );
     while (<IN>) {
         chomp;
         if (/>/) {
@@ -644,7 +647,7 @@ sub fold {
     close IN;
     close OUT;
     if ( $seq_num < 1 ) { die "No seqeucne in your reference file\n"; }
-    return ("/tmp/Contig$$.fold");
+    return ("$out_fold");
 }
 
 sub SNP_INDEL_COUNT {
