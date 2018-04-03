@@ -911,10 +911,11 @@ echo "
 ================================================================================
 Check phame.ctl for the control file
 
-Quick start:
-    perl src/runPhaME.pl test/phame.ctl
+Quick test:
+    cd PhaME-1
+    sh test/TestAll.sh
     Please use the full path to specify the location of fasta file.
     Read README.md for detail
 Check our github site for update:
-    https://github.com/LANL-Bioinformatics/PhaME
+    https://github.com/mshakya/PhaME-1
 ";

@@ -1,6 +1,6 @@
 #! /bin/sh
 
-#rm -rf test/workdirs
+rm -rf test/workdirs
 
 ############# #1 Test with just paired reads and picked reference ##############
 mkdir -p test/workdirs/t1_ebola_preads
@@ -23,7 +23,7 @@ cp test/data/ebola_reads/*R1.fastq test/workdirs/t2_ebola_sreads/
 perl src/runPhaME.pl test/ctl_files/t2_ebola_sreads.ctl
 a=$(grep -c ">" test/workdirs/t2_ebola_sreads/results/t2_all_snp_alignment.fna)
 b=2
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 2 finished without any errors";
 else
 	echo "Test 2: There is something wrong!"
@@ -36,7 +36,7 @@ cp test/data/ebola_contigs/*.contigs test/workdirs/t3_ebola_contigs/
 perl src/runPhaME.pl test/ctl_files/t3_ebola_contigs.ctl
 a=$(wc -l < test/workdirs/t3_ebola_contigs/results/t3_all_snp_alignment.fna)
 b=20
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 3 finished without any errors";
 else
 	echo "Test 3: There is something wrong!"
@@ -49,7 +49,7 @@ mkdir -p test/workdirs/t4_ebola_complete
 perl src/runPhaME.pl test/ctl_files/t4_ebola_complete.ctl
 a=$(wc -l < test/workdirs/t4_ebola_complete/results/paml/PAMLsitesResults.txt)
 b=8
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 4 finished without any errors";
 else
 	echo "Test 4: There is something wrong!"
@@ -63,7 +63,7 @@ cp test/data/ebola_contigs/*.contigs test/workdirs/t5_ebola_complete_contigs/
 perl src/runPhaME.pl test/ctl_files/t5_ebola_cmp_ctgs.ctl
 a=$(wc -l < test/workdirs/t5_ebola_complete_contigs/results/PSgenes/cds0_470_2689.cdn.ABSREL.json)
 b=462
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 5 finished without any errors";
 else
 	echo "Test 5: There is something wrong!"
@@ -77,7 +77,7 @@ cp test/data/ebola_reads/*R1.fastq test/workdirs/t6_ebola_complete_sread/
 perl src/runPhaME.pl test/ctl_files/t6_ebola_cmp_sreads.ctl
 a=$(grep -c ">" test/workdirs/t6_ebola_complete_sread/results/t6_all_snp_alignment.fna)
 b=11
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 6 finished without any errors";
 else
 	echo "Test 6: There is something wrong!"
@@ -91,7 +91,7 @@ cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t7_ebola_complete_pread/
 perl src/runPhaME.pl test/ctl_files/t7_ebola_cmp_preads.ctl
 a=$(grep -c ">" test/workdirs/t7_ebola_complete_pread/results/t7_cds_snp_alignment.fna)
 b=11
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 7 finished without any errors";
 else
 	echo "Test 7: There is something wrong!"
@@ -106,7 +106,7 @@ cp test/data/ebola_contigs/*.contigs test/workdirs/t8_ebola_contigs_sread/
 perl src/runPhaME.pl test/ctl_files/t8_ebola_ctg_sreads.ctl
 a=$(grep -c ">" test/workdirs/t8_ebola_contigs_sread/results/t8_all_snp_alignment.fna)
 b=3
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 8 finished without any errors";
 else
 	echo "Test 8: There is something wrong!"
@@ -121,7 +121,7 @@ cp test/data/ebola_contigs/*.contigs test/workdirs/t9_ebola_contigs_pread/
 perl src/runPhaME.pl test/ctl_files/t9_ebola_ctg_preads.ctl
 a=$(grep -c ">" test/workdirs/t9_ebola_contigs_pread/results/t9_all_snp_alignment.fna)
 b=3
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 9 finished without any errors";
 else
 	echo -e "Test 9: There is something wrong!"
