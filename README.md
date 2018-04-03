@@ -132,7 +132,7 @@ $mkdir -p workdir
   4. Run the analysis using docker.
 
 ```
-docker run --rm -v phame_analysis_folder:/data migun/phame perl /PhaME-1/src/runPhaME.pl 
+docker run --rm -v phame_analysis_folder:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli.ctl
 ```
 
 --------------------------------------------------------------
