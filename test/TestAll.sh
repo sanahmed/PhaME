@@ -8,7 +8,7 @@ cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
 perl src/runPhaME.pl test/ctl_files/t1_ebola_preads.ctl
 a=$(wc -l < test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna)
 b=4
-if ((a == b));then
+if [ "$a" -eq "$b" ];then
 	echo "Test 1 finished without any errors";
 else
 	echo "Test 1: There is something wrong!"
