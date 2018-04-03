@@ -95,12 +95,12 @@ To bypass the installation steps, we have provided a docker [image](https://stac
   
   ```
 
-- Check if the image is correctly downloaded.
+- Check if the image is correctly downloaded by running the provided test.
   ```
-  docker run --rm 
+  docker run --rm migun/phame-1 sh test/TestAll.sh 
   ```
 
-- 
+- Now to run your own data (see bwlow for deta) 
 
 --------------------------------------------------------------
 ### Running PhaME
@@ -148,7 +148,7 @@ PhaME is run using a control file where the parameters and input folders are spe
 
 PhaME requires inputs in two folder:
 1. *refdir*
-  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following extensions. Please avoid filenames that have multiple `.` or has special characters like `:` in their name.
+  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following extensions. The path to the folder should be either absolute or relative to the location from where you will be running PhaME. Please avoid filenames that have multiple `.` or has special characters like `:` in their name.
   - `*`.fasta
   - `*`.fna
   - `*`.fa
@@ -167,7 +167,7 @@ GCA_000008865_1_ASM886v1_genomic.fna   GCA_000017985_1_ASM1798v1_genomic.fna  GC
 Each of these files represent one genome. Each genome may have multiple sequences representing multiple replicons or contigs, but are all part of one genome. `gff` files corresponding to a genome must have the same exact name and in the same folder, just different extension. For example, `gff` file for genome `GCA_000006925_2_ASM692v2_genomic.fna` is `GCA_000006925_2_ASM692v2_genomic.gff`.
 
 2. *workdir*
-  - This is the folder where intermediate and final files of analysis are stored. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
+  - This is the folder where intermediate and final files of analysis are stored. The path to the folder should be either absolute or relative to the location from where the PhaME is run. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
      - `*`.contig
      - `*`.contigs
 
