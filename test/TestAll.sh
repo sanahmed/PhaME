@@ -13,7 +13,11 @@ if [ "$a" -eq "$b" ];then
 else
 	echo "Test 1: There is something wrong!"
 	echo "t1_all_snp_alignment.fna does not have 2 sequences."
-	cat test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna 
+	cat test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna
+	cat test/workdirs/t1_ebola_preads/results/t1_PhaME.log
+	cat test/workdirs/t1_ebola_preads/results/t1.error
+	ls -lh test/workdirs/t1_ebola_preads/results/
+
 	exit 1
 fi
 ################################################################################
