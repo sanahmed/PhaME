@@ -10,45 +10,42 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 --------------------------------------------------------------
 ## Version
-1.0
+0.3
 
---------------------------------------------------------------
-## SYSTEM REQUIREMENTS
+## 0.0 Installing PhaME
 
-* Perl version > 5.16
+You can use "git" to obtain the package:
 
+    $ git clone https://github.com/mshakya/PhaME-1.git
+    $ cd PhaME-1
+    $ ./INSTALL.sh
+
+`INSTALL.sh` checks for dependencies that are already installed and only installs the one that are not installed or are of not specified version.
+
+The C/C++ compiling environment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
+
+### 0.1 Dependencies
+
+### 0.1.0 Programming/Scripting languages
+* Perl > 5.16
+
+### 0.1.1 Third party softwares/packages
 * MUMmer version 3.23 - Pairwise alignment using NUCmer 
-
 * Bowtie2 version >=2.2.8 - Mapping of reads
-
 * SAMtools version 1.3.1 and vcftools - Convert BAM files created by Bowtie
-
 * FastTree version >=2.1.9 - Construction of phylogenetic tree
-
 * RAxML version >=8.2.9 - Maximum likelihood construction of phylogenetic tree
-
 * mafft version >=7.305 - For optional evolutionary analyses
-
 * pal2nal version >=14 - For optional evolutionary analyses
-
 * paml version >=4.8 - For optional evolutionary analyses
-
 * HyPhy version >=2.2 - For optional evolutionary analyses
-
 * bwa VER >= 0.7.15
-
 * cmake VER >= 3.0.1
-
 * gcc >= 4.9
-
 * bcftools VER >= 1.6
-
-* samtools VER >= 1.6
-
 * bbmap version >= 37.90
 
---------------------------------------------------------------
-## PERL PACKAGES
+### 0.1.2 Perl Packages
 
 * File::Basename = 2.85
 * File::Path = 2.09
@@ -59,21 +56,6 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 * Time::BaseName = 2.85
 * Time::HiRes = 1.9726
 
-The C/C++ compiling environment might be required for installing dependencies. Systems may vary. Please assure that your system has the essential software building packages (e.g. build-essential for Ubuntu, XCODE for Mac...etc) installed properly before running the installing script.
-
---------------------------------------------------------------
-### Obtaining PhaME
-
-You can use "git" to obtain the package:
-
-    $ git clone https://github.com/mshakya/PhaME-1.git
-
-### Installing PhaME
-
-    $ cd PhaME
-    $ ./INSTALL.sh
-
-`INSTALL.sh` checks for dependencies that are already installed and only installs the one that are not installed or are of not specified version.
 
 `HYPHY` installation is a bit tricky as its not part of conda, and installation is not streamlined, and `PhaME` requires it to be installed in the `thirdParty` folder. However, if you have native `gcc` >=4.9, installation shoule be breeze and the script `INSTALL.sh` should be sufficient, but if your native gcc is `4.8` or lower, you will need to install it manually. Please refer to this question that I created in hyphy repo for [details](https://github.com/veg/hyphy/issues/755). In summary, install required version of `gcc` or find out the path to `gcc` if its already installed, followed by the installation of the latest version of `libcurl`.
 
@@ -83,54 +65,50 @@ $CC=/path/to/gcc CXX=/path/to/g++ cmake -DINSTALL_PREFIX=/path/to/thirdParty/hyp
 $make 
  -->
 
---------------------------------------------------------------
-### Running PhaME with docker
+--------------------------------------------------------------------------------
+## 1.0 Running PhaME 
+
+### 1.1 with Docker
 
 To bypass the installation steps, we have provided a docker [image](https://stackoverflow.com/questions/23735149/what-is-the-difference-between-a-docker-image-and-a-container) for PhaME. To run PhaME from a docker image, follow these steps:
-- Install [Docker](https://docs.docker.com/install/).
-- Download the latest version of PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame-1/). 
-```
+##### 1. Install [Docker](https://docs.docker.com/install/).
 
+##### 2. Download the latest PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame-1/). 
+```
 $docker pull migun/phame-1
 
 ```
 
-- Check if the image is correctly downloaded by running the provided test.
+##### 3. Check if the image is correctly downloaded by running the provided test.
 ```
 $docker run --rm migun/phame-1 sh test/TestAll.sh 
 ```
 
-- Run your own data using docker. A step by step guide:
-  1. Create a folder to mount onto your docker.
+##### 4. Run your own data using docker. A step by step guide:
+
+I. Create a folder to mount onto your docker.
+
 ```
 $mkdir -p phame_analysis_folder
-
 ```
-
-2. Create a `refdir` folder with complete genomes within `phame_analysis_folder`.
+II. Create a `refdir` folder with complete genomes within `phame_analysis_folder`.
 
   This folder will contain fasta files representing complete genomes. 
-```
 
+```
 $cd phame_analysis_folder
 $mkdir -p refdir
-
 ```
-And then copy or download genomes and their gff files (when needed) onto this folder.
+Copy or download genomes and their gff files (if needed) onto this folder.
 
-  3. Create a `workdir` folder within the `phame_analysis_folder`.
+III. Create a `workdir` folder within the `phame_analysis_folder`.
     This folder will have all the intermediate and final outputs of the analysis including input contigs and reference
 ```
 $mkdir -p workdir
-
 ```
-
-  3. Create a control file (See below).
+IV. Create a control file (See below).
     All the inputs and parameters of a PhaME analysis is set in the control file. Using the provided template create a control file with apprpriate parameters and save it in the `phame_analysis_foler`.
-
-
-  4. Run the analysis using docker.
-
+V. Run the analysis using docker.
 ```
 docker run --rm -v phame_analysis_folder:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli.ctl
 ```
@@ -139,15 +117,34 @@ We have also provided an example folder with genomes and contigs to try it out. 
 
 ```
 $git clone https://github.com/mshakya/phame_examples.git
-$docker run --rm -v [FULL_PATH]/phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
+$docker run --rm -v $(pwd)/phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
 
 ```
 
 
 --------------------------------------------------------------
-### Running PhaME
+### 1.2 without Docker with native installation
 
-#### Input files
+After the PhaME is installed, the first step would be to run the test that I have provided. All of them can be run at a same time using:
+
+```
+$cd PhaME-1
+
+sh test/TestAll.sh
+
+```
+It will write all its output in `test/workdirs` folder.
+
+To run your own analysis, create a folder for `refdir` and `workdir` and add corresponding genomes and contigs and reads into the folder. Then create a control file and run:
+
+
+```
+perl PhaME-1/src/runPhaME.pl phame_analysis_folder/ecoli.ctl
+
+```
+
+
+## Description of PhaME parameters
 
 PhaME is run using a control file where the parameters and input folders are specified. Here is how a control file looks like with the description of their options.
 
@@ -177,7 +174,7 @@ PhaME is run using a control file where the parameters and input folders are spe
   
     PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
 
-         code = 1  # 0:Bacteria; 1:Virus
+         code = 0  # 0:Bacteria; 1:Virus
 
         clean = 0  # 0:no clean; 1:clean # remove intermediate and temp files after analysis is complete
 
@@ -279,19 +276,6 @@ GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2
 
 18. `cutoff`
   - This options lets user control the genomes to include based on how much of their region was included in the alignemnt against the reference genome. Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
-
-
-#### Test run
-After installing PhaME, you can check your installation using a suite of Test runs that I have provided. All of them can be run at a same time using:
-
-```
-$cd PhaME-1
-
-sh test/TestAll.sh
-
-```
-
-It will write all its output in `test/workdirs` folder.
 
 --------------------------------------------------------------
 #### OUTPUT files
