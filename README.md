@@ -81,7 +81,7 @@ You can use "git" to obtain the package:
 $rm -rf CMakeCache* CMakeFiles/
 $CC=/path/to/gcc CXX=/path/to/g++ cmake -DINSTALL_PREFIX=/path/to/thirdParty/hyphy/folder
 $make 
- -->```
+ -->
 
 --------------------------------------------------------------
 ### Running PhaME with docker
@@ -135,6 +135,15 @@ $mkdir -p workdir
 docker run --rm -v phame_analysis_folder:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli.ctl
 ```
 
+We have also provided an example folder with genomes and contigs to try it out. The folder can be downloaded from [github](https://github.com/mshakya/phame_examples.git), mounted to the docker image and then run.
+
+```
+$git clone https://github.com/mshakya/phame_examples.git
+$docker run --rm -v phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
+
+```
+
+
 --------------------------------------------------------------
 ### Running PhaME
 
@@ -181,7 +190,7 @@ PhaME is run using a control file where the parameters and input folders are spe
 
 PhaME requires inputs in two folder:
 1. *refdir*
-  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following extensions. The path to the folder should be either absolute or relative to the location from where you will be running PhaME. Please avoid filenames that have multiple `.` or has special characters like `:` in their name.
+  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following extensions. The path to the folder should be either absolute or relative to the location of the control file. Please avoid filenames that have multiple `.` or has special characters like `:` in their name.
   - `*`.fasta
   - `*`.fna
   - `*`.fa
@@ -200,7 +209,7 @@ GCA_000008865_1_ASM886v1_genomic.fna   GCA_000017985_1_ASM1798v1_genomic.fna  GC
 Each of these files represent one genome. Each genome may have multiple sequences representing multiple replicons or contigs, but are all part of one genome. `gff` files corresponding to a genome must have the same exact name and in the same folder, just different extension. For example, `gff` file for genome `GCA_000006925_2_ASM692v2_genomic.fna` is `GCA_000006925_2_ASM692v2_genomic.gff`.
 
 2. *workdir*
-  - This is the folder where intermediate and final files of analysis are stored. The path to the folder should be either absolute or relative to the location from where the PhaME is run. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
+  - This is the folder where intermediate and final files of analysis are stored. The path to the folder should be either absolute or relative to the location of the control file. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
      - `*`.contig
      - `*`.contigs
 
@@ -354,12 +363,12 @@ Summary files ( all files are found under folder `workdir/results`)
   - `working directory`/results/snps
       - SNP coordinate files generated from NUCmer and bowtie
       - `g1_g2.snps`: contains pairwise snps between `g1` and `g2`. For example:
-        ```
+```
         [P1] [SUB]   [SUB]   [P2]    [BUFF]  [DIST]  [FRM]   [TAGS]
         127     T       C    127        22      127     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
         149     T       C    149        6       149     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
         155     C       A    155        6       155     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
-        ```
+```
 
   - `working directory`/results/gaps
       - Gap coordinate files generated from NUCmer and bowtie
@@ -368,11 +377,11 @@ Summary files ( all files are found under folder `workdir/results`)
         - `g1_g2.coords` is a table file that contains regions of genome `g1` and `g2` that were aligned.
         - `g_repeat_coords.txt` is a table that contains region within genome `g` that were detected as similar.
         - `g_repeat_stats.txt` contains genome size, repeat segment, and repeat length of genome `g`. For example:
-            ```
+```
                 ZEBOV_2007_4Luebo size: 18958
                 Repeats segment #:  0
                 Repeats total length:   0 (0.00%)
-            ```
+```
         - `repeat_stats.txt` summary of all `g_repeat_stats.txt`.
   - `working directory`/results/temp
       - Temporary files generated
