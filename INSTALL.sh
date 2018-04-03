@@ -32,7 +32,7 @@ samtools_VER=1.3.1
 perl5_VER=5.8.0
 bcftools_VER=1.6
 hyphy_VER=2.3.11
-bbmap_VER=37.90
+bbmap_VER=37.62
 
 #minimum required version of Perl modules
 perl_File_Basename_VER=2.85
@@ -182,7 +182,7 @@ echo "
 install_bbmap()
 {
 echo "--------------------------------------------------------------------------
-                           installing bbmap v37.90
+                           installing bbmap v37.62
 --------------------------------------------------------------------------------
 "
 conda install --yes -c bioconda bbmap -p $ROOTDIR/thirdParty/miniconda
@@ -192,7 +192,7 @@ ln -sf $ROOTDIR/thirdParty/miniconda/bin/comparesketch.sh $ROOTDIR/bin/comparesk
 
 echo "
 ------------------------------------------------------------------------------
-                           mummer v37.90 
+                           mummer v37.62 
 ------------------------------------------------------------------------------
 "
 }

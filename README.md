@@ -89,18 +89,51 @@ $make
 To bypass the installation steps, we have provided a docker [image](https://stackoverflow.com/questions/23735149/what-is-the-difference-between-a-docker-image-and-a-container) for PhaME. To run PhaME from a docker image, follow these steps:
 - Install [Docker](https://docs.docker.com/install/).
 - Download the latest version of PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame-1/). 
-  ```
+```
 
-  $docker pull migun/phame-1
-  
-  ```
+$docker pull migun/phame-1
+
+```
 
 - Check if the image is correctly downloaded by running the provided test.
-  ```
-  docker run --rm migun/phame-1 sh test/TestAll.sh 
-  ```
+```
+$docker run --rm migun/phame-1 sh test/TestAll.sh 
+```
 
-- Now to run your own data (see bwlow for deta) 
+- Run your own data using docker. A step by step guide:
+  1. Create a folder to mount onto your docker.
+```
+$mkdir -p phame_analysis_folder
+
+```
+
+2. Create a `refdir` folder with complete genomes within `phame_analysis_folder`.
+
+  This folder will contain fasta files representing complete genomes. 
+```
+
+$cd phame_analysis_folder
+$mkdir -p refdir
+
+```
+And then copy or download genomes and their gff files (when needed) onto this folder.
+
+  3. Create a `workdir` folder within the `phame_analysis_folder`.
+    This folder will have all the intermediate and final outputs of the analysis including input contigs and reference
+```
+$mkdir -p workdir
+
+```
+
+  3. Create a control file (See below).
+    All the inputs and parameters of a PhaME analysis is set in the control file. Using the provided template create a control file with apprpriate parameters and save it in the `phame_analysis_foler`.
+
+
+  4. Run the analysis using docker.
+
+```
+docker run --rm -v phame_analysis_folder:/data migun/phame perl /PhaME-1/src/runPhaME.pl 
+```
 
 --------------------------------------------------------------
 ### Running PhaME

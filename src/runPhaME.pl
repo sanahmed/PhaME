@@ -95,6 +95,8 @@ my $bindir = getBinDirectory();
 ## Read in control file
 open( CTL, "$control" ) || die "Please provide a control file";
 
+my $ctl_dir = dirname($control);
+chdir $ctl_dir;
 while (<CTL>) {
     if (/refdir\s*=\s*(\S+)\s*#{0,1}.*$/) {
         $refdir = Cwd::abs_path($1);
