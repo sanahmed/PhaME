@@ -3,7 +3,6 @@
 ############################# Base Docker Image ################################
 
 FROM ubuntu:16.04
-#FROM continuumio/miniconda3
 
 ############################# MAINTAINER #######################################
 
@@ -29,5 +28,5 @@ RUN	git clone https://github.com/mshakya/PhaME-1.git
 WORKDIR /PhaME-1
 RUN ./INSTALL.sh
 ENV PATH="/PhaME-1/thirdParty/miniconda/bin:/PhaME-1/src:${PATH}"
-RUN sh test/TestAll.sh
+# RUN sh test/TestAll.sh
 #############################ENVIRONMENT#####################################
