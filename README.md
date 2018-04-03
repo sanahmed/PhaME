@@ -146,11 +146,6 @@ PhaME is run using a control file where the parameters and input folders are spe
 
 ``` 
 
-
-
-
-
-
 PhaME requires inputs in two folder:
 1. *Reference folder*
   A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following syntax. Also, please try to avoid filenames that have multiple `.` or has special characters like `:` in their name.

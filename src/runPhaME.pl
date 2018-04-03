@@ -672,7 +672,8 @@ if ( $ps == 1 ) { # if selection analysis is turned ON
         $hyphydir = $outdir . '/hyphy';
         if ( !-d $hyphydir ) { 
             `mkdir -p $hyphydir`; }
-        `cp $tbest $hyphydir`;
+        if ($ tree == 2 || $tree == 3) {
+            `cp $tbest $hyphydir`; }
         if ( $tree == 2 || $tree == 3 ) {
             $ptree = $hyphydir . "/RAxML_bestTree.$project\_cds";
         }
