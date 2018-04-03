@@ -1,6 +1,6 @@
 #! /bin/sh
 
-rm -rf test/workdirs
+#rm -rf test/workdirs
 
 ############# #1 Test with just paired reads and picked reference ##############
 mkdir -p test/workdirs/t1_ebola_preads
