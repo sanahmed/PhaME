@@ -773,7 +773,7 @@ sub paml {
 
     if ( $model == 2 ) {
         print "\n";
-        my $edit = "time ParseTree.pl $tree 2>>$error >> $log\n\n";
+        my $edit = "ParseTree.pl $tree 2>>$error >> $log\n\n";
         print $edit;
         if ( system($edit) ) { die "Error running $edit.\n"; }
 
