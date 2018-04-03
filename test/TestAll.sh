@@ -67,6 +67,14 @@ fi
 mkdir -p test/workdirs/t5_ebola_complete_contigs
 cp test/data/ebola_contigs/*.contigs test/workdirs/t5_ebola_complete_contigs/
 perl src/runPhaME.pl test/ctl_files/t5_ebola_cmp_ctgs.ctl
+a=$(grep -c ">" test/workdirs/t5_ebola_complete_contigs/results/t5_all_snp_alignment.fna)
+b=10
+if [ "$a" -eq "$b" ];then
+	echo "Test 5 finished without any errors";
+else
+	echo "Test 5: There is something wrong!"
+	exit 1
+fi
 #Commenting out hyphy test for now.
 #a=$(wc -l < test/workdirs/t5_ebola_complete_contigs/results/PSgenes/cds0_470_2689.cdn.ABSREL.json)
 #b=462
