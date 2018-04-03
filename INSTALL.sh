@@ -16,7 +16,7 @@ mkdir -p $ROOTDIR/bin
 export PATH="$ROOTDIR/bin/":"$ROOTDIR/thirdParty/miniconda/bin/":$PATH
 # Minimum Required versions of dependencies
 # nucmer 3.1 is packaged in mummer 3.23
-bowtie2_VER=2.2.8
+bowtie2_VER=2.3.0
 bwa_VER=0.7.15
 cmake_VER=3.0.1
 cpanm_VER=1.7039
@@ -231,14 +231,14 @@ echo "
 install_bowtie2()
 {
 echo "--------------------------------------------------------------------------
-                           installing bowtie2 v2.2.8
+                           installing bowtie2 v2.3.0
 --------------------------------------------------------------------------------
 "
 conda install --yes -c bioconda bowtie2=$bowtie2_VER -p $ROOTDIR/thirdParty/miniconda
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/bowtie2 $ROOTDIR/bin/bowtie2
 echo "
 ------------------------------------------------------------------------------
-                           bowtie2 v2.2.8 installed
+                           bowtie2 v2.3.0 installed
 ------------------------------------------------------------------------------
 "
 }
