@@ -28,7 +28,7 @@ muscle_VER=3.8.31
 paml_VER=4.9
 R_VER=3.3.1
 RAxML_VER=8.2.10
-samtools_VER=1.3.1
+samtools_VER=1.7
 perl5_VER=5.8.0
 bcftools_VER=1.6
 hyphy_VER=2.3.11
@@ -246,14 +246,14 @@ echo "
 install_samtools()
 {
 echo "--------------------------------------------------------------------------
-                           Downloading samtools v1.3.1
+                           Downloading samtools v1.7
 --------------------------------------------------------------------------------
 "
 conda install --yes -c bioconda samtools=$samtools_VER -p $ROOTDIR/thirdParty/miniconda
 ln -sf $ROOTDIR/thirdParty/miniconda/bin/samtools $ROOTDIR/bin/samtools
 echo "
 --------------------------------------------------------------------------------
-                           samtools v1.3.1 installed
+                           samtools v1.7 installed
 --------------------------------------------------------------------------------
 "
 }
