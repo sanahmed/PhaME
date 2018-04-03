@@ -18,7 +18,7 @@ before_script:
 
 script:
   - PWD=$(pwd)
-  - travis_wait 30 sh test/TestAll.sh
+  - sh test/TestAll.sh
   - cover -test
 
 after_success:
