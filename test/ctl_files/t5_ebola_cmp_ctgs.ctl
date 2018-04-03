@@ -21,7 +21,7 @@
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
             N = 100  # Number of bootstraps to run *See below    
   
-    PosSelect = 2 # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+    PosSelect = 0 # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
 
          code = 1  # 0:Bacteria; 1:Virus
 
