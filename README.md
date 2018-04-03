@@ -351,29 +351,6 @@ Summary files ( all files are found under folder `workdir/results`)
       - HyPhy results
 
 
-## Parameters
-
-### reference
-`reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference`
-  0, picks a random genome to be reference from the reference folder.
-  1, user specified reference
-  2, uses the genome that has the best ANI among all genomes. Calculated using mash implementation in bbmap.
-
-
-### code
-`code = 1  # 0:Bacteria; 1:Virus`
-
-`Virus` sets option for nucmer alignment that is not default.
-
-`Bacteria` aligns using default option with `maxmatch` for nucmer.
-
-
-### cutoff
-
-`cutoff = `X
-
-Option to remove genomes that aligned with less than X proportion (0-1) of the reference genome. 
-
 --------------------------------------------------------------
 ## CITATION
 
