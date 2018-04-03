@@ -75,13 +75,13 @@ You can use "git" to obtain the package:
 
 `INSTALL.sh` checks for dependencies that are already installed and only installs the one that are not installed or are of not specified version.
 
-`HYPHY` installation is a bit tricky as its not part of conda, and installation is not streamlined, and `PhaME` requires it to be installed in the `thirdParty` folder. However, if you have native `gcc` >=4.9, installation shoule be breeze, but if your native gcc is `4.8` or lower, you will need to install it manually. Please refer to this question that I created in hyphy repo for [details](https://github.com/veg/hyphy/issues/755). In summary, install required version of `gcc` or find out the path to `gcc` if its already installed, and also install the latest version of `libcurl`, add it to path and do this:
+`HYPHY` installation is a bit tricky as its not part of conda, and installation is not streamlined, and `PhaME` requires it to be installed in the `thirdParty` folder. However, if you have native `gcc` >=4.9, installation shoule be breeze and the script `INSTALL.sh` should be sufficient, but if your native gcc is `4.8` or lower, you will need to install it manually. Please refer to this question that I created in hyphy repo for [details](https://github.com/veg/hyphy/issues/755). In summary, install required version of `gcc` or find out the path to `gcc` if its already installed, followed by the installation of the latest version of `libcurl`.
 
-```
+<!-- ```
 $rm -rf CMakeCache* CMakeFiles/
 $CC=/path/to/gcc CXX=/path/to/g++ cmake -DINSTALL_PREFIX=/path/to/thirdParty/hyphy/folder
 $make 
-```
+ -->```
 
 --------------------------------------------------------------
 ### Running PhaME with docker
@@ -91,13 +91,13 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 - Download the latest version of PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame-1/). 
   ```
 
-  docker pull migun/phame-1
+  $docker pull migun/phame-1
   
   ```
 
 - Check if the image is correctly downloaded.
   ```
-  docker run 
+  docker run --rm 
   ```
 
 - 
@@ -107,16 +107,59 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 #### Input files
 
-Please try to avoid filenames that have multiple `.` in their name.
+PhaME is run using a control file where the parameters and input folders are specified.
 
-PhaME requires inputs in several folder/directory:
-* A directory with reference genomes (complete genomes) with following file suffixes
+```
+       refdir = test/data/ebola_ref  # directory where reference (Complete) files are located
+      workdir = test/workdirs/ebola_complete # directory where contigs/reads files are located and output is stored
+
+    reference = 2  # 0:pick a random reference from refdir; 1:use given reference; 2: use ANI based reference
+      reffile = KJ660347.fasta  # reference filename when option 1 is chosen
+
+      project = t4  # main alignment file name
+
+      cdsSNPS = 1  # 0:no cds SNPS; 1:cds SNPs, divides SNPs into coding and non-coding sequences, gff file is required
+
+      buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genomes from refdir
+
+    FirstTime = 1  # 1:yes; 2:update existing SNP alignment, only works when buildSNPdb is used first time to build DB
+
+         data = 0  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
+                   # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
+                   # 6:combination F+C+R; 7:realignment  *See below 
+        reads = 2  # 1: single reads; 2: paired reads; 3: both types present;
+
+         tree = 1  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
+    bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
+            N = 100  # Number of bootstraps to run *See below    
+  
+    PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+
+         code = 1  # 0:Bacteria; 1:Virus
+
+        clean = 0  # 0:no clean; 1:clean # remove intermediate and temp files after analysis is complete
+
+      threads = 2  # Number of threads to use
+
+       cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
+
+
+``` 
+
+
+
+
+
+
+PhaME requires inputs in two folder:
+1. *Reference folder*
+  A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following syntax. Also, please try to avoid filenames that have multiple `.` or has special characters like `:` in their name.
   - `*`.fasta
   - `*`.fna
   - `*`.fa
   - `*`.gff  (optional: to analyze Coding region SNPs of a selected reference file)    
 
-For example a typical folder with reference genomes look like this:
+For example, a typical reference folder with reference genomes look like this:
 
 ```
 $ ls ref/
@@ -126,12 +169,13 @@ GCA_000007405.1_ASM740v1_genomic.fna   GCA_000017765.1_ASM1776v1_genomic.fna  GC
 GCA_000008865.1_ASM886v1_genomic.fna   GCA_000017985.1_ASM1798v1_genomic.fna  GCA_000026265.1_ASM2626v1_genomic.gff   GCA_000257275.1_ASM25727v1_genomic.fna
 
 ```
-Each of these files represent a genome of organism. They may have multiple sequences, but are all part of one organism.
+Each of these files represent one genome. They may have multiple sequences representing multiple replicons or contigs, but are all part of one genome.
 
-* A working directory.
-  - If your analysis includes incomplete genomes or contig files, they must be in the working directory and contig file must have following suffixes.
+2. *Working folder*
+  - This is the folder where intermediate and final files of analysis are written. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
      - `*`.contig
      - `*`.contigs
+
     For example, a working directory with contigs folder look like this:
 ```
 $ ls workdir/*.contig
@@ -140,10 +184,16 @@ workdir/GCA_000155105.1_ASM15510v1_genomic.contig  workdir/GCA_000968895.2_ASM96
 workdir/GCA_000190495.1_ASM19049v1_genomic.contig  workdir/GCA_000968905.2_ASM96890v2_genomic.contig   workdir/GCA_001514845.1_ASM151484v1_genomic.contig
 workdir/GCA_000191665.1_ecmda7_genomic.contig      workdir/GCA_001471755.1_ASM147175v1_genomic.contig  workdir/GCA_001514865.1_ASM151486v1_genomic.contig
 ```
+  If the analysis includes reads files, they must be in working folder as well. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
 
-  - If your analysis includes reads files, if paired, must have `R1` and `R2` at the end, else it needs to have `.fastq` as extension.
-     - *_R1.fastq *_R2.fastq
-  - A control file (e.g. [phame.ctl](https://raw.githubusercontent.com/mshakya/PhaME-1/master/test/phame.ctl))
+```
+$ ls *.fastq
+GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2164314_QC_trimmed_R1.fastq  GGC_SRR2164314_QC_trimmed_R2.fastq
+
+```
+
+
+
 
 #### Test run
 
