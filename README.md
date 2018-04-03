@@ -139,7 +139,7 @@ We have also provided an example folder with genomes and contigs to try it out. 
 
 ```
 $git clone https://github.com/mshakya/phame_examples.git
-$docker run --rm -v phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
+$docker run --rm -v [FULL_PATH]/phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
 
 ```
 
