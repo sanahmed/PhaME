@@ -110,7 +110,7 @@ IV. Create a control file (See below).
     All the inputs and parameters of a PhaME analysis is set in the control file. Using the provided template create a control file with apprpriate parameters and save it in the `phame_analysis_foler`.
 V. Run the analysis using docker.
 ```
-docker run --rm -v phame_analysis_folder:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli.ctl
+docker run --rm -v $(pwd)/phame_analysis_folder:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli.ctl
 ```
 
 We have also provided an example folder with genomes and contigs to try it out. The folder can be downloaded from [github](https://github.com/mshakya/phame_examples.git), mounted to the docker image and then run.
