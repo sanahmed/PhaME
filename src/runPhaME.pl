@@ -255,7 +255,7 @@ END_MESSAGE
     }
 }
 
-print "\tCode:\t$types\n";
+print "\tCode:\t$type\n";
 print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 

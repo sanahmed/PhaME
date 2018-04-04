@@ -2,7 +2,7 @@
       workdir = ../workdirs/t1_ebola_preads # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
-      reffile = KJ660347.fasta  # reference filename 
+      reffile = ZEBOV_2002_Ilembe.fna  # reference filename 
 
       project = t1  # main alignment file name
 
@@ -21,7 +21,7 @@
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
             N = 100  # Number of bootstraps to run *See below    
   
-    PosSelect = 0  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+    PosSelect = 3  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
 
          code = 1  # 0:Bacteria; 1:Virus
 
@@ -31,4 +31,6 @@
 
        cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
+* When using data option 1,2,5 need a complete reference to align/map to. 
+* Use data option 7 when need to extract SNPs using a sublist of already aligned genomes. 
 

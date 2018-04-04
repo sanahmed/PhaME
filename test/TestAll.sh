@@ -152,6 +152,20 @@ else
 	exit 1
 fi
 ################################################################################
+################### #10 Test exit messages for incorrect ctl files #############
+mkdir -p test/workdirs/t10_error_messages
+perl src/runPhaME.pl test/ctl_files/t10A_error_message.ctl > test/workdirs/t10_error_messages/A.error
+perl src/runPhaME.pl test/ctl_files/t10B_error_message.ctl > test/workdirs/t10_error_messages/B.error
+a=$(wc -l < test/workdirs/t10_error_messages/A.error)
+b=$(wc -l < test/workdirs/t10_error_messages/B.error)
+c=14
+if [ "$a" -eq "$b" ];then
+	echo "Test 10 finished without any errors";
+else
+	echo -e "Test 10: There is something wrong while printint error messages!"
+	exit 1
+fi
+################################################################################
 
 #10 test with sread and pread
 #mkdir -p test/workdirs/t10_ebola_sread_pread
