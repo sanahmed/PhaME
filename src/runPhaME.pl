@@ -177,9 +177,9 @@ if ( $rsignal == 0 ) {
     closedir DIR;
 
 # I add this here to just run mash regardless, but not use mash picked genome as reference
-    my $sketch_output = $workdir . "/sketch_output.txt";
-    my $mash_ref = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
-        $sketch_output );
+#    my $sketch_output = $workdir . "/sketch_output.txt";
+#    my $mash_ref = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
+#        $sketch_output );
 }
 elsif ( $rsignal == 2 ) {
     my $sketch_output = $workdir . "/sketch_output.txt";
@@ -190,9 +190,9 @@ elsif ( $rsignal == 2 ) {
 elsif ( $rsignal == 1 ) {
 
 # I add this here to just run mash regardless, but not use mash picked genome as reference
-    my $sketch_output = $workdir . "/sketch_output.txt";
-    my $mash_ref = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
-        $sketch_output );
+#    my $sketch_output = $workdir . "/sketch_output.txt";
+#    my $mash_ref = PhaME::PickRefGenome( $workdir, $refdir, $error, $logfile,
+#        $sketch_output );
 }
 
 ( $name, $path, $suffix ) = fileparse( "$reference", qr/\.[^.]*/ );
