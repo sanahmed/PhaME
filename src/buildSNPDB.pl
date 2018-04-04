@@ -169,8 +169,10 @@ close CMAT;
 close CDSMAT;
 close IMAT;
 close CDSOUT;
+################################################################################
 
 sub read_reference {
+    # 
     my ( $header, @seq );
     my $fh = FileHandle->new($reffile) || die "$!";
     if ( $fh->open("< $reffile") ) {
@@ -197,9 +199,10 @@ sub read_reference {
     }
     close IN;
 }
+################################################################################
 
 sub read_gap {
-  # subroutine that checks the proportion of query that aligned to rerefere
+  # subroutine that checks the proportion of query that aligned to reference
   # and add to skip list if it doesnt pass the threshold
     my %skip_query;
     open( IN, "$gapfile" ) || die "$!";
@@ -263,7 +266,7 @@ sub read_gap {
     close IN;
     return \%skip_query;
 }
-
+################################################################################
 
 sub read_directory {
     my $snp_dir = $indir . '/snps';
@@ -289,6 +292,7 @@ sub read_directory {
         }
     }
 }
+################################################################################
 
 sub create_ALLsnp_array {
     my $ref         = 0;
@@ -343,6 +347,7 @@ sub create_ALLsnp_array {
     $SNPcount = scalar( keys %SNPcount );
     print BASE "Total SNPs:\t$SNPcount\n";
 }
+################################################################################
 
 sub create_CDSsnp_array {
     my $ref         = 0;
@@ -392,6 +397,7 @@ sub create_CDSsnp_array {
     $CDScount = scalar( keys %CDSSNPcount );
     if ( $coding == 1 ) { print BASE "CDS SNPs:\t$CDScount\n"; }
 }
+################################################################################
 
 sub create_INTsnp_array {
     my $ref         = 0;
@@ -435,6 +441,7 @@ sub create_INTsnp_array {
         print INTOUT "\n";
     }    #header list
 }
+################################################################################
 
 sub create_stats {
     my $ref         = 0;
@@ -480,6 +487,7 @@ sub create_stats {
         }
     }
 }
+################################################################################
 
 sub create_comparison {
     my $ref     = 0;
@@ -507,6 +515,7 @@ sub create_comparison {
         }
     }
 }
+################################################################################
 
 sub create_matrix {
     foreach (@headers) {
@@ -567,6 +576,7 @@ sub create_matrix {
         }
     }
 }
+################################################################################
 
 sub SNPcounts {
     my $file      = shift;
@@ -656,6 +666,7 @@ sub SNPcounts {
     $cdsSNPcount{"$ref_id:$query_id"}  = $cdsCount;
     $intSNPcount{"$ref_id:$query_id"}  = $intCount;
 }
+################################################################################
 
 sub print_summary {
     my $last      = 0;
@@ -693,6 +704,7 @@ Core genome length:\t$base_total\n";
 
     close GAPF;
 }
+################################################################################
 
 sub contig_nucmer_snp {
     my $count = 0;
@@ -745,6 +757,7 @@ sub read_nucmer_snp {
     }
     close IN;
 }
+################################################################################
 
 sub read_vcf_snp {
     my $count = 0;
@@ -801,6 +814,7 @@ sub read_vcf_snp {
     }
     close IN;
 }
+################################################################################
 
 sub read_cds_coords {
     open( CDS, "$CDScoords" ) || die "$!";

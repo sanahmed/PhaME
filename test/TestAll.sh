@@ -162,10 +162,24 @@ c=14
 if [ "$a" -eq "$b" ];then
 	echo "Test 10 finished without any errors";
 else
-	echo -e "Test 10: There is something wrong while printint error messages!"
+	echo -e "Test 10: There is something wrong while printing error messages!"
 	exit 1
 fi
 ################################################################################
+
+################### #11 Test the threshold option#########################
+mkdir -p test/workdirs/t11_flu
+perl src/runPhaME.pl test/ctl_files/t11_flu_test_coverage_threshold.ctl
+a=$(grep -c ">" test/workdirs/t11_flu/results/t11_all_snp_alignment.fna)
+b=25
+if [ "$a" -eq "$b" ];then
+	echo "Test 11 finished without any errors";
+else
+	echo -e "Test 11: There is something wrong with threshold option!"
+	exit 1
+fi
+################################################################################
+
 
 #10 test with sread and pread
 #mkdir -p test/workdirs/t10_ebola_sread_pread
