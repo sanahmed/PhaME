@@ -13,7 +13,8 @@ use Cwd;
 $| = 1;
 
 # set up environments
-$ENV{PATH} = "$RealBin:$RealBin/../thirdParty/miniconda/bin:$RealBin/../bin:$ENV{PATH}";
+$ENV{PATH}
+    = "$RealBin:$RealBin/../thirdParty/miniconda/bin:$RealBin/../bin:$ENV{PATH}";
 $ENV{PERL5LIB}
     = ( $ENV{PERL5LIB} )
     ? "$ENV{PERL5LIB}:$RealBin/../lib:$RealBin/../ext/lib/perl5"
@@ -108,7 +109,7 @@ while (<CTL>) {
         $outdir = $workdir . '/results';
         if ( !-e $outdir ) { `mkdir -p $outdir`; }
         $workdir = Cwd::abs_path($workdir);
-        $outdir = Cwd::abs_path($outdir);
+        $outdir  = Cwd::abs_path($outdir);
     }
 
     if (/project\s*=\s*(\S+)\s*#{0,1}.*$/) { $project = $1; }
@@ -216,24 +217,45 @@ if ( !-d $refdir || !-d $workdir || !-d $outdir ) {
 }
 
 print "\tReference:\t$reference\n";
+if ( !-e "$reference" )
+    {print "File $reference does not exist.\n";
+    exit;
+    }
 
-#if (!-e "$reference"){print "File $reference does not exist.\nPlease provide correct reference\n";}
 if ( $gsignal == 1 ) {
     print "\tAnnotation:\t$annotation\n";
     if ( !-e $annotation ) {
-        print
-            "File $annotation does not exist.\nPlease provide correct annotation file\n";
+        my $message = <<'END_MESSAGE';
+            File $annotation does not exist.
+
+            You selected cdsSNPs = 1, but did not provide a GFF file.
+
+            I don't know how to proceed.
+
+            Please provide correct GFF file or set cdsSNPs=0 and rerun!
+END_MESSAGE
+        print $message;
+        exit;
     }
 }
 if ( $pselection > 0 ) {
     print "\tGenes:\t$genefile\n";
     if ( -e $reference && !-e $genefile ) {
-        print
-            "File $genefile does not exist.\nPlease provide correct functional protein file\n";
+        my $message = <<'END_MESSAGE';
+            File $annotation does not exist.
+
+            You turned on selection analysis (PosSelect), but did not provide a GFF file.
+
+            I don't know how to proceed.
+
+            Please provide correct GFF file or turn OFF posSelect (set to 0) and rerun!
+END_MESSAGE
+        print $message;
+        exit;
     }
 }
 
-print "\tCode:\t$type\n";
+print "\tCode:\t$types\n";
 print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 
@@ -449,7 +471,7 @@ if ( $check == 0 ) {
         next if ( $files =~ /^\..?/ );
         my ( $qname, $qpath, $qsuffix ) = fileparse( "$files", qr/\.[^.]*/ );
         if ( $nucmer == 1 ) {
-            if ( $files =~ /.+\.fn|s?a?s?t?a$/                
+            if (   $files =~ /.+\.fn|s?a?s?t?a$/
                 && $files !~ /.+\.contig$|\.contigs$|\.ctg$]$/
                 && $files !~ /fa?s?t?q/ )
             {
@@ -462,8 +484,9 @@ if ( $check == 0 ) {
             }
         }
         if ( $contig_nucmer == 1 ) {
-            if ( $files =~ /.+\.contig$|\.contigs$|\.ctg$]$/
-                && $files !~ /fa?s?t?q/ ) {
+            if (   $files =~ /.+\.contig$|\.contigs$|\.ctg$]$/
+                && $files !~ /fa?s?t?q/ )
+            {
                 my $contig = $workdir . '/' . $files;
                 my ( $list, $genome_size )
                     = PhaME::prepareContig( $workdir, $contig, $qname );
@@ -514,7 +537,8 @@ $name =~ s/\W/_/g;    # Replacing special characters with _
 $reference = "$workdir/files/$name.fna";
 
 if ( $nucmer == 1 ) {
-    open( FAS, ">$workdir/fasta_list.txt" )   || die "$!";
+    open( FAS, ">$workdir/fasta_list.txt" ) || die "$!";
+
     # open( CON, ">$workdir/contigs_list.txt" ) || die "$!";
 
     foreach my $names ( sort keys %fasta_list ) {
@@ -632,32 +656,35 @@ if ( -e $tbest )      { `mv $tbest $outdir/`; }
 if ( $tree == 2 || $tree == 3 ) {
     $tbest = $outdir . "/RAxML_bestTree.$project\_cds";
 }
-if ( $tree == 1 ) { 
-    $tbest = $outdir . "/RAxML_bestTree.$project\_all"; }
+if ( $tree == 1 ) {
+    $tbest = $outdir . "/RAxML_bestTree.$project\_all";
+}
 ################################################################################
 my $pamldir;
 my $hyphydir;
-if ( $ps == 1 ) { # if selection analysis is turned ON
+if ( $ps == 1 ) {    # if selection analysis is turned ON
     my $end        = 0;
     my $stats_file = $outdir . "/$project\_stats.txt";
     my $genedir    = $outdir . '/PSgenes';
-    my $gapfile = $outdir . "/$project\_gaps.txt";
-    
+    my $gapfile    = $outdir . "/$project\_gaps.txt";
+
     # start making trees for PAML
     if ( $pselection == 1 || $pselection == 3 ) {
         $pamldir = $outdir . '/paml';
-        if ( !-d $pamldir ) { 
-            `mkdir -p $pamldir`; }
-        if ($ tree == 2 || $tree == 3) {
-        `cp $tbest $pamldir`;
-    }
+        if ( !-d $pamldir ) {
+            `mkdir -p $pamldir`;
+        }
+        if ( $tree == 2 || $tree == 3 ) {
+            `cp $tbest $pamldir`;
+        }
         if ( $tree == 2 || $tree == 3 ) {
             $ptree = $pamldir . "/RAxML_bestTree.$project\_cds";
         }
         if ( $tree == 1 ) {
+
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-            "$project\_all", $error, $logfile );
+                "$project\_all", $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
             `cp $tbest $pamldir`;
@@ -672,17 +699,20 @@ if ( $ps == 1 ) { # if selection analysis is turned ON
 
     if ( $pselection == 2 || $pselection == 3 ) {
         $hyphydir = $outdir . '/hyphy';
-        if ( !-d $hyphydir ) { 
-            `mkdir -p $hyphydir`; }
-        if ($ tree == 2 || $tree == 3) {
-            `cp $tbest $hyphydir`; }
+        if ( !-d $hyphydir ) {
+            `mkdir -p $hyphydir`;
+        }
+        if ( $tree == 2 || $tree == 3 ) {
+            `cp $tbest $hyphydir`;
+        }
         if ( $tree == 2 || $tree == 3 ) {
             $ptree = $hyphydir . "/RAxML_bestTree.$project\_cds";
         }
         if ( $tree == 1 ) {
+
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-            "$project\_all", $error, $logfile );
+                "$project\_all", $error, $logfile );
             $hyphydir = $outdir . '/paml';
             if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
             `cp $tbest $hyphydir`;
@@ -694,7 +724,6 @@ if ( $ps == 1 ) { # if selection analysis is turned ON
             exit;
         }
     }
-
 
     # PREPARE FILES FOR RUNNING PAML OR HYPHY ANALYSIS
     # start extracting genes
@@ -727,8 +756,9 @@ if ( $ps == 1 ) { # if selection analysis is turned ON
     # RUN PAML
     if ( $pselection == 1 || $pselection == 3 ) {
         PhaME::paml(
-            $outdir, $bindir,  $ptree, 0, "Sites", "0,1,2,7,8",
-            $core,   $threads, $error, $logfile
+            $outdir, $bindir,     $ptree, 0,
+            "Sites", "0,1,2,7,8", $core,  $threads,
+            $error,  $logfile
         );
         PhaME::paml(
             $outdir, $bindir,  $ptree, 2, "BrSites", 0,
