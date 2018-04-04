@@ -218,7 +218,7 @@ workdir/GCA_000155105_1_ASM15510v1_genomic.contig  workdir/GCA_000968895_2_ASM96
 workdir/GCA_000190495_1_ASM19049v1_genomic.contig  workdir/GCA_000968905.2_ASM96890v2_genomic.contig   workdir/GCA_001514845_1_ASM151484v1_genomic.contig
 workdir/GCA_000191665_1_ecmda7_genomic.contig      workdir/GCA_001471755_1_ASM147175v1_genomic.contig  workdir/GCA_001514865_1_ASM151486v1_genomic.contig
 ```
-  If the analysis includes reads files, they must be in working folder as well. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
+  If the analysis includes reads files, they must be in working folder as well and decompressed. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
 
 ```
 $ ls *.fastq
