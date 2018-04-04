@@ -174,7 +174,7 @@ PhaME is run using a control file where the parameters and input folders are spe
   
     PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both # these analysis need gff file to parse genomes to genes
 
-         code = 0  # 0:Bacteria; 1:Virus
+         code = 0  # 0:Bacteria; 1:Virus; 2: Eukarya
 
         clean = 0  # 0:no clean; 1:clean # remove intermediate and temp files after analysis is complete
 
