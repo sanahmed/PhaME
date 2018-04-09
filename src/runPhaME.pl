@@ -225,7 +225,7 @@ if ( !-e "$reference" )
 if ( $gsignal == 1 ) {
     print "\tAnnotation:\t$annotation\n";
     if ( !-e $annotation ) {
-        my $message = <<'END_MESSAGE';
+        my $message = <<"END_MESSAGE";
             File $annotation does not exist.
 
             You selected cdsSNPs = 1, but did not provide a GFF file.
@@ -241,8 +241,8 @@ END_MESSAGE
 if ( $pselection > 0 ) {
     print "\tGenes:\t$genefile\n";
     if ( -e $reference && !-e $genefile ) {
-        my $message = <<'END_MESSAGE';
-            File $annotation does not exist.
+        my $message = <<"END_MESSAGE";
+            File $genefile does not exist.
 
             You turned on selection analysis (PosSelect), but did not provide a GFF file.
 
