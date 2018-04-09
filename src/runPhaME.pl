@@ -88,6 +88,7 @@ my %read_list;
 my $mappingGaps;
 my $ptree;
 my $buildSNPdb = 0;
+my $message;
 
 my $control = $ARGV[0] || "phame.ctl";
 my $bindir = getBinDirectory();
@@ -197,14 +198,7 @@ elsif ( $rsignal == 1 ) {
 }
 
 ( $name, $path, $suffix ) = fileparse( "$reference", qr/\.[^.]*/ );
-if ( $gsignal == 1 )   { $annotation = "$refdir/$name.gff"; }
-if ( $pselection > 0 ) { $genefile   = "$refdir/$name.gff"; }
 
-# Filtering out genomes based on the cutoff using ANI
-# my $sketch_output = $workdir . "/sketch_output.txt";
-# my @remove_genomes = PhaME::filter_genomes($sketch_output, $reference, $cutoff, $workdir);
-# print "Warning: These genomes will be removed as they do not pass given ANI cutoff of $cutoff% with reference:$reference";
-# print join("\n", @remove_genomes);
 
 print("\n");
 &print_timeInterval( "\n$runtime\n", "\tLoading information\n" );
@@ -222,11 +216,19 @@ if ( !-e "$reference" )
     exit;
     }
 
+
 if ( $gsignal == 1 ) {
-    print "\tAnnotation:\t$annotation\n";
-    if ( !-e $annotation ) {
-        my $message = <<"END_MESSAGE";
-            File $annotation does not exist.
+    if ( -e "$refdir/$name.gff" ) {
+        $annotation = "$refdir/$name.gff";
+        print "\tAnnotation:\t$annotation\n";
+    }
+    elsif (-e "$refdir/$name.gff3" ) {
+        $annotation = "$refdir/$name.gff3";
+        print "\tAnnotation:\t$annotation\n";
+    }
+    else {
+        $message = <<"END_MESSAGE";
+            File $refdir/$name.gff or $refdir/$name.gff3 does not exist.
 
             You selected cdsSNPs = 1, but did not provide a GFF file.
 
@@ -238,11 +240,19 @@ END_MESSAGE
         exit;
     }
 }
+
 if ( $pselection > 0 ) {
-    print "\tGenes:\t$genefile\n";
-    if ( -e $reference && !-e $genefile ) {
-        my $message = <<"END_MESSAGE";
-            File $genefile does not exist.
+    if ( -e "$refdir/$name.gff" ){
+        $genefile = "$refdir/$name.gff";
+        print "\tGenes:\t$genefile\n";
+    }
+    elsif ( -e "$refdir/$name.gff3" ){
+        $genefile = "$refdir/$name.gff3";
+        print "\tGenes:\t$genefile\n";
+    }
+    else {
+        $message = <<"END_MESSAGE";
+            File $refdir/$name.gff or $refdir/$name.gff3 does not exist.
 
             You turned on selection analysis (PosSelect), but did not provide a GFF file.
 
@@ -253,6 +263,7 @@ END_MESSAGE
         print $message;
         exit;
     }
+
 }
 
 print "\tCode:\t$type\n";
