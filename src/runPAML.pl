@@ -30,6 +30,9 @@ my $pamldir = $dir . "/paml";
 chdir $pamldir;
 print "$genedir\n";
 
+my $pm= new Parallel::ForkManager($thread);
+$pm->run_on_finish(sub{my ($pid,$ident)=@_;});
+
 if ( $NSsites =~ /,/ ) {
     my @temp = split ",", $NSsites;
     $NSsites = join( ' ', @temp );
@@ -38,6 +41,7 @@ if ( $NSsites =~ /,/ ) {
 opendir( DIR, $genedir );
 foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
     if ( $files =~ /(.+)\.msa$/ ) {
+        $pm->start and next;
         $seqfile = $genedir . '/' . $files;
         my ( $name, $path, $suf ) = fileparse( "$seqfile", qr/\.[^.]*/ );
         $seqfile = $genedir . '/' . $name . '.cdn';
@@ -116,6 +120,8 @@ foreach my $files ( sort { $a cmp $b } readdir(DIR) ) {
 * These codes correspond to transl_table 1 to 11 of GENEBANK.";
         system("codeml");
     }
+$pm->finish;
 }
+$pm->wait_all_children;
 closedir(DIR);
 

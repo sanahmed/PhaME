@@ -73,7 +73,7 @@ for (my $i=0; $i<=$#files; $i++){
    $pm->start and next;   
    my ($ref_file_name,$ref_file_path,$ref_file_suffix)=fileparse("$files[$i]", qr/\.[^.]*/);
    if ($program=~/oneline/){`fasta_oneline.pl $files[$i] > $ref_file_path/$ref_file_name.faa`}
-   if ($program=~ /mafft/i){`mafft $mafft_options $files[$i] > $ref_file_path/$ref_file_name.msa`;}
+   if ($program=~ /mafft/i){`unset MAFFT_BINARIES; mafft --auto $mafft_options $files[$i] > $ref_file_path/$ref_file_name.msa`;}
    if ($program=~/pal2nal/){`pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
 #   if ($program=~/pal2nal/){`pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
    if ($program=~ /translate/){`translate.pl $files[$i] > $ref_file_path/$ref_file_name.faa`;}

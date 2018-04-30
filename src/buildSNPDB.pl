@@ -91,6 +91,7 @@ $SNPstats      = "$indir\/$project\_stats.txt";
 $SNPcomps      = "$indir\/$project\_comparisons.txt";
 if ( $coding == 1 ) {
     $cdsSNPoutfile = "$indir\/$project\_cds_snp_alignment.fna";
+    #TODO: int_snp_alingment.fna is not correct, it prints all positions
     $intSNPoutfile = "$indir\/$project\_int_snp_alignment.fna";
     $CDScoords     = "$indir\/CDScoords.txt";
     $noncoding     = "$indir\/noncoding.txt";
@@ -429,7 +430,7 @@ sub create_INTsnp_array {
         for ( sort keys %INTSNPcount ) {
             $current_snp = $_ - 1;
 
-            #Check SNP is not present in gaps and present in coding region.
+            #TODO: Check SNP is not present in gaps and present in coding region.
             if ( defined $snp_location{$_}{$comparison} ) {
                 print INTOUT $snp_location{$_}{$comparison};
             }
