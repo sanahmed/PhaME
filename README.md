@@ -375,7 +375,8 @@ Summary files ( all files are found under folder `workdir/results`)
       - PAML results
   - `working directory`/results/hyphy
       - HyPhy results
-
+  - `working directory`/results/`*_ambiguousSNPpositions.txt`
+      - Positions in genomes represented as raw reads where there are ambiguous SNPs.
 
 --------------------------------------------------------------
 ## CITATION

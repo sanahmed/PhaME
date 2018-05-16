@@ -730,6 +730,8 @@ sub contig_nucmer_snp {
 }
 
 sub read_nucmer_snp {
+    # reads nucmer snps and adjust the co-ordinates to account for self-nucmerized
+    # regions that were removed
     my $count = 0;
     open( IN, "$snp_file" ) || die "$!";
     while (<IN>) {
