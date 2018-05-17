@@ -181,6 +181,13 @@ fi
 ################################################################################
 
 
+#12 test with complete, contigs, pread, and sread 
+mkdir -p test/workdirs/t12_ebola_comp_contigs_pread_sread
+cp test/data/ebola_contigs/*.contigs test/workdirs/t12_ebola_comp_contigs_pread_sread/
+cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t12_ebola_comp_contigs_pread_sread/
+cp test/data/ebola_reads/*single.fastq test/workdirs/t12_ebola_comp_contigs_pread_sread/
+perl src/runPhaME.pl test/ctl_files/t12_ebola_comp_contigs_pread_sread.ctl
+
 #10 test with sread and pread
 #mkdir -p test/workdirs/t10_ebola_sread_pread
 # cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_sread_pread/
@@ -194,11 +201,7 @@ fi
 # cp test/data/ebola_reads/*R1.fastq test/workdirs/ebola_contigs_sread/
 # perl src/runPhaME.pl test/ctl_files/t11_ebola_comp_contigs_sread.ctl
 
-# #12 test with complete, contigs, and pread 
-# mkdir -p test/workdirs/ebola_comp_contigs_pread
-# cp test/data/ebola_contigs/*.contigs test/workdirs/ebola_comp_contigs_pread/
-# cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/ebola_comp_contigs_pread/
-# perl src/runPhaME.pl test/ctl_files/t12_ebola_comp_contigs_pread.ctl
+
 
 # #13 test with complete, sread, and pread 
 # mkdir -p test/workdirs/ebola_comp_sread_pread

@@ -332,9 +332,11 @@ sub codingRegions {
 
     my $outfile = $dir . "/noncoding.txt";
     my $coding  = $dir . "/CDScoords.txt";
+    my $coding_GFF = $dir . "/$name\_cds.gff";
 
     open( OUT, ">$outfile" );
     open( CDS, ">$coding" );
+    open( CDS_GFF, ">$coding_GFF" );
 
     my $first       = 1;
     my $permutation = 0;
@@ -347,24 +349,25 @@ sub codingRegions {
             ( $line, $temp, $source_start, $source_end ) = split " ", $_;
         }
         if ( !/^#/ ) {
-            my ($name,  $source, $method, $start, $stop,
+            my ($chr_name,  $source, $method, $start, $stop,
                 $score, $strand, $phase,  $field
             ) = split "\t", $_;
 
-#      my ($name,$method,$start,$stop,$score,$strand,$phase,$field)=split "\t",$_;
             my @group = split ";", $field if ($field);
 
             if ( $method and $method =~ /CDS/ ) {
                 $start = $start + $permutation;
                 $stop  = $stop + $permutation;
 
-                print CDS "$name\t$start\t$stop\t";
+                print CDS "$chr_name\t$start\t$stop\t";
+                print CDS_GFF "$name\t$source\t$method\t$start\t$stop\t$score\t$strand\t$phase\t$field";
                 $CDS{$start} = $stop;
                 foreach (@group) {
                     if ( /product=(.+)/ || /description=(.+)/ ) {
                         print CDS $1;
                     }
                 }
+                print CDS_GFF "\n";
                 print CDS "\n";
             }
         }
@@ -410,7 +413,7 @@ sub clean {
     my $dir = shift;
     print "\nCleaning up...\n";
     system(
-        "rm -f $dir/*.pileup $dir/*.bam $dir/*.bcf $dir/*.mgaps $dir/*.ntref $dir/*.sam $dir/*.delta $dir/*.filter"
+        "rm -f $dir/*.pileup $dir/*.bam $dir/*.bcf $dir/*.mgaps $dir/*.ntref $dir/*.sam $dir/*.delta $dir/*.*filter"
     );
 }
 
@@ -929,6 +932,40 @@ sub combo {
         return @list[@position];
         }
 }
+
+
+sub SNPsAnalysis {
+    # A function that parses .snps and .vcf file
+    # it outputs another file with detail information on SNP position
+    # like did SNP result in synonymous or non-synonymous changes
+    # it requires a modified gff file that is generated from codingRegions()
+    # the function runs chienchi's script that is implemented in EDGE
+    # it only parses snps and vcf file of contigs and reads
+    my $cds_gff = shift;
+    my $snp_dir = shift;
+    my $ref_fasta = shift;
+    my $log = shift;
+    my $error = shift;
+    my $snp_file;
+
+    opendir( DIR, $snp_dir );
+    while ( my $files = readdir(DIR) ) {
+        next if ( $files =~ /^..?$/ );
+        if ( $files =~ /contigs?.snps$/ ) {
+            $snp_file = $snp_dir . '/' . $files;
+            my $p = "SNP_analysis.pl -gff $cds_gff -SNP $snp_file -format nucmer -fasta $ref_fasta -output $snp_dir 2>>$error >> $log\n\n";
+            print $p;
+            if ( system($p) ) { die "Error running $p.\n"; }
+        }
+        elsif ( $files =~ /.+\.vcf/ ) {
+            $snp_file = $snp_dir . '/' . $files;
+            my $p = "SNP_analysis.pl -gff $cds_gff -SNP $snp_file -format vcf -fasta $ref_fasta 2>>$error -output $snp_dir >> $log\n\n";
+            print $p;
+            if ( system($p) ) { die "Error running $p.\n"; }
+            }
+    }
+}
+
 
 sub filter_genomes {
 

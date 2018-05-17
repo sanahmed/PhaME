@@ -201,7 +201,7 @@ elsif ( $rsignal == 1 ) {
 
 
 print("\n");
-&print_timeInterval( "\n$runtime\n", "\tLoading information\n" );
+&print_timeInterval( "\n$runtime\n", "Loading information\n" );
 print "\tRefd:\t$refdir\n";
 print "\tWorkd:\t$workdir\n";
 print "\tOutd:\t$outdir\n";
@@ -270,7 +270,7 @@ print "\tCode:\t$type\n";
 print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 
-&print_timeInterval( $runtime, "\tChecking directories and files... " );
+&print_timeInterval( $runtime, "Checking directories and files... " );
 my $check = PhaME::check( $workdir, $refdir, $time, $data, $name, $logfile,
     $project );
 if ( $data == 7 ) { $check = 0; }
@@ -455,7 +455,7 @@ if ( $check == 0 ) {
     print "Complete.\n";
 }
 
-&print_timeInterval( $runtime, "\tPreparing files... \n" );
+&print_timeInterval( $runtime, "Preparing files... \n" );
 if ( $check == 0 ) {
     `mkdir -p $workdir/files`;
 
@@ -561,11 +561,11 @@ if ( $nucmer == 1 ) {
         #      print "$names\t",$fasta_list{$names},"\n";
     }
 
-    &print_timeInterval( $runtime, "\tRunning NUCmer on complete genomes\n" );
+    &print_timeInterval( $runtime, "Running NUCmer on complete genomes\n" );
     PhaME::completeNUCmer( $reference, $workdir, $bindir,
         "$workdir/fasta_list.txt", $type, $threads, $error, $logfile,
         $buildSNPdb );
-    &print_timeInterval( $runtime, "\tNUCmer on genomes complete\n" );
+    &print_timeInterval( $runtime, "NUCmer on genomes complete\n" );
 }
 
 if ( $contig_nucmer == 1 ) {
@@ -622,10 +622,20 @@ if ( $buildSNP == 1 ) {
     if ( $gsignal == 1 ) {
         &print_timeInterval( $runtime, "Preparing to identify SNPs\n" );
         print
-            "\tGFF annotation file provided, SNPs will be differentiated as coding vs noncoding\n";
+            "\tGFF file provided, SNPs will be differentiated as coding vs noncoding\n\n";
         my ( $genname, $genpath, $gensuffix )
             = fileparse( "$annotation", qr/\.[^.]*/ );
         PhaME::codingRegions( $outdir, $annotation, $genname );
+        print 
+            "\tSNPs from contigs and/or raw reads will be parsed\n";
+        print
+            "\tto synonymous and non-synonymous if given\n\n";
+        my $cds_gff = $outdir . "/$genname\_cds.gff";
+        my $snps_folder = $outdir . "/snps";
+        my $ref_fasta = "$workdir/files/$genname.fna";
+        PhaME::SNPsAnalysis($cds_gff, $snps_folder, $ref_fasta, $logfile, $error);
+
+
     }
     &print_timeInterval( $runtime, "Identifying SNPs\n" );
     &print_timeInterval( $runtime, "Starting with gaps\n" );
@@ -640,11 +650,15 @@ if ( $buildSNP == 1 ) {
 }
 
 if ( $buildtree == 1 || $bs == 1 ) {
+    &print_timeInterval($runtime, "Preparing all SNP phylogeny\n");
     my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
         "$project\_all", $error, $logfile );
+    &print_timeInterval( $runtime, "DONE\n");
     if ( $gsignal == 1 ) {
+        &print_timeInterval( $runtime, "Preparing CDS phylogeny\n");
         PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds",
             $error, $logfile );
+        &print_timeInterval( $runtime, "DONE\n");
     }
     &print_timeInterval( $runtime, "$end\n" );
     if ( $bsignal == 1 ) {

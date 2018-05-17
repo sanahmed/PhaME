@@ -383,10 +383,10 @@ foreach my $ref_name ( sort keys %{$ref_hash} ) {
 }
 
 # clean up
-`rm -rf /tmp/*$$*`;
+#`rm -rf /tmp/*$$*`;
 unless ($debug) {
     unlink $ref_window_gc;
-    `rm $outDir/*$$*`;
+#    `rm $outDir/*$$*`;
 }
 
 sub mapped_reads_per_contigs {

@@ -6,7 +6,7 @@
 
       project = t8  # main alignment file name
 
-      cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
+      cdsSNPS = 1  # 0:no cds SNPS; 1:cds SNPs
 
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 

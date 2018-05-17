@@ -25,7 +25,7 @@
 
          code = 1  # 0:Bacteria; 1:Virus
 
-        clean = 0  # 0:no clean; 1:clean
+        clean = 1  # 0:no clean; 1:clean
 
       threads = 2  # Number of threads to use
 
