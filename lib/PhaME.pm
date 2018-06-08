@@ -86,6 +86,8 @@ sub check {
 
     # Check if all snps and gaps files are present in appropriate directories
     if ( $time == 2 ) {
+        my $pref_name = $reference;
+        $pref_name =~ s/\W/_/g;    # Replacing special characters with _
 
         #print "This is the 2nd time around!\n";
         my $snpdir = "$wdir/snps";
@@ -100,26 +102,30 @@ sub check {
             while (<LIST>) {
                 chomp;
 
-                my $snpsfile = "$snpdir/$reference\_$_.snps";
-                my $gapsfile = "$gapdir/$reference\_$_.gaps";
+                my $snpsfile = "$snpdir/$pref_name\_\_$_.snps";
+                my $gapsfile = "$gapdir/$pref_name\_$_.gaps";
                 if (/contig/) {
-                    $snpsfile = "$snpdir/$reference\_$_" . "s.snps";
-                    $gapsfile = "$gapdir/$reference\_$_" . "s.gaps";
+                    $snpsfile = "$snpdir/$pref_name\_$_.snps";
+                    $gapsfile = "$gapdir/$pref_name\_$_.gaps";
+                }
+                if (/contigs/) {
+                    $snpsfile = "$snpdir/$pref_name\_$_" . "s.snps";
+                    $gapsfile = "$gapdir/$pref_name\_$_" . "s.gaps";
                 }
                 if (/(.+)_p|sread/) {
-                    $snpsfile = "$snpdir/$reference\_$1.vcf";
+                    $snpsfile = "$snpdir/$pref_name\_$1.vcf";
                     $gapsfile
-                        = glob "$gapdir/$reference\_$1\_$reference*.gaps";
+                        = glob "$gapdir/$pref_name\_$1\_$pref_name*.gaps";
                 }
 
                 #         $refcheck{$_}++;
-                if ( $reference ne $_ && !-e $snpsfile ) {
+                if ( $pref_name ne $_ && !-e $snpsfile ) {
                     print "$snpsfile\n";
                     print
                         "\nsnps directory not complete.\nChange control file to finish previous run.\n";
                     return ("1");
                 }
-                if ( $reference ne $_ && !-e $gapsfile ) {
+                if ( $pref_name ne $_ && !-e $gapsfile ) {
                     print "$gapsfile\n";
                     print
                         "\ngaps directory not complete.\nChange control file to finish previous run.\n";
@@ -562,15 +568,10 @@ sub buildTree {
     if ( $tree == 1 || $tree == 3 ) {
         print "Reconstructing phylogeny using FastTree\n";
         my $fasttree
-            = "export OMP_NUM_THREADS=$thread; FastTreeMP -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error\n\n";
+            = "export OMP_NUM_THREADS=$thread; FastTreeMP -quiet -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error \n\n";
         print $fasttree;
         if ( system($fasttree) ) { die "Error running $fasttree.\n"; }
 
-# removing generation of rooted tree
-# my $rooted_tree_cmd= "raxmlHPC-PTHREADS -T $thread -m GTRGAMMAI -f I -t $outdir/$name.fasttree -w $outdir -n $name 2>>$error >> $log\n\n";
-# eval{ system($rooted_tree_cmd);};
-# system("mv $outdir/RAxML_rootedTree.$name $outdir/${name}_rooted.fasttree") if ( -e "$outdir/RAxML_rootedTree.$name");
-# `rm $outdir/RAxML_info.$name`;
     }
     if ( $tree == 2 || $tree == 3 ) {
         print "Reconstructing phylogeny using raxmlHPC-PTHREADS\n";
