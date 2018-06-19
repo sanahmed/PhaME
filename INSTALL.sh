@@ -554,7 +554,7 @@ cpanm Time::HiRes@$perl_Time_HiRes_VER
 cpanm File::Path@$perl_File_Path_VER
 cpanm File::Basename@$perl_File_Basename_VER
 cpanm File::Copy@$perl_File_Copy_VER
-cpanm IO::Handle@$perl_IO_Handle_VER
+# cpanm IO::Handle@$perl_IO_Handle_VER
 cpanm Parallel::ForkManager@$perl_Parllel_ForkManager_VER -l $ROOTDIR/ext
 cpanm Bio::SeqIO -l $ROOTDIR/ext
 ################################################################################
@@ -898,21 +898,21 @@ else
   install_perl_File_Copy
 fi
 #------------------------------------------------------------------------------#
-if ( checkPerlModule IO::Handle )
-then
-  #perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'
-  perl_IO_Handle_installed_VER=`perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'`
-  if ( echo $perl_IO_Handle_installed_VER $perl_IO_Handle_VER | awk '{if($2>=$3) exit 0; else exit 1}')
-  then
-    echo " - found Perl module IO::Handle $perl_IO_Handle_installed_VER"
-  else
-    echo "Required version of IO::Handle $perl_IO_Handle_VER was not found"
-    install_perl_IO_Handle
-  fi
-else
-  echo "Perl IO::Handle is not found"
-  install_perl_IO_Handle
-fi
+# if ( checkPerlModule IO::Handle )
+# then
+#   #perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'
+#   perl_IO_Handle_installed_VER=`perl -MIO::Handle -e 'print $IO::Handle::VERSION ."\n";'`
+#   if ( echo $perl_IO_Handle_installed_VER $perl_IO_Handle_VER | awk '{if($2>=$3) exit 0; else exit 1}')
+#   then
+#     echo " - found Perl module IO::Handle $perl_IO_Handle_installed_VER"
+#   else
+#     echo "Required version of IO::Handle $perl_IO_Handle_VER was not found"
+#     install_perl_IO_Handle
+#   fi
+# else
+#   echo "Perl IO::Handle is not found"
+#   install_perl_IO_Handle
+# fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule Test::Exception )
 then
