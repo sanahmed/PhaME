@@ -131,7 +131,6 @@ print OUT ">$name\n";
 open (IN,$file)||die "$!";
 while (<IN>){
    chomp;
-   $_ =~ s/\r\n|\n|\r/\n/g;
    if (!/^>/){$sequence.=$_;}#print OUT $_;}
 }
 print OUT "$sequence\n";;
@@ -164,7 +163,6 @@ if ($fh->open("<$file")){
    $/=">";
    while (<$fh>){
       $_=~ s/\>//g;
-      $_ =~ s/\r\n|\n|\r/\n/g;
       unless($_){next;};
       ($header,@seq)=split /\n/,$_;
       $sequence= join "",@seq;
@@ -433,6 +431,7 @@ my $list=shift;
 my $thread=shift;
 my $name=shift;
 my $error=shift;
+my $aligner=shift;
 my $log=shift;
 my $outdir=$indir."/results";
 my $reference= $outdir.'/temp/'.$name.'.fna';
@@ -440,7 +439,7 @@ my $type;
 
 if(!-e $reference || -z $reference){ $reference = $indir.'/files/'.$name.'.fna';}
 print "\n";
-my $map="runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a bowtie 2>>$error >> $log\n\n";
+my $map="runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner 2>>$error >> $log\n\n";
 print $map;
 if (system ($map)){die "Error running $map.\n";}
 

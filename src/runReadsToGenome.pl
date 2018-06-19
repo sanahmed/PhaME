@@ -1,9 +1,9 @@
 #! /usr/bin/perl
 # required: 1. R
-#           2. samtools 0.1.18 mt 
+#           2. samtools > 1.1 
 #           3. bwa 0.6 sampe patched  
 #           4. bowtie2
-#           5. bcftools  (from samtools package)
+#           5. bcftools  > 1.1 
 #           6. vcfutils.pl  (from samtools package)
 #           7. snap
 #     input: paired reads files: forward.fasta/q and reverse.fasta/q
@@ -38,6 +38,7 @@ my ($file1, $file2, $paired_files,$prefix, $ref_file, $outDir,$file_long,$single
 my $bwa_options="-t 4 ";
 my $bowtie_options="-p 8 -a";
 my $snap_options="-t 4 -M ";
+my $minimap2_options="-t 4 ";
 my $aligner="bwa";
 my ($window_size, $step_size)=(1000,200);
 my $pacbio_bwa_option="-b5 -q2 -r1 -z10 "; 
@@ -55,11 +56,14 @@ GetOptions(
    'd=s'              => \$outDir,
    'bwa_options=s'    => \$bwa_options,
    'bowtie_options=s' => \$bowtie_options,
+   'minimap2_options=s'  => \$minimap2_options,
    'snap_options=s'   => \$snap_options,
    'pacbio'           => \$pacbio,
    'debug'            => \$debug,
    'help|?',          sub {Usage()}
 );
+
+my $tmp = "$outDir";
 
 ## input check ##
 unless ( -e $ref_file && $outDir) { &Usage;}
@@ -85,7 +89,8 @@ if (! -e $outDir){mkdir $outDir;}
 my ($bwa_threads)= $bwa_options =~ /-t (\d+)/;
 my ($bowtie_threads)= $bowtie_options =~ /-p (\d+)/;
 my ($snap_threads)= $snap_options =~ /-t (\d+)/;
-my $samtools_threads = $bwa_threads || $bowtie_threads || $snap_threads ||"1";
+my ($minimap2_threads)= $minimap2_options =~ /-t (\d+)/;
+my $samtools_threads = $bwa_threads || $bowtie_threads || $snap_threads || $minimap2_threads || "1";
 my ($ref_file_name, $ref_file_path, $ref_file_suffix)=fileparse("$ref_file", qr/\.[^.]*/);
 
 # index reference
@@ -104,6 +109,14 @@ elsif ($aligner =~ /snap/i){
    $ref_file=&fold($ref_file);
    `snap index $ref_file $ref_file.snap `;
 }
+elsif ($aligner =~ /minimap2/i ){
+     # fold sequence in 100 bp per line (samtools cannot accept > 65535 bp one line sequence)
+    $ref_file=&fold($ref_file);
+    `minimap2 -d $tmp/$ref_file_name.mmi $ref_file `;
+}
+
+## index reference sequence 
+`samtools faidx $ref_file`; 
 
 if ($file_long){
    print "Mapping long reads\n";
@@ -115,7 +128,10 @@ if ($file_long){
   #`echo -e "Mapped_reads_number:\t$mapped_Long_reads" >>$outDir/LongReads_aln_stats.txt`;
    }
    elsif ($aligner =~ /snap/i){`snap single $ref_file.snap $file_long -o $outDir/LongReads$$.sam $snap_options`;}
-   `samtools view -@ $samtools_threads -uhS $outDir/LongReads$$.sam | samtools sort -@ $samtools_threads - $outDir/LongReads$$`;
+   elsif ($aligner =~ /minimap2/i){
+          `minimap2 -La $minimap2_options  $tmp/$ref_file_name.mmi $file_long > $outDir/LongReads$$.sam`;
+   }
+   `samtools view -t $ref_file.fai -@ $samtools_threads -uhS $outDir/LongReads$$.sam | samtools sort -@ $samtools_threads -O BAM -T $outDir -o $outDir/LongReads$$.bam - `;
 }
 if ($paired_files){
    print "Mapping paired end reads\n";
@@ -128,7 +144,10 @@ if ($paired_files){
       `bwa sampe -t $bwa_threads -a 100000 $ref_file /tmp/reads_1_$$.sai /tmp/reads_2_$$.sai $file1 $file2 > $outDir/paired$$.sam`;
    }
    elsif ($aligner =~ /snap/i){`snap paired $ref_file.snap $file1 $file2 -o $outDir/paired$$.sam $snap_options`;}
-   `samtools view -@ $samtools_threads -uhS $outDir/paired$$.sam | samtools sort -@ $samtools_threads - $outDir/paired$$`;
+   elsif ($aligner =~ /minimap2/i){
+      `minimap2  $minimap2_options -ax sr $tmp/$ref_file_name.mmi $file1 $file2 > $outDir/paired$$.sam`;
+   }
+   `samtools view -t $ref_file.fai -@ $samtools_threads -uhS $outDir/paired$$.sam | samtools sort -@ $samtools_threads -O BAM -T $outDir -o $outDir/paired$$.bam -`;
 }
 
 if ($singleton){
@@ -141,7 +160,10 @@ if ($singleton){
       `bwa samse -n 50 -t $bwa_threads $ref_file /tmp/singleton$$.sai $singleton > $outDir/singleton$$.sam`;
     }
     elsif($aligner =~ /snap/i){`snap single $ref_file.snap $file_long -o $outDir/singleton$$.sam $snap_options`;}
-    `samtools view -@ $samtools_threads -uhS $outDir/singleton$$.sam | samtools sort -@ $samtools_threads - $outDir/singleton$$`;
+    elsif ($aligner =~ /minimap2/i){
+        `minimap2  $minimap2_options -ax sr $tmp/$ref_file_name.mmi $singleton> $outDir/singleton$$.sam`;
+    }
+    `samtools view -t $ref_file.fai -@ $samtools_threads -uhS $outDir/singleton$$.sam | samtools sort -@ $samtools_threads -O BAM -T $outDir -o $outDir/singleton$$.bam -`;
 }
 
 # merge bam files if there are different file type, paired, single end, long..
@@ -167,8 +189,6 @@ elsif($file_long){
    `mv $outDir/LongReads$$.bam $bam_output`;
 }
 
-## index reference sequence 
-`samtools faidx $ref_file`; 
 
 ## index BAM file 
 `samtools index $bam_output $bam_index_output`; 
@@ -179,8 +199,13 @@ print "Generate alignment statistical numbers \n";
  
 ## SNP call
 print "SNPs/Indels call...\n";
-`samtools mpileup -ugf $ref_file $bam_output | bcftools view -bcg - > $bcf_output `;
-`bcftools view $bcf_output | bcftools view -v -S - | vcfutils.pl varFilter -a 3 -d1 -D1000 > $vcf_output`; 
+my $max_depth=100000;
+my $min_indel_candidate_depth=3;
+my $min_alt_bases=3;
+my $min_depth=1;
+
+`bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
+`bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
 
 ## derived chimera info 
 if ($aligner=~ /bwa/i and $paired_files){ 
@@ -193,7 +218,7 @@ if ($aligner=~ /bwa/i and $paired_files){
 
 ## generate genome coverage plots and histograms 
 print "Generate genome coverage plots and histograms...\n";
-`samtools mpileup -BQ0 -d10000000 -f  $ref_file $bam_output >$pileup_output`; 
+`samtools mpileup -ABQ0 -d10000000 -f  $ref_file $bam_output >$pileup_output`; 
 
 if ($paired_files){
   ## generate proper-paired reads coverage
