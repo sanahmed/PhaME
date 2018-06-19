@@ -2,6 +2,7 @@
 
 use strict;
 use warnings;
+use Getopt::Long;
 use FindBin qw($Bin $RealBin);
 use lib "$Bin";
 use lib "$RealBin/../lib";
@@ -89,10 +90,16 @@ my $mappingGaps;
 my $ptree;
 my $buildSNPdb = 0;
 my $message;
-
-my $control = $ARGV[0] || "phame.ctl";
+my $PACKAGENAME="PhaME";
+my $PACKAGEVERSION="1.0.0";
 my $bindir = getBinDirectory();
 
+GetOptions(
+    'version|v' => sub { version() },
+    'help|h' => sub { printusage() },
+);
+
+my $control = $ARGV[0] || "phame.ctl";
 ##########################################################################################
 ## Read in control file
 open( CTL, "$control" ) || die "Please provide a control file";
@@ -827,4 +834,16 @@ sub print_timeInterval {
         int( ( $now % 3600 ) / 60 ), int( $now % 60 );
     print "[$string]  $msg";
 }
+
+sub version {
+    print "\n$PACKAGENAME (version $PACKAGEVERSION)\n";
+}
+
+sub printusage {
+   print "\n$PACKAGENAME (version $PACKAGEVERSION)\n";
+   print "\nUSAGE: runPhaME.pl <control file>\n\n";
+   print "\n";
+   print "\n";
+}
+
 
