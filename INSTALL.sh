@@ -556,7 +556,7 @@ cpanm File::Basename@$perl_File_Basename_VER
 cpanm File::Copy@$perl_File_Copy_VER
 # cpanm IO::Handle@$perl_IO_Handle_VER
 cpanm Parallel::ForkManager@$perl_Parllel_ForkManager_VER -l $ROOTDIR/ext
-cpanm Bio::SeqIO -l $ROOTDIR/ext
+cpanm Bio::SeqIO
 ################################################################################
 if ( checkHyPhyInstallation HYPHYMP )
 then

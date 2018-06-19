@@ -18,6 +18,7 @@ before_script:
 
 script:
   - PWD=$(pwd)
+  - source activate phame
   - sh test/TestAll.sh
   - cover -test
 
