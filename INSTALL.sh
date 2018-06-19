@@ -45,6 +45,7 @@ perl_Time_HiRes=1.9726
 perl_Statistics_Distributions_VER=1.02
 perl_Test_Exception_VER=0.43
 perl_Time_HiRes_VER=1.9758
+perl_File_Copy_VER=2.21 
 
 
 ################################################################################
