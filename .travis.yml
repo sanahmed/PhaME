@@ -12,14 +12,12 @@ before_install:
 
 install:
   - ./INSTALL.sh
-  - source activate phame
   - export PATH="$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
 
 before_script:
   - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
 
 script:
-  - PWD=$(pwd)
   - source activate phame
   - sh test/TestAll.sh
   - cover -test
