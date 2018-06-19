@@ -19,7 +19,7 @@ before_script:
 
 script:
   - source activate phame
-  - sh test/TestAll.sh
+  - test/TestAll.sh
   - cover -test
 
 after_success:
