@@ -102,7 +102,7 @@ sub check {
             while (<LIST>) {
                 chomp;
 
-                my $snpsfile = "$snpdir/$pref_name\_\_$_.snps";
+                my $snpsfile = "$snpdir/$pref_name\_$_.snps";
                 my $gapsfile = "$gapdir/$pref_name\_$_.gaps";
                 if (/contig/) {
                     $snpsfile = "$snpdir/$pref_name\_$_.snps";
@@ -118,7 +118,6 @@ sub check {
                         = glob "$gapdir/$pref_name\_$1\_$pref_name*.gaps";
                 }
 
-                #         $refcheck{$_}++;
                 if ( $pref_name ne $_ && !-e $snpsfile ) {
                     print "$snpsfile\n";
                     print
@@ -894,19 +893,19 @@ sub PickRefGenome {
 }
 
 
-sub FilterGenomes {
+# sub FilterGenomes {
 
-    # A function that outputs list of genomes that needs to be filtered out based on cutoff.
-    my $sketch_file   = shift;
-    my $ref_genome    = shift;
-    my $cutoff = shift;
-    my @remove_list;
+#     # A function that outputs list of genomes that needs to be filtered out based on cutoff.
+#     my $sketch_file   = shift;
+#     my $ref_genome    = shift;
+#     my $cutoff = shift;
+#     my @remove_list;
     
-    $ref_genome =~ s/\//\\\//g;
-    my $x = `cat $sketch_file | grep $ref_genome |awk '{ if (\$3 < $cutoff ) print \$1, \$2 }'| sed 's/$ref_genome//g' | sed 's/ //g'`;
-    @remove_list = split(/\n/, $x);
-    return @remove_list;
-}
+#     $ref_genome =~ s/\//\\\//g;
+#     my $x = `cat $sketch_file | grep $ref_genome |awk '{ if (\$3 < $cutoff ) print \$1, \$2 }'| sed 's/$ref_genome//g' | sed 's/ //g'`;
+#     @remove_list = split(/\n/, $x);
+#     return @remove_list;
+# }
 
 
 sub combo {
@@ -970,32 +969,32 @@ sub SNPsAnalysis {
 }
 
 
-sub filter_genomes {
+# sub filter_genomes {
 
-    # A function that gives list of genomes whose ANI when compared to reference is less than the threshold.
-    # It needs a three column sketch file as input
-    # sketch file contains file path in specified ref directory
-    # but it outputs the path to folder where genomes are copied
-    my $sketch_file   = shift;
-    my $ref_genome    = shift;
-    my $cutoff = shift;
-    my $workdir = shift;
-    my @remove_list;
-    my @final_remove_list;
+#     # A function that gives list of genomes whose ANI when compared to reference is less than the threshold.
+#     # It needs a three column sketch file as input
+#     # sketch file contains file path in specified ref directory
+#     # but it outputs the path to folder where genomes are copied
+#     my $sketch_file   = shift;
+#     my $ref_genome    = shift;
+#     my $cutoff = shift;
+#     my $workdir = shift;
+#     my @remove_list;
+#     my @final_remove_list;
     
-    $ref_genome =~ s/\//\\\//g;
-    my $x = `cat $sketch_file | grep $ref_genome |awk '{ if (\$3 < $cutoff ) print \$1, \$2 }'| sed 's/$ref_genome//g' | sed 's/ //g'`;
-    @remove_list = split(/\n/, $x);
+#     $ref_genome =~ s/\//\\\//g;
+#     my $x = `cat $sketch_file | grep $ref_genome |awk '{ if (\$3 < $cutoff ) print \$1, \$2 }'| sed 's/$ref_genome//g' | sed 's/ //g'`;
+#     @remove_list = split(/\n/, $x);
 
-    foreach my $remove_file (@remove_list){
-         my($filename, $dirs, $suffix) = File::Basename::fileparse($remove_file, qr/\.[^.]*/);
-         $filename =~ s/\W/_/g;
-         $filename = $filename . ".fna";
-         push(@final_remove_list, $filename)
+#     foreach my $remove_file (@remove_list){
+#          my($filename, $dirs, $suffix) = File::Basename::fileparse($remove_file, qr/\.[^.]*/);
+#          $filename =~ s/\W/_/g;
+#          $filename = $filename . ".fna";
+#          push(@final_remove_list, $filename)
 
-    }
-    return uniq(@final_remove_list);
-}
+#     }
+#     return uniq(@final_remove_list);
+# }
 
 sub uniq {
     my %seen;

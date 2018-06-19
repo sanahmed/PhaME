@@ -2,17 +2,17 @@
       workdir = ../workdirs/t8_ebola_contigs_sread # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
-      reffile = KJ660347.fasta  # reference filename 
+      reffile = ZEBOV_2002_Ilembe.fna  # reference filename 
 
       project = t8  # main alignment file name
 
-      cdsSNPS = 1  # 0:no cds SNPS; 1:cds SNPs
+      cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
 
-      buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
+      buildSNPdb = 1 # 0: only align to reference 1: build SNP database of all complete genome
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 
-         data = 5  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
+         data = 6  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 1  # 1: single reads; 2: paired reads; 3: both types present;

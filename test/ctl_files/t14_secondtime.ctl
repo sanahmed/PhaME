@@ -1,18 +1,18 @@
-       refdir = test/data/ebola_ref  # directory where reference files are located
-      workdir = test/workdirs/ebola_comp_sread_pread # directory where contigs/reads files are located and output is stored
+       refdir = ../data/ebola_ref  # directory where reference files are located
+      workdir = ../workdirs/t14_secondtime # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
       reffile = KJ660347.fasta  # reference filename 
 
-      project = t13  # main alignment file name
+      project = t14  # main alignment file name
 
       cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
 
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 
-    FirstTime = 1  # 1:yes; 2:update existing SNP alignment
+    FirstTime = 2  # 1:yes; 2:update existing SNP alignment
 
-         data = 4  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
+         data = 6  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 3  # 1: single reads; 2: paired reads; 3: both types present;

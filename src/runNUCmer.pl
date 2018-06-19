@@ -100,15 +100,16 @@ my $query_gaps;
 
 my $sketch_output = File::Spec->catfile( $query_dir, "sketch_output.txt" );
 
-print "$sketch_output\n";
-my @remove_list = PhaME::filter_genomes( $sketch_output, $ref_genome, $cutoff,
-    $query_dir );
+# print "$sketch_output\n";
+my @remove_list;
+# my @remove_list = PhaME::filter_genomes( $sketch_output, $ref_genome, $cutoff,
+    # $query_dir );
 
 print "$ref_genome\n";
 print "$cutoff\n";
 print "$query_dir\n";
-print "Warning: These genomes will be removed as they do not pass given ANI cutoff of $cutoff% with reference:$ref_genome\n";
-print join("\n", @remove_list);
+# print "Warning: These genomes will be removed as they do not pass given ANI cutoff of $cutoff% with reference:$ref_genome\n";
+# print join("\n", @remove_list);
 
 @query = misc_funcs::read_directory($query_dir, @remove_list);
 

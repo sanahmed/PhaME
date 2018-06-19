@@ -43,7 +43,8 @@ GetOptions(
     'g|gene=s'   => \$gff_file,
     'p|gap=s'    => \$gapfile,
 );
-
+################################################################################
+# Checking for maximum threads possible.
 my $maxthreads
     = ( $^O =~ /darwin/ )
     ? `sysctl hw.ncpu | awk '{print \$2}'`
@@ -56,20 +57,22 @@ if ( $threads < 1 || $threads > $maxthreads ) {
 my $genedir = $dir . '/PSgenes';
 if ( !-d $genedir ) { `mkdir $genedir`; }
 
+# create threads
 my $pm = new Parallel::ForkManager($threads);
 $pm->run_on_finish( sub { my ( $pid, $ident ) = @_; } );
-
+# open gap file
 open( IN, $gapfile ) || die "$!";
 while (<IN>) {
     chomp;
     my ( $gapstart, $gapend ) = split " ", $_;
     my $length = $gapend - $gapstart;
 
-    #   print "$temp1\t$gapstart\t$gapend\t$length\t$temp2\n";
+      # print "$temp1\t$gapstart\t$gapend\t$length\t$temp2\n";
     if ( $length >= 100 ) { $gaps{$gapstart} = $gapend; }
 }
+
 ################################################################################
-# parse fasta file
+# parse fasta file of reference genome
 my $fh = FileHandle->new($file) || die "$!";
 if ( $fh->open("< $file") ) {
     $/ = ">";
@@ -81,14 +84,14 @@ if ( $fh->open("< $file") ) {
         $reference{$header} = $seq;
         $name = $header;
 
-        #      print "$name\n$seq\n";
+             # print "$name\n$seq\n";
     }
     $/ = "\n";
     $fh->close;
 }
 ################################################################################
-# parse gff file
-my $fh1 = FileHandle->new($gff_file) || die "$!";
+# parse gff file of reference genome
+my $fh1 = FileHandle->new($gff_file) || die "No GFF file found!";
 if ( $fh1->open("< $gff_file") ) {
     while (<$fh1>) {
         chomp;
@@ -107,8 +110,10 @@ if ( $fh1->open("< $gff_file") ) {
                 my %annotations = map { split /=/; } split /;/, $Attributes;
                 my $gene_id = $annotations{"ID"} || $annotations{"Name"};
                 $gene_id =~ s/\W/_/g;
+                # gets strand information and names of genes
                 $genes{"$start:$end"}->{id}     = $gene_id;
                 $genes{"$start:$end"}->{strand} = $strand;
+                
             }
         }
 
@@ -122,7 +127,7 @@ while (<LIST>) {
     chomp;
     push( @header_list, "$name:$_" );
 
-    #   print "$name:$_\n";
+      # print "$name:$_\n";
 }
 close LIST;
 ################################################################################
@@ -138,7 +143,7 @@ while (<IN>) {
         if ( $start == 0 ) { $start = 1; }
         if ( abs $start - $end > 300 ) {
 
-            #print "$start\t$end\n";
+            # print "$start\t$end\n";
             $coords{"$start:$end"} = $start;
             $alternative{$rpos}{"$refid:$queryid"} = $qbase;
         }
@@ -157,6 +162,7 @@ open( GAP, ">$gapgenes" ) || die "$!";
 OUTER:
 foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
     my ( $start, $end ) = $coord =~ /(\d+):(\d+)/;
+    print "$start\n";
 
     foreach my $gap ( keys %gaps ) {
         if ( $gap >= $start && $gaps{$gap} <= $end ) {
@@ -197,22 +203,28 @@ foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
     $pm->start and next;
     open( my $fh, ">$outfile" ) || die "$!";
 
-    #   print "$start\t$end\n";
-
+    # parsing through the working_list.txt file, @header_list contains lines from working_list.txt
     foreach my $comparison (@header_list) {
+        print "$comparison\n\n";
+        # $comparison string contains following
+        # "KJ660347_2_ebolavirus_GIN_Gueckedou_C07:KR653305_1_Zaire_ebolavirus_isolate_Ebola_virus_H_sapiens_wt_SLE_2014_Makona_20141043__partial_genome_contig"
         if ( $comparison =~ /(.+):(.+)/ ) {
             ( $first, $second ) = ( $1, $2 );
             print $fh ">$second\n";
+            }
 
-            #          print "$comparison\t$first\n";
-        }
 
         if ( $genes{"$start:$end"} ) {
             my $gene_len = $end - $start + 1;
-            my $gene = substr( $reference{$name}, $start - 1, $gene_len );
+            # subsets nucleotide using gene coordinates
 
+            my $gene = substr( $reference{$name}, $start - 1, $gene_len );
+            print "$name\nname";
+            # print "$reference{$name}\n";
+            # print "$gene\n\n";
             #         print "$entry\n";
             my $strand = $genes{"$start:$end"}->{strand};
+            print "$strand\n";
 
             #            print "$first\t$start\t$end\n";
             foreach my $position ( sort { $a <=> $b } keys %alternative ) {

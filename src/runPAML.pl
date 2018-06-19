@@ -30,7 +30,7 @@ my $pamldir = $dir . "/paml";
 chdir $pamldir;
 print "$genedir\n";
 
-my $pm= new Parallel::ForkManager($thread);
+my $pm= new Parallel::ForkManager(1);
 $pm->run_on_finish(sub{my ($pid,$ident)=@_;});
 
 if ( $NSsites =~ /,/ ) {

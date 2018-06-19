@@ -60,7 +60,7 @@ my $modelsFile = $hyphydir . '/models.txt';
 my $hyphy = "$RealBin/../ext/lib/hyphy/TemplateBatchFiles";
 
 # this works, but cant find output file
-my $hyphy = "/Users/migunshakya/Applications/hyphy/res/TemplateBatchFiles";
+# my $hyphy = "/Users/migunshakya/Applications/hyphy/res/TemplateBatchFiles";
 
 chdir $hyphy;
 
@@ -293,7 +293,7 @@ ExecuteAFile (fileToExecute,inputRedirect);
 
 ################################################################################
 sub runBranchSiteREL {
-    my $aBSREL = "$RealBin/../thirdParty/hyphy-2.3.11/res/TemplateBatchfiles/SelectionAnalyses/aBSREL.bf";
+    my $aBSREL = "$RealBin/../thirdParty/hyphy-2.3.11/res/TemplateBatchFiles/SelectionAnalyses/aBSREL.bf";
     my $pm = new Parallel::ForkManager($thread);
     for ( my $i = 0; $i <= $#geneList; $i++ ) {
         $pm->start($i) and next;

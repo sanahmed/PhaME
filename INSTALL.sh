@@ -22,14 +22,14 @@ cmake_VER=3.0.1
 cpanm_VER=1.7039
 FastTree_VER=2.1.9
 mafft_VER=7.305
-miniconda_VER=4.2.12
+miniconda_VER=4.4.11
 mummer_VER=3.23
 muscle_VER=3.8.31
 paml_VER=4.9
 R_VER=3.3.1
 RAxML_VER=8.2.10
 samtools_VER=1.3.1
-perl5_VER=5.8.0
+perl5_VER=5.26.2.1
 bcftools_VER=1.6
 hyphy_VER=2.3.11
 bbmap_VER=37.62
@@ -73,22 +73,22 @@ if [[ "$OSTYPE" == "darwin"* ]]
 then
 {
 
-  curl -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda2-4.2.12-MacOSX-x86_64.sh
-  chmod +x miniconda.sh
-  ./miniconda.sh -b -p $ROOTDIR/thirdParty/miniconda -f
-  ln -sf $ROOTDIR/thirdParty/miniconda/bin/conda $ROOTDIR/bin/conda
-  ln -sf $ROOTDIR/thirdParty/miniconda/bin/pip $ROOTDIR/bin/pip
-  export PATH=$ROOTDIR/bin:$PATH
+    curl -o miniconda.sh https://repo.continuum.io/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+    chmod +x miniconda.sh
+    ./miniconda.sh -b -p $ROOTDIR/thirdParty/miniconda -f
+    conda update --yes -n base conda
+    ln -sf $ROOTDIR/thirdParty/miniconda/bin/conda $ROOTDIR/bin/conda
+    ln -sf $ROOTDIR/thirdParty/miniconda/bin/pip $ROOTDIR/bin/pip
 }
 else
 {  
 
-  wget https://repo.continuum.io/miniconda/Miniconda2-4.2.12-Linux-x86_64.sh -O miniconda.sh
-  chmod +x miniconda.sh
-  ./miniconda.sh -b -p $ROOTDIR/thirdParty/miniconda -f
-  ln -sf $ROOTDIR/thirdParty/miniconda/bin/conda $ROOTDIR/bin/conda
-  ln -sf $ROOTDIR/thirdParty/miniconda/bin/pip $ROOTDIR/bin/pip
-  export PATH=$ROOTDIR/bin:$PATH
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+    chmod +x miniconda.sh
+    ./miniconda.sh -b -p $ROOTDIR/thirdParty/miniconda -f
+    conda update --yes -n base conda
+    ln -sf $ROOTDIR/thirdParty/miniconda/bin/conda $ROOTDIR/bin/conda
+    ln -sf $ROOTDIR/thirdParty/miniconda/bin/pip $ROOTDIR/bin/pip
 
 }
 fi
@@ -504,19 +504,75 @@ echo "
 ################################################################################
 if ( checkSystemInstallation conda )
 then
-  echo "conda is found"
-  if [ -d "$ROOTDIR/thirdParty/miniconda" ]; then
-    echo "conda is installed and pointed to right environment"  
+  conda_installed_VER=`conda --version 2>&1 | perl -nle 'print $& if m{conda \d+\.\d+\.\d+}'`;
+  if ( echo $conda_installed_VER $miniconda_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+  then 
+    echo " - found conda $conda_installed_VER"
+    if [ -d "$ROOTDIR/thirdParty/miniconda" ]; then
+      echo "conda is pointed to right environment"
+      echo "creating phame environment"
+      conda create --name phame --yes
+      source activate phame
+    else
+      echo "Creating a separate conda enviroment ..."
+      conda create --name phame --yes
+      source activate phame
+    fi
   else
-    echo "Creating a separate conda enviroment ..."
-    conda create --yes -p $ROOTDIR/thirdParty/miniconda
+    echo "Required version of conda ($miniconda_VER) was not found"
+    install_miniconda
+    conda create --name phame --yes
+    source activate phame
   fi
 else
   echo "conda was not found"
   install_miniconda
+  conda create --name phame --yes
+  source activate phame
 fi
 
 ################################################################################
+conda install --yes -n phame -c anaconda perl=$perl5_VER 
+conda install --yes -n phame -c bioconda perl-app-cpanminus=$cpanm_VER
+conda install --yes -n phame -c bioconda mummer=$mummer_VER
+conda install --yes -n phame -c bioconda bbmap
+conda install --yes -n phame -c anaconda cmake=$cmake_VER
+conda install --yes -n phame -c bioconda bwa=$bwa_VER
+conda install --yes -n phame -c bioconda bowtie2=$bowtie2_VER
+conda install --yes -n phame -c bioconda samtools=$samtools_VER
+conda install --yes -n phame -c bioconda FastTree=$FastTree_VER
+conda install --yes -n phame -c bioconda RAxML=$RAxML_VER
+conda install --yes -n phame -c bioconda muscle=$muscle_VER
+conda install --yes -n phame -c bioconda mafft=$mafft_VER
+conda install --yes -n phame -c bioconda paml=$paml_VER
+conda install --yes -n phame -c bioconda bcftools=$bcftools_VER
+cpanm Getopt::Long@$perl_Getopt_Long_VER
+cpanm Test::Exception@$perl_Test_Exception_VER
+cpanm Statistics::Distributions@$perl_Statistics_Distributions_VER
+cpanm Time::HiRes@$perl_Time_HiRes_VER
+cpanm File::Path@$perl_File_Path_VER
+cpanm File::Basename@$perl_File_Basename_VER
+cpanm File::Copy@$perl_File_Copy_VER
+cpanm IO::Handle@$perl_IO_Handle_VER
+cpanm Parallel::ForkManager@$perl_Parllel_ForkManager_VER -l $ROOTDIR/ext
+cpanm Bio::SeqIO -l $ROOTDIR/ext
+################################################################################
+if ( checkHyPhyInstallation HYPHYMP )
+then
+  hyphy_installed_VER=`thirdParty/hyphy-2.3.11/HYPHYMP -v 2>&1 | grep 'HYPHY' | perl -nle 'print $& if m{HYPHY \d+\.\d+.\d\d}'`;
+  if ( echo $hyphy_installed_VER $hyphy_VER | awk '{if($2>=$3) exit 0; else exit 1}' )
+  then 
+    echo " - found HyPhy $hyphy_installed_VER"
+  else 
+    echo "Required version of HyPhy $hyphy_VER was not found"
+    install_hyphy
+  fi
+else
+  echo "HyPhy was not found"
+  install_hyphy
+fi
+
+
 if ( checkSystemInstallation perl )
 then
   perl_installed_VER=`perl -v 2>&1| grep 'version' | perl -nle 'print $& if m{\d+\.\d+\.\d+}'`;
@@ -525,7 +581,7 @@ then
     echo " - found perl $perl_installed_VER"
   else
   echo "Required version of perl $perl_VER was not found"
-  install_perl
+  install_perl 
   fi
 else 
   echo "perl was not found"
