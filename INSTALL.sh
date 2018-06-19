@@ -485,21 +485,21 @@ echo "
 }
 
 
-install_perl_Parallel_ForkManager()
-{
-echo "--------------------------------------------------------------------------
-                           installing Perl Module Parallel::ForkManager v1.17
---------------------------------------------------------------------------------
-"
-cpanm Parallel::ForkManager@$perl_Parllel_ForkManager_VER -l $ROOTDIR/ext
-cpanm Bio::SeqIO -l $ROOTDIR/ext
+# install_perl_Parallel_ForkManager()
+# {
+# echo "--------------------------------------------------------------------------
+#                            installing Perl Module Parallel::ForkManager v1.17
+# --------------------------------------------------------------------------------
+# "
+# cpanm Parallel::ForkManager@$perl_Parllel_ForkManager_VER -l $ROOTDIR/ext
+# cpanm Bio::SeqIO -l $ROOTDIR/ext
 
-echo "
---------------------------------------------------------------------------------
-                           Parallel::ForkManager v1.17 installed
---------------------------------------------------------------------------------
-"
-}
+# echo "
+# --------------------------------------------------------------------------------
+#                            Parallel::ForkManager v1.17 installed
+# --------------------------------------------------------------------------------
+# "
+# }
 
 
 ################################################################################
@@ -930,20 +930,20 @@ else
   install_perl_Test_Exception
 fi
 #------------------------------------------------------------------------------#
-if ( checkPerlModule Parallel::ForkManager )
-then
-  perl_Parallel_ForkManager_installed_VER=`perl -MParallel::ForkManager -e 'print $Parallel::ForkManager::VERSION ."\n";'`
-  if ( echo $perl_Parallel_ForkManager_installed_VER $perl_Parallel_ForkManager_VER | awk '{if($1>=$2) exit 0; else exit 1}')
-  then
-    echo " - found Perl module Parallel::ForkManager $perl_Parallel_ForkManager_installed_VER"
-  else
-    echo "Required version of Parallel::ForkManager $perl_Parallel_ForkManager_VER was not found"
-    install_perl_Parallel_ForkManager
-  fi
-else
-  echo "Perl Parallel::ForkManager is not found"
-  install_perl_Parallel_ForkManager
-fi
+# if ( checkPerlModule Parallel::ForkManager )
+# then
+#   perl_Parallel_ForkManager_installed_VER=`perl -MParallel::ForkManager -e 'print $Parallel::ForkManager::VERSION ."\n";'`
+#   if ( echo $perl_Parallel_ForkManager_installed_VER $perl_Parallel_ForkManager_VER | awk '{if($1>=$2) exit 0; else exit 1}')
+#   then
+#     echo " - found Perl module Parallel::ForkManager $perl_Parallel_ForkManager_installed_VER"
+#   else
+#     echo "Required version of Parallel::ForkManager $perl_Parallel_ForkManager_VER was not found"
+#     install_perl_Parallel_ForkManager
+#   fi
+# else
+#   echo "Perl Parallel::ForkManager is not found"
+#   install_perl_Parallel_ForkManager
+# fi
 #------------------------------------------------------------------------------#
 if ( checkPerlModule Statistics::Distributions )
 then
