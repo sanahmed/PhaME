@@ -481,6 +481,7 @@ sub removeGaps {
 }
 
 # Runs bowtie on paired-end reads
+
 sub readsMapping {
     my $indir     = shift;
     my $bindir    = shift;
@@ -488,6 +489,7 @@ sub readsMapping {
     my $thread    = shift;
     my $name      = shift;
     my $error     = shift;
+    my $aligner	  = shift;
     my $log       = shift;
     my $outdir    = $indir . "/results";
     my $reference = $outdir . '/temp/' . $name . '.fna';
@@ -498,7 +500,7 @@ sub readsMapping {
     }
     print "\n";
     my $map
-        = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a bowtie 2>>$error >> $log\n\n";
+        = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner 2>>$error >> $log\n\n";
     print $map;
     if ( system($map) ) { die "Error running $map.\n"; }
 
@@ -512,6 +514,7 @@ sub readsMapping {
     }
     closedir CLEAN;
     return ("Read Mapping complete");
+
 }
 
 sub buildSNPDB {

@@ -55,6 +55,7 @@ my $outdir;
 my $project;
 my $rsignal = 0;
 my $reference;
+my $aligner="bowtie";
 my $name;
 my $path;
 my $suffix;
@@ -123,9 +124,16 @@ while (<CTL>) {
     if (/project\s*=\s*(\S+)\s*#{0,1}.*$/) { $project = $1; }
 
     if (/reference\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $rsignal = $1; }
+    if (/aligner\s*=\s*(\S+)\s*#{0,1}.*$/){$aligner=$1;}
     if ( $rsignal == 1 && /reffile\s*=\s*(\S+)\s*#{0,1}.*$/ ) {
         $reference = "$refdir/$1";
     }
+    elsif($rsignal==0){
+      opendir(DIR, $refdir);
+      my @reffiles = grep { /.[fna|fa|fasta|fsa]$/ && -f "$refdir/$_" } readdir(DIR);
+      $reference= "$refdir/". $reffiles[int(rand(scalar(@reffiles)))];
+      closedir DIR;
+   }
 
     if (/cdsSNPS\s*=\s*(0|1)\s*#{0,1}.*$/) { $gsignal = $1; }
 
@@ -511,7 +519,7 @@ if ( $check == 0 ) {
                 $contig_list{$list} = $genome_size;
             }
         }
-        if ( $read_mapping == 1 ) {
+        if ( $read_mapping == 1 )  {
             if (   $files =~ /.+\.f{1}a?s?t?q$/
                 && $files !~ /.+\.f{1}n|s?a?s?t?a$/
                 && $files !~ /.+\.contig$|\.contigs$|\.ctg$]$/ )
@@ -552,6 +560,7 @@ if ( $check == 0 ) {
 }    # check=0
 
 $name =~ s/\W/_/g;    # Replacing special characters with _
+
 $reference = "$workdir/files/$name.fna";
 
 if ( $nucmer == 1 ) {
@@ -612,7 +621,7 @@ if ( $read_mapping == 1 ) {
         PhaME::removeGaps( $bindir, $reference, $mappingGaps );
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end = PhaME::readsMapping( $workdir, $bindir,
-            "$workdir/reads_list.txt", $threads, $name, $error, $logfile );
+            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $logfile );
         &print_timeInterval( $runtime, "$end\n" );
     }
     elsif ( $time == 1 ) {
@@ -620,7 +629,7 @@ if ( $read_mapping == 1 ) {
         `mkdir -p $tempdir; cp $reference $tempdir`;
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end = PhaME::readsMapping( $workdir, $bindir,
-            "$workdir/reads_list.txt", $threads, $name, $error, $logfile );
+            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $logfile );
         &print_timeInterval( $runtime, "$end\n" );
     }
 }
