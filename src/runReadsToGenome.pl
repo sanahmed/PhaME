@@ -159,8 +159,8 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
     my $ref_file = $ref_files[$ref_file_i];
     my ( $ref_file_name, $ref_file_path, $ref_file_suffix )
         = fileparse( "$ref_file", qr/\.[^.]*/ );
-    my $bam_output       = "$outDir/$ref_file_name.sort.bam";
-    my $bam_index_output = "$outDir/$ref_file_name.sort.bam.bai";
+    my $bam_output       = "$outDir/$prefix.sort.bam";
+    my $bam_index_output = "$outDir/$prefix.sort.bam.bai";
     push @bam_outputs, $bam_output;
     unless ($plot_only)
     { # skip the alignment steps, SNP steps, assume bam and pileup files were generated.
@@ -320,8 +320,7 @@ $pm->run_on_finish(    # called BEFORE the first call to start()
         my ( $pid, $exit_code, $ident, $exit_signal, $core_dump, $data ) = @_;
 
         if ( defined($data) ) {    # children are not forced to send anything
-            print $pdf_fh $data->{pdfRscrip
-t}, "\n";
+            print $pdf_fh $data->{pdfRscript}, "\n";
             `echo "$data->{stats_print_string}" >> $final_stats_output`;
         }
     }
@@ -333,14 +332,14 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
     my ( $ref_file_name, $ref_file_path, $ref_file_suffix )
         = fileparse( "$ref_file", qr/\.[^.]*/ );
     $pm->start($ref_file_name) and next;
-    my $bam_output       = "$outDir/$ref_file_name.sort.bam";
-    my $bam_index_output = "$outDir/$ref_file_name.sort.bam.bai";
-    my $pileup_output    = "$outDir/$ref_file_name.pileup";
-    my $bcf_output       = "$outDir/$ref_file_name.raw.bcf";
-    my $vcf_output       = "$outDir/$ref_file_name.vcf";
-    my $stats_output     = "$outDir/$ref_file_name.alnstats.txt";
-    my $consensusSeq     = "$outDir/$ref_file_name.consensus.fasta";
-    my $ref_window_gc    = "$outDir/$ref_file_name.windows_gc.txt";
+    my $bam_output       = "$outDir/$prefix.sort.bam";
+    my $bam_index_output = "$outDir/$prefix.sort.bam.bai";
+    my $pileup_output    = "$outDir/$prefix.pileup";
+    my $bcf_output       = "$outDir/$prefix.raw.bcf";
+    my $vcf_output       = "$outDir/$prefix.vcf";
+    my $stats_output     = "$outDir/$prefix.alnstats.txt";
+    my $consensusSeq     = "$outDir/$prefix.consensus.fasta";
+    my $ref_window_gc    = "$outDir/$prefix.windows_gc.txt";
 
     unless ($plot_only)
     { # skip the alignment steps, SNP steps, assume bam and pileup files were generated.
@@ -433,14 +432,14 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
         my $coverage_output = "$outDir/${prefix}_${ref_name}.coverage";
         my $WindowCoverage_output
             = "$outDir/${prefix}_${ref_name}.window_size_coverage";
-        my $gap_output = "$outDir/${prefix}_${ref_name}.gap.coords";
+        my $gap_output = "$outDir/${prefix}_${ref_name}.gaps";
         my $coverage_plot
             = "$outDir/Coverage_plots/${prefix}_${ref_name}_base_coverage.png";
         my $histogram
             = "$outDir/Coverage_plots/${prefix}_${ref_name}_coverage_histogram.png";
 
         my $pileup_cmd
-            = "samtools mpileup -A -BQ0 -d10000000 -r $ref_name -f  $ref_file $bam_output ";
+            = "samtools mpileup -BQ0 -d10000000 -r $ref_name -f  $ref_file $bam_output ";
 
         # build base coverage hash
         my @base_array = (0) x $ref_len;

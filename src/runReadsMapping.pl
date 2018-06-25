@@ -59,7 +59,7 @@ my $querydir = $indir;
 read_directory($querydir);
 
 ####################Setting up threads##########################################
-my $pm = new Parallel::ForkManager($thread);
+my $pm = new Parallel::ForkManager(1);
 
 $pm->run_on_finish(    # called BEFORE the first call to start()
     sub {
@@ -118,7 +118,7 @@ sub read_directory {
         next if ( $files =~ /^..?$/ );
         if ( $files !~ /$name/
             && ( $files =~ /(.+)[_.]R1.*\.fa?s?t?q$/ ) )
-            {
+        {
             $temp = $1 . '_pread';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
@@ -148,64 +148,65 @@ sub read_directory {
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
                 create_bowtie_commands( $query, $prefix, $temp, $thread );
-                }
             }
+        }
     }
     closedir(PARENT);
 }
 
-sub create_bowtie_commands
-{
-my $read=shift;
-my $prefix=shift;
-my $temp=shift;
-my $read1;
-my $read2;
-my $readu;
+# sub create_bowtie_commands {
+# my $read=shift;
+# my $prefix=shift;
+# my $temp=shift;
+# my $thread=shift;
+# my $read1;
+# my $read2;
+# my $readu;
 
-my ($name,$path,$suffix)=fileparse("$read",qr/\.[^.]*/);
-if ($temp=~/pread/i){
-#   print "$read\n";
-   if ($name=~ /(.+)([_.]R)(\d)(.*)$/){
-      $prefix.= "\_$1";
-      $read1=$path.$1.$2.$3.$4.$suffix;
-      $read2=$path.$1.$2.'2'.$4.$suffix;
-   }
-   if ($name=~ /(.+)([_.])(1)(.*)$/){
-      $prefix.= "\_$1";
-      $read1=$path.$1.$2.$3.$4.$suffix;
-      $read2=$path.$1.$2.'2'.$4.$suffix;
-   }
+# my ($name,$path,$suffix)=fileparse("$read",qr/\.[^.]*/);
+# if ($temp=~/pread/i){
+# #   print "$read\n";
+#    if ($name=~ /(.+)([_.]R)(\d)(.*)$/){
+#       $prefix.= "\_$1";
+#       $read1=$path.$1.$2.$3.$4.$suffix;
+#       $read2=$path.$1.$2.'2'.$4.$suffix;
+#    }
+#    if ($name=~ /(.+)([_.])(1)(.*)$/){
+#       $prefix.= "\_$1";
+#       $read1=$path.$1.$2.$3.$4.$suffix;
+#       $read2=$path.$1.$2.'2'.$4.$suffix;
+#    }
 
-   my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
-#   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
-   push (@command,$bowtie_command);
-}
-elsif ($temp=~/sread/i){
-   $prefix.="\_$name";
-   my $bowtie_command= "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
-    $bowtie_command= "runReadsToGenome.pl -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" if ($aligner =~ /minimap/);
-#   print "READ1:  $read1\n$bowtie_command\n\n\n";
-   push (@command,$bowtie_command);
-}elsif ($temp=~/_read/i){
-#   print "$read\n";
-   if ($name=~ /(.+)([_.]R)(\d)(.*)$/){
-      $prefix.= "\_$1";
-      $read1=$path.$1.$2.$3.$4.$suffix;
-      $read2=$path.$1.$2.'2'.$4.$suffix;
-      $readu=$path.$1.$suffix;
-   }
-   elsif ($name=~ /(.+)([_.])(1)(.*)$/){
-      $prefix.= "\_$1";
-      $read1=$path.$1.$2.$3.$4.$suffix;
-      $read2=$path.$1.$2.'2'.$4.$suffix;
-      $readu=$path.$1.$suffix;
-   }
+#    my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+# #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
+#    push (@command,$bowtie_command);
+# }
+# elsif ($temp=~/sread/i){
+#    $prefix.="\_$name";
+#    my $bowtie_command= "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+#     $bowtie_command= "runReadsToGenome.pl -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner" if ($aligner =~ /minimap/);
+# #   print "READ1:  $read1\n$bowtie_command\n\n\n";
+#    push (@command,$bowtie_command);
+# }elsif ($temp=~/_read/i){
+# #   print "$read\n";
+#    if ($name=~ /(.+)([_.]R)(\d)(.*)$/){
+#       $prefix.= "\_$1";
+#       $read1=$path.$1.$2.$3.$4.$suffix;
+#       $read2=$path.$1.$2.'2'.$4.$suffix;
+#       $readu=$path.$1.$suffix;
+#    }
+#    elsif ($name=~ /(.+)([_.])(1)(.*)$/){
+#       $prefix.= "\_$1";
+#       $read1=$path.$1.$2.$3.$4.$suffix;
+#       $read2=$path.$1.$2.'2'.$4.$suffix;
+#       $readu=$path.$1.$suffix;
+#    }
 
-   my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
-#   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
-   push (@command,$bowtie_command);
-}
+#    my $bowtie_command= "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner" ;
+# #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
+#    push (@command,$bowtie_command);
+# }
+
 ################################################################################
 sub create_bowtie_commands {
     my $read   = shift;
@@ -217,9 +218,9 @@ sub create_bowtie_commands {
     my $readu;
     my ( $name, $path, $suffix ) = fileparse( "$read", qr/\.[^.]*/ );
     my $bowtie_options = '-p $thread';
+
     if ( $temp =~ /pread/i ) {
 
-        #   print "$read\n";
         if ( $name =~ /(.+)([_.]R)(\d)(.*)$/ ) {
             $prefix .= "\_$1";
             $read1 = $path . $1 . $2 . $3 . $4 . $suffix;
@@ -227,7 +228,7 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p $read1,$read2 -ref $reference -pre $prefix -d $outdir -aligner $aligner -bowtie_options '-p $thread'";
+            = "runReadsToGenome.pl -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
 
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
@@ -235,7 +236,7 @@ sub create_bowtie_commands {
     elsif ( $temp =~ /sread/i ) {
         $prefix .= "\_$name";
         my $bowtie_command
-            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -bowtie_options '-p $thread'";
+            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -bowtie_options '-p $thread'";
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }
@@ -249,17 +250,15 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -bowtie_options '-p $thread'";
+            = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread `-bowtie_options '-p $thread'";
 
         print "[RUNNING:] $bowtie_command\n";
 
-        #   print "READ1:  $read1\nREAD2:  $read2\n$bowtie_command\n\n\n";
         push( @command, $bowtie_command );
     }
 }
 
-sub usage
-    { 
+sub usage {
     print <<"END";
     Usage:perl $0 
         -r          <reference_fasta> 
