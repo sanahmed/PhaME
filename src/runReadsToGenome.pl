@@ -121,7 +121,7 @@ if ($paired_files) {
 
 ## output file variable initialized ##
 my $final_stats_output = "$outDir/$prefix.alnstats.txt";
-my $plotsPdf           = "$outDir/${prefix}_plots.pdf";
+my $plotsPdf           = "$outDir/$prefix"."_plots.pdf";
 
 #my $final_vcf_output="$outDir/$prefix.vcf";
 #my $bcf_output="$outDir/$prefix.raw.bcf";
@@ -429,14 +429,14 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
             . $mapped_reads . "\t";
 
         # generate coverage file
-        my $coverage_output = "$outDir/${prefix}_${ref_name}.coverage";
+        my $coverage_output = "$outDir/$prefix.coverage";
         my $WindowCoverage_output
             = "$outDir/${prefix}_${ref_name}.window_size_coverage";
         my $gap_output = "$outDir/${prefix}_${ref_name}.gaps";
         my $coverage_plot
-            = "$outDir/Coverage_plots/${prefix}_${ref_name}_base_coverage.png";
+            = "$outDir/Coverage_plots/$prefix"."_base_coverage.png";
         my $histogram
-            = "$outDir/Coverage_plots/${prefix}_${ref_name}_coverage_histogram.png";
+            = "$outDir/Coverage_plots/$prefix"."coverage_histogram.png";
 
         my $pileup_cmd
             = "samtools mpileup -BQ0 -d10000000 -r $ref_name -f  $ref_file $bam_output ";
@@ -463,11 +463,11 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
         #if ($paired_files){
         if (0) {    # disable
             $properpair_coverage_output
-                = "$outDir/${prefix}_${ref_name}.p$$.window_size_coverage";
+                = "$outDir/$prefix.p$$.window_size_coverage";
             $unproperpair_coverage_output
-                = "$outDir/${prefix}_${ref_name}.up$$.window_size_coverage";
+                = "$outDir/$prefix.up$$.window_size_coverage";
             $other_coverage_plot
-                = "$outDir/${prefix}_${ref_name}_coverage_comparison.png";
+                = "$outDir/$prefix"."coverage_comparison.png";
             &window_size_coverage( "", $properpair_coverage_output,
                 \%proper_base_hash, "", $ref_name, $ref_len );
             &window_size_coverage( "", $unproperpair_coverage_output,

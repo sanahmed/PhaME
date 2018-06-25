@@ -236,7 +236,7 @@ sub create_bowtie_commands {
     elsif ( $temp =~ /sread/i ) {
         $prefix .= "\_$name";
         my $bowtie_command
-            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -bowtie_options '-p $thread'";
+            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }

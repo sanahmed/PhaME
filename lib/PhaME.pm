@@ -239,7 +239,6 @@ sub identifyGaps {
     opendir( DIR, "$gapdir" );
     while ( my $gaps = readdir(DIR) ) {
 
-#   if ($gaps=~ /^$name\_(.+)\_norepeats\.gaps/ || $gaps=~ /^$name\_(.+_contig)s\.gaps/ && $gaps!~ /^$name\_norepeats/){
     if (   $gaps =~ /^$name\_norepeats\_(.+)\_norepeats\.gaps/
         || $gaps =~ /^$name\_(.+_contig)s?\.gaps/
         || $gaps =~ /^$name\_(.+)\.gaps/ ){
@@ -247,7 +246,6 @@ sub identifyGaps {
             $line = 0;
             my $gapfile = "$gapdir/$gaps";
             open( IN, $gapfile ) || die "$!";
-            #print "Nucmer Gaps\n";
             while (<IN>) { $line++; print GAP "$_"; }
             close IN;
             if ( $line == 0 ) {
