@@ -184,6 +184,7 @@ sub create_bowtie_commands {
         $prefix .= "\_$name";
         my $bowtie_command
             = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
+        $bowtie_command= "runReadsToGenome.pl -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0" if ($aligner =~ /minimap/);
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }

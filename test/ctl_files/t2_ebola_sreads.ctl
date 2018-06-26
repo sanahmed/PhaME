@@ -9,6 +9,7 @@
       cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
 
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
+      aligner = bowtie
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 
@@ -29,7 +30,7 @@
 
       threads = 2  # Number of threads to use
 
-       cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
+       cutoff = 0.0  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
 * When using data option 1,2,5 need a complete reference to align/map to. 
 * Use data option 7 when need to extract SNPs using a sublist of already aligned genomes. 

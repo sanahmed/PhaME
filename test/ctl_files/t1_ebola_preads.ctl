@@ -11,6 +11,7 @@
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
+      aligner = bowtie # bwa: bwa mem; bowtie: bowtie2
 
          data = 2  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
@@ -29,6 +30,6 @@
 
       threads = 2  # Number of threads to use
 
-       cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
+       cutoff = 0.0  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
 

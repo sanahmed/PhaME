@@ -635,6 +635,11 @@ if ( $read_mapping == 1 ) {
 }
 
 if ( $buildSNP == 1 ) {
+    &print_timeInterval( $runtime, "Identifying SNPs\n" );
+    &print_timeInterval( $runtime, "Starting with gaps\n" );
+    PhaME::identifyGaps( $outdir, "$workdir/working_list.txt", $name, "snp",
+    $project );
+    &print_timeInterval( $runtime, "Gap identification complete\n" );
     if ( $gsignal == 1 ) {
         &print_timeInterval( $runtime, "Preparing to identify SNPs\n" );
         print
@@ -642,26 +647,25 @@ if ( $buildSNP == 1 ) {
         my ( $genname, $genpath, $gensuffix )
             = fileparse( "$annotation", qr/\.[^.]*/ );
         PhaME::codingRegions( $outdir, $annotation, $genname );
-        print 
-            "\tSNPs from contigs and/or raw reads will be parsed\n";
-        print
-            "\tto synonymous and non-synonymous if given\n\n";
-        my $cds_gff = $outdir . "/$genname\_cds.gff";
-        my $snps_folder = $outdir . "/snps";
-        my $ref_fasta = "$workdir/files/$genname.fna";
-        PhaME::SNPsAnalysis($cds_gff, $snps_folder, $ref_fasta, $logfile, $error);
-
-
     }
-    &print_timeInterval( $runtime, "Identifying SNPs\n" );
-    &print_timeInterval( $runtime, "Starting with gaps\n" );
-    PhaME::identifyGaps( $outdir, "$workdir/working_list.txt", $name, "snp",
-        $project );
-    &print_timeInterval( $runtime, "Gap identification complete\n" );
+    &print_timeInterval( $runtime, "Preparing to identify SNPs\n" );
     my $end
         = PhaME::buildSNPDB( $outdir, $bindir, $reference,
         "$workdir/working_list.txt", $project, $gsignal, $error, $logfile,
         $cutoff );
+    if ( $gsignal == 1 ) {
+        print 
+            "\tSNPs from contigs and/or raw reads will be parsed\n";
+        print
+            "\tto synonymous and non-synonymous if given\n\n";
+        my ( $genname, $genpath, $gensuffix )
+            = fileparse( "$annotation", qr/\.[^.]*/ );
+        my $cds_gff = $outdir . "/$genname\_cds.gff";
+        my $snps_folder = $outdir . "/snps";
+        my $ref_fasta = "$workdir/files/$genname.fna";
+        PhaME::SNPsAnalysis($cds_gff, $snps_folder, $ref_fasta, $logfile, $error);
+    }
+    
     &print_timeInterval( $runtime, "$end\n" );
 }
 

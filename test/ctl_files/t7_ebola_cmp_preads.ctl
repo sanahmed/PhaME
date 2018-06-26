@@ -8,6 +8,8 @@
 
       cdsSNPS = 1  # 0:no cds SNPS; 1:cds SNPs
 
+      aligner = bwa
+
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment

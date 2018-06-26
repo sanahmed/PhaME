@@ -44,6 +44,7 @@ fi
 if [[ $1 -eq 3 ]] || [[ -z  $1 ]];
 then
 	############## #3 Test with just contigs using ANI based reference ##############
+	echo "Test with just contigs using ANI based reference";
 	mkdir -p test/workdirs/t3_ebola_contigs
 	cp test/data/ebola_contigs/*.contigs test/workdirs/t3_ebola_contigs/
 	perl src/runPhaME.pl test/ctl_files/t3_ebola_contigs.ctl
@@ -71,15 +72,6 @@ then
 		echo "Test 4: There is something wrong!"
 		exit 1
 	fi
-	# Turning off test for PAML, taking too long, need a quicker dataset
-	# a=$(wc -l < test/workdirs/t4_ebola_complete/results/paml/PAMLsitesResults.txt)
-	# b=8
-	# if [ "$a" -eq "$b" ];then
-	# 	echo "Test 4 finished without any errors";
-	# else
-	# 	echo "Test 4: There is something wrong with PAML test!"
-	# 	exit 1
-	# fi
 	############################################################################
 fi
 
@@ -120,12 +112,13 @@ fi
 
 if [[ $1 -eq 7 ]] || [[ -z $1 ]] || [[ $1 -eq 13 ]];
 then
-	################ #7 Test with complete and pread, designated reference ########
+	### #7 Test with complete and pread using BWA, designated reference ########
+	echo "Test with complete and pread using BWA, designated reference"
 	mkdir -p test/workdirs/t7_ebola_complete_pread
-	cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t7_ebola_complete_pread/
+	cp test/data/ebola_reads/SRR3359589*R[1-2].fastq test/workdirs/t7_ebola_complete_pread/
 	perl src/runPhaME.pl test/ctl_files/t7_ebola_cmp_preads.ctl
 	a=$(grep -c ">" test/workdirs/t7_ebola_complete_pread/results/t7_cds_snp_alignment.fna)
-	b=11
+	b=10
 	if [ "$a" -eq "$b" ];then
 		echo "Test 7 finished without any errors";
 	else
