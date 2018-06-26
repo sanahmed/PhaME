@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 use strict;
 use Getopt::Long;
@@ -36,12 +36,14 @@ exit;
 my $file=$ARGV[0];
 &Usage unless (-e $file);
 
-my $command="nucmer --maxmatch --nosimplify --prefix=seq_seq$$ $file $file 2>/dev/null";
-print "Running self-nucmer on $file.\n";
-if (system ("$command")) {die "$command"}; 
+my $nucmer_command="nucmer --maxmatch --nosimplify --prefix=seq_seq$$ $file $file 2>/dev/null";
+my $coords_command="show-coords -r -I $identity -L $len_cutoff -T seq_seq$$.delta | awk \'\$1 != \$3 || \$2 != \$4 && \$8==\$9 {print}\' > seq_seq$$.coords";
+print "\nRunning self-nucmer on $file\n";
+print "[RUNNING:] $nucmer_command\n";
+print "[RUNNING:] $coords_command\n";
+if (system ("$nucmer_command")) {die "$nucmer_command"}; 
 # apply identity cutoff and lenght cutoff and use awk to skip self-hits
-my $command="show-coords -r -I $identity -L $len_cutoff -T seq_seq$$.delta | awk \'\$1 != \$3 || \$2 != \$4 && \$8==\$9 {print}\' > seq_seq$$.coords";
-if (system ("$command")) {die "$command"};
+if (system ("$coords_command")) {die "$coords_command"};
 &get_coords_file("seq_seq$$.coords");
 unlink "seq_seq$$.delta";
 unlink "seq_seq$$.coords";

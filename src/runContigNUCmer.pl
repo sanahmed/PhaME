@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/env perl
 
 ######################################################
 # Written by Sanaa Ahmed
@@ -171,6 +171,7 @@ for (my $i=0;$i<=$#reference_list; $i++){
       $pm->start() and next;
       my ($name,$path,$suffix)=fileparse("$reference_list[$i]",qr/\.[^.]*/);
       my ($qname,$qpath,$qsuffix)=fileparse("$query_list[$j]",qr/\.[^.]*/);
+      # next if $name !~ /$reference/ && $reference;
       $prefix= "$name\_$qname";
       my $query=$query_list[$j];
       my $reference=$reference_list[$i];
