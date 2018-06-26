@@ -220,11 +220,12 @@ if [[ $1 -eq 14 ]] || [[ -z $1 ]];
 then
 	################### #13 Test the second time option#########################
 	mkdir -p test/workdirs/t14_secondtime
-	cp -r test/workdirs/t5_ebola_complete_contigs/* test/workdirs/t14_secondtime/
+	cp -r test/workdirs/t4_ebola_complete/* test/workdirs/t14_secondtime/
+	# echo "ebola_contig" >> test/workdirs/t14_secondtime/working_list.txt
 	cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t14_secondtime/
 	perl src/runPhaME.pl test/ctl_files/t14_secondtime.ctl
 	a=$(grep -c ">" test/workdirs/t14_secondtime/results/t14_all_snp_alignment.fna)
-	b=12
+	b=11
 	if [ "$a" -eq "$b" ];then
 		echo "Test 14 finished without any errors";
 	else

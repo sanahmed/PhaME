@@ -321,7 +321,7 @@ sub run_ref_nucmer {
             = fileparse( $ref_genome, qr/\.[^.]*/ );
         $ref_name =~ s/\.fna//;
         $full_genome_name =~ s/\.fna//;
-        my $prefix1   = $ref_name . '__' . $full_genome_name;
+        my $prefix1   = $ref_name . '_' . $full_genome_name;
         my $ref_fasta = $outdir . '/' . $ref_name . '_norepeats.fna';
         my $full_genome_fasta
             = $outdir . '/' . $full_genome_name . '_norepeats.fna';
