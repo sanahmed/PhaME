@@ -849,12 +849,16 @@ sub print_timeInterval {
 }
 
 sub version {
-    print "\n$PACKAGENAME (version $PACKAGEVERSION)\n";
+    print "$PACKAGENAME (version $PACKAGEVERSION)\n";
+    exit;
 }
 
 sub printusage {
    print "\n$PACKAGENAME (version $PACKAGEVERSION)\n";
-   print "\nUSAGE: runPhaME.pl <control file>\n\n";
+   print "\nUSAGE: runPhaME <control file>\n\n";
+   print "-h show this help message and exit\n";
+   print "-v show version number and exit\n";
+   exit;
    print "\n";
    print "\n";
 }
