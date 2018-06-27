@@ -1,26 +1,31 @@
 sudo: required
+
+services:
+  - docker
+
 language: perl
 perl:
   - "5.16"
 
 before_install:
-  # - eval "${MATRIX_EVAL}"
-  - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
-  - sudo apt-get update -qq
-  - sudo apt-get -y install -qq gcc-5 g++-5
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+  - docker pull migun/phame-1 
+  # - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
+  # - sudo apt-get update -qq
+  # - sudo apt-get -y install -qq gcc-5 g++-5
+  # - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
 
 install:
-  - ./INSTALL.sh
-  - export PATH="$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
+  # - ./INSTALL.sh
+  # - export PATH="$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
 
 before_script:
-  - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
+  # - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
 
 script:
-  - source activate phame
-  - test/TestAll.sh
-  - cover -test
+  # - source activate phame
+  # - test/TestAll.sh
+  # - cover -test
+  - docker run --rm migun/phame-1 sh test/TestAll.sh 
 
-after_success:
-  - cover -report codecov
+#after_success:
+#  - cover -report codecov
