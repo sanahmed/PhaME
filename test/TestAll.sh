@@ -6,7 +6,7 @@ if [[ $1 -eq 1 ]] || [[ -z $1 ]];then
 	############# #1 Test with just paired reads and picked reference ##############
 	mkdir -p test/workdirs/t1_ebola_preads
 	cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
-	perl src/runPhaME.pl test/ctl_files/t1_ebola_preads.ctl
+	runPhaME test/ctl_files/t1_ebola_preads.ctl
 	a=$(grep -c ">" < test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna)
 	b=2
 	if [ "$a" -eq "$b" ];then
@@ -29,7 +29,7 @@ then
 	############## #2 Test with just single reads and random reference #############
 	mkdir -p test/workdirs/t2_ebola_sreads
 	cp test/data/ebola_reads/*R1.fastq test/workdirs/t2_ebola_sreads/
-	perl src/runPhaME.pl test/ctl_files/t2_ebola_sreads.ctl
+	runPhaME test/ctl_files/t2_ebola_sreads.ctl
 	a=$(grep -c ">" test/workdirs/t2_ebola_sreads/results/t2_all_snp_alignment.fna)
 	b=2
 	if [ "$a" -eq "$b" ];then
@@ -47,7 +47,7 @@ then
 	echo "Test with just contigs using ANI based reference";
 	mkdir -p test/workdirs/t3_ebola_contigs
 	cp test/data/ebola_contigs/*.contigs test/workdirs/t3_ebola_contigs/
-	perl src/runPhaME.pl test/ctl_files/t3_ebola_contigs.ctl
+	runPhaME test/ctl_files/t3_ebola_contigs.ctl
 	a=$(wc -l < test/workdirs/t3_ebola_contigs/results/t3_all_snp_alignment.fna)
 	b=20
 	if [ "$a" -eq "$b" ];then
