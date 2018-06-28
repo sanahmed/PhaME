@@ -18,15 +18,16 @@ install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - chmod +x miniconda.sh
   - ./miniconda.sh -b -f
+  - export PATH="/home/travis/miniconda3/bin:$PATH"
   - conda update --yes -n base conda
   - conda install --yes -c bioconda mummer>=3.23
   - conda install --yes -c bioconda samtools>=1.7
   - conda install --yes -c bioconda bbmap>=37.62
   - conda install --yes -c bioconda bowtie2=2.3.0
   - conda install --yes -c bioconda perl-app-cpanminus=$1.7039
-  - cpanm Getopt::Long@$2.45
-  - cpanm Test::Exception@$0.43
-  - cpanm Statistics::Distributions@$1.02
+  - cpanm Getopt::Long@2.45
+  - cpanm Test::Exception@0.43
+  - cpanm Statistics::Distributions@1.02
   - cpanm Time::HiRes@1.9726
   - cpanm File::Path@2.09
   - cpanm File::Basename@2.85
