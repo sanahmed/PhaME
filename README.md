@@ -10,7 +10,7 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 --------------------------------------------------------------
 ## Version
-0.3
+1.0.0
 
 ## 0.0 Installing PhaME
 
