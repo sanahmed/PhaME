@@ -28,7 +28,6 @@ install:
   - cpanm Getopt::Long@2.45
   - cpanm Test::Exception@0.43
   - cpanm Statistics::Distributions@1.02
-  - cpanm Time::HiRes@1.9726
   - cpanm File::Path@2.09
   - cpanm File::Basename@2.85
   - cpanm File::Copy@2.21
