@@ -54,7 +54,7 @@ AUTHORS
 # global variables
 my $PACKAGENAME    = "PhaME";
 my $PACKAGEVERSION = "1.0.0";
-my $AUTHORS        = "Migun Shakya, Chienchi Lo, Sanaa Ahmed";
+my $AUTHORS        = "Migun Shakya, Chien-Chi Lo, Sanaa Ahmed";
 my $URL            = 'https://github.com/LANL-Bioinformatics/PhaME';
 my $vcheck         = '';
 my $refdir;     # variable storing directory with reference sequence
