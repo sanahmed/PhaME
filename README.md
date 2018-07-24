@@ -14,11 +14,29 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 ## 0.0 Installing PhaME
 
-You can use "git" to obtain the package:
+PhaME for a linux machine can be installed using conda. If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. After installtion of conda, add channels for bioconda and conda-forge using:
+  
+    $ conda config --add channels r
+    $ conda config --add channels defaults
+    $ conda config --add channels conda-forge
+    $ conda config --add channels bioconda
+
+Then simply run:
+
+    conda install phame
+
+We do recommend creating a separate conda environment for PhaME. You can create a conda environment by:
+
+    $ conda create -n my_env
+    $ conda install phame -n my_env
+
+To get the latest version of PhaME, one can use "git" to obtain the package:
 
     $ git clone https://github.com/mshakya/PhaME-1.git
     $ cd PhaME-1
     $ ./INSTALL.sh
+
+However, ./INSTALL.sh is no longer supported. We recommend using bioconda to install all dependencies of PhaME and the `git clone` the repository to use the latest PhaME.
 
 `INSTALL.sh` checks for dependencies that are already installed and only installs the one that are not installed or are of not specified version.
 
@@ -32,11 +50,12 @@ The C/C++ compiling environment might be required for installing dependencies. S
 ### 0.1.1 Third party softwares/packages
 * MUMmer version 3.23 - Pairwise alignment using NUCmer 
 * Bowtie2 version >=2.2.8 - Mapping of reads
-* SAMtools version 1.3.1 and vcftools - Convert BAM files created by Bowtie
+* BWA >= 0.7.17 - Mapping of reads
+* SAMtools >=1.6 Convert BAM files, etc.
 * FastTree version >=2.1.9 - Construction of phylogenetic tree
 * RAxML version >=8.2.9 - Maximum likelihood construction of phylogenetic tree
-* mafft version >=7.305 - For optional evolutionary analyses
-* pal2nal version >=14 - For optional evolutionary analyses
+* mafft version >=7.305 - Alignment of protein coding genes for evolutionary analyses
+* pal2nal version >=14 - Converts protein sequence alignment to codon alignments
 * paml version >=4.8 - For optional evolutionary analyses
 * HyPhy version >=2.2 - For optional evolutionary analyses
 * bwa VER >= 0.7.15
