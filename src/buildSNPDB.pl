@@ -142,8 +142,8 @@ print "Reading Gaps file.\n";
 my $skip_query_ref = read_gap($gapfile);
 
 print "Printing Summary Statistics.\n";
-print_summary();
 read_directory($indir);
+print_summary();
 
 print "Creating SNP alignment.\n";
 create_ALLsnp_array();
@@ -413,7 +413,7 @@ sub create_INTsnp_array {
             if ( $skip_query_ref->{$second} ) { next; }
         }
         for ( 1 .. length($ref_sequence) ) {
-            if ( !defined $gap_location{$_} && defined !$coding_location{$_} )
+            if ( !defined $gap_location{$_} && !defined $coding_location{$_} )
             {    # Check SNP is not present in gaps.
                 if ( defined $snp_location{$_}{$comparison} ) {
                     $INTSNPcount{$_} = 1;
