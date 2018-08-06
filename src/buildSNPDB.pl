@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 ################################################################
-# Written by Sanaa Ahmed
+# Written by Sanaa Ahmed , Migun Shakya, Chien-Chi Lo
 # Jan. 03, 2013
 
 # Given a directory containing snp files creates SNP alignment
@@ -676,18 +676,19 @@ sub print_summary {
     my $ref_len   = length $ref_sequence;
 
     foreach my $query ( sort keys %query_gaps ) {
-        print BASE "$query\tGap_legnth\t", $query_gaps{$query}, "\n";
+        print BASE "$query\tGap_length\t", $query_gaps{$query}, "\n";
     }
 
     print BASE "Reference used:\t$name\n";
 
     my ( $start, $end );
     foreach my $keys ( sort { $a <=> $b } keys %gap_location ) {
+        $gap_total++;
         if ($first) { $start = $keys; $last = $keys; $first = 0; }
         elsif ( $last != $keys - 1 ) {
             print GAPF "$start\t$last\n";
             my $gap_length = $last - $start + 1;
-            $gap_total += $gap_length;
+            # $gap_total += $gap_length;
             $start = $keys;
         }
         $last = $keys;
@@ -695,7 +696,7 @@ sub print_summary {
     if ( $last <= $ref_len ) {
         print GAPF "$start\t$last\n";
         my $gap_length = $last - $start + 1;
-        $gap_total += $gap_length;
+        # $gap_total += $gap_length;
     }
 
     my $base_total = $ref_len - $gap_total;
