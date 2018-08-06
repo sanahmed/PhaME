@@ -683,8 +683,17 @@ sub print_summary {
 
     my ( $start, $end );
     foreach my $keys ( sort { $a <=> $b } keys %gap_location ) {
+        # print "keys:\n";
+        # print "$keys\n";
+        # print "keys_done\n";
         if ($first) { $start = $keys; $last = $keys; $first = 0; }
         elsif ( $last != $keys - 1 ) {
+            print "keys:\n";
+        print "$keys\n";
+            print "start:\n";
+            print "$start\n";
+            print "last:\n";
+            print "$last\n";
             print GAPF "$start\t$last\n";
             my $gap_length = $last - $start + 1;
             $gap_total += $gap_length;
@@ -692,7 +701,7 @@ sub print_summary {
         }
         $last = $keys;
     }
-    if ( $last == $ref_len ) {
+    if ( $last <= $ref_len ) {
         print GAPF "$start\t$last\n";
         my $gap_length = $last - $start + 1;
         $gap_total += $gap_length;
