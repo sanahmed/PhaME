@@ -476,7 +476,7 @@ sub create_stats {
 
                             # print "$start\t$end\n";
                             print STAT
-                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\n";
+                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$product\n";
                         }
                     }
                     else {
