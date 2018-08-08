@@ -369,7 +369,10 @@ sub codingRegions {
                 $CDS{$start} = $stop;
                 foreach (@group) {
                     if ( /product=(.+)/ || /description=(.+)/ ) {
-                        print CDS $1;
+                        print CDS "$1\t";
+                    }
+                    if ( /gene=(.+)/ ) {
+                        print CDS "$1\t";
                     }
                 }
                 print CDS_GFF "\n";

@@ -475,12 +475,12 @@ sub create_stats {
                         }
                         elsif ( defined $coding_location{$_} ) {
                             my $snp = $_;
-                            my ( $start, $end, $product ) = split /,/,
+                            my ( $start, $end, $gene, $product ) = split /,/,
                                 $coding_location{$_};
 
                             # print "$start\t$end\n";
                             print STAT
-                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$product\n";
+                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$gene\t$product\n";
                         }
                     }
                     else {
@@ -520,22 +520,24 @@ sub create_core_stats {
                                 print CORE_STAT
                                 "$first\t$second\tnoncoding SNP\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
                                 }
+
                             elsif ( !defined $snp_location{$_}{$comparison} ) {
+
                                 print CORE_STAT
                                 "$first\t$second\tnoncoding_conserved_core\t$_\t$positions{$_}{$comparison}\t$ref\t$ref\n";
                             }
                         }
                         elsif ( defined $coding_location{$_} ) {
                             my $snp = $_;
-                            my ( $start, $end, $product ) = split /,/,
+                            my ( $start, $end, $gene, $product ) = split /,/,
                                 $coding_location{$_};
                             if ( defined $snp_location{$_}{$comparison} ) {
                                 print CORE_STAT
-                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$product\n";
+                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$gene\t$product\n";
                                 }
                             elsif ( !defined $snp_location{$_}{$comparison} ) {
                                 print CORE_STAT
-                                "$first\t$second\tcoding_conserved_core\t$snp\t$positions{$snp}{$comparison}\t$ref\t$ref\t$start\t$end\t$product\n";
+                                "$first\t$second\tcoding_conserved_core\t$snp\t$positions{$snp}{$comparison}\t$ref\t$ref\t$start\t$end\t$gene\t$product\n";
                             }
                         }
                     }
@@ -891,9 +893,9 @@ sub read_cds_coords {
     open( CDS, "$CDScoords" ) || die "$!";
     while (<CDS>) {
         chomp;
-        my ( $id, $start, $end, $product ) = split /\t/, $_;
+        my ( $id, $start, $end, $gene, $product ) = split /\t/, $_;
         for ( $start .. $end ) {
-            $coding_location{$_} = "$start,$end,$product";
+            $coding_location{$_} = "$start,$end,$gene,$product";
         }
 
         # if ($snp>=$start && $snp<=$end){return ($start,$end);}
