@@ -66,6 +66,7 @@ my $frm;
 my $ref;
 my $query;
 my %positions;
+my $coreSNPstat;
 
 # When 60% linear reference lenght are gap (query compared to)
 # The query will not use to build snp alignment
@@ -91,7 +92,6 @@ $SNPstats      = "$indir\/$project\_stats.txt";
 $SNPcomps      = "$indir\/$project\_comparisons.txt";
 if ( $coding == 1 ) {
     $cdsSNPoutfile = "$indir\/$project\_cds_snp_alignment.fna";
-    #TODO: int_snp_alingment.fna is not correct, it prints all positions
     $intSNPoutfile = "$indir\/$project\_int_snp_alignment.fna";
     $CDScoords     = "$indir\/CDScoords.txt";
     $noncoding     = "$indir\/noncoding.txt";
@@ -105,8 +105,10 @@ $pairMatrixfile = "$indir\/$project\_snp_pairwiseMatrix.txt";
 $coreMatrixfile = "$indir\/$project\_snp_coreMatrix.txt";
 $cdsMatrixfile  = "$indir\/$project\_snp_CDSMatrix.txt";
 $intMatrixfile  = "$indir\/$project\_snp_intergenicMatrix.txt";
+$coreSNPstat   = "$indir\/$project\_core_stats.txt";
 
 open( OUT,    ">$allSNPoutfile" )  || die "$!";
+open( CORE_STAT, ">$coreSNPstat" ) || die "$!";
 open( STAT,   ">$SNPstats" )       || die "$!";
 open( AMB,    ">$ambiguous" )      || die "$!";
 open( COMP,   ">$SNPcomps" )       || die "$!";
@@ -154,6 +156,7 @@ if ( $coding == 1 ) {
 
 print "Creating SNP stats file. \n";
 create_stats();
+create_core_stats();
 create_comparison();
 create_matrix();
 
@@ -170,6 +173,7 @@ close CMAT;
 close CDSMAT;
 close IMAT;
 close CDSOUT;
+close CORE_STAT;
 ################################################################################
 
 sub read_reference {
@@ -482,6 +486,69 @@ sub create_stats {
                     else {
                         print STAT
                             "$first\t$second\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
+                    }
+                }
+            }
+        }
+    }
+}
+
+################################################################################
+
+sub create_core_stats {
+    my $ref         = 0;
+    my $current_snp = 0;
+    my $first       = 0;
+    my $second      = 0;
+    my $start       = 0;
+    my $end         = 0;
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { next; }
+        }
+        foreach ( sort { $a <=> $b } keys %snp_location ) {
+            $current_snp = $_ - 1;
+            if ( !defined $gap_location{$_} ) {
+                if ( $first ne $second )
+                {  
+                    $ref = substr( $ref_sequence, $current_snp, 1 );
+                    if ( $coding == 1 ) {
+                        if ( !defined $coding_location{$_} ) {
+                            if ( defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tnoncoding SNP\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
+                                }
+                            elsif ( !defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tnoncoding_conserved_core\t$_\t$positions{$_}{$comparison}\t$ref\t$ref\n";
+                            }
+                        }
+                        elsif ( defined $coding_location{$_} ) {
+                            my $snp = $_;
+                            my ( $start, $end, $product ) = split /,/,
+                                $coding_location{$_};
+                            if ( defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$product\n";
+                                }
+                            elsif ( !defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tcoding_conserved_core\t$snp\t$positions{$snp}{$comparison}\t$ref\t$ref\t$start\t$end\t$product\n";
+                            }
+                        }
+                    }
+                    else {
+                        if ( defined $snp_location{$_}{$comparison} ) {
+                            print CORE_STAT
+                            "$first\t$second\tsnp_core\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
+                                }
+                        elsif ( !defined $snp_location{$_}{$comparison} ) {
+                            print CORE_STAT
+                                "$first\t$second\tconserved_core\t$_\t$positions{$_}{$comparison}\t$ref\t$ref\n";
+                            
+                        }
                     }
                 }
             }
@@ -824,7 +891,7 @@ sub read_cds_coords {
     open( CDS, "$CDScoords" ) || die "$!";
     while (<CDS>) {
         chomp;
-        my ( $id, $start, $end, $product ) = split /\s+/, $_;
+        my ( $id, $start, $end, $product ) = split /\t/, $_;
         for ( $start .. $end ) {
             $coding_location{$_} = "$start,$end,$product";
         }
