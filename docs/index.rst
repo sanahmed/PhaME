@@ -7,8 +7,8 @@ PhaME: **Ph**\ylogenetics **a**\nd **M**\olecular **E**\volution analysis tool
    
    introduction
    installation
-   docker
    dependencies
+   docker
    gui
    commandline
    output
