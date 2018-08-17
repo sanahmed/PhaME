@@ -34,8 +34,8 @@ We do recommend creating a separate conda environment for PhaME. You can create 
 
 To get the latest version of PhaME, one can use "git" to obtain the package:
 
-    $ git clone https://github.com/mshakya/PhaME-1.git
-    $ cd PhaME-1
+    $ git clone https://github.com/mshakya/PhaME.git
+    $ cd PhaME
     $ ./INSTALL.sh
 
 However, ./INSTALL.sh is no longer supported. We recommend using bioconda to install all dependencies of PhaME and the `git clone` the repository to use the latest PhaME.
@@ -149,7 +149,7 @@ $docker run --rm -v $(pwd)/phame_examples:/data migun/phame-1 perl src/runPhaME.
 After the PhaME is installed, the first step would be to run the test that I have provided. All of them can be run at a same time using:
 
 ```
-$cd PhaME-1
+$cd PhaME
 
 sh test/TestAll.sh
 
@@ -160,7 +160,7 @@ To run your own analysis, create a folder for `refdir` and `workdir` and add cor
 
 
 ```
-perl PhaME-1/src/runPhaME.pl phame_analysis_folder/ecoli.ctl
+perl PhaME/src/runPhaME phame_analysis_folder/ecoli.ctl
 
 ```
 
