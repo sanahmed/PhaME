@@ -573,7 +573,7 @@ sub buildTree {
     if ( $tree == 1 || $tree == 3 ) {
         print "Reconstructing phylogeny using FastTree\n";
         my $fasttree
-            = "export OMP_NUM_THREADS=$thread; FastTreeMP -quiet -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error \n\n";
+            = "export OMP_NUM_THREADS=$thread; FastTree -quiet -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error \n\n";
         print $fasttree;
         if ( system($fasttree) ) { die "Error running $fasttree.\n"; }
 
