@@ -305,7 +305,7 @@ sub runBranchSiteREL {
         my $batch  = $hyphydir . '/' . $name . '_BSrel.bf';
         my $output = $hyphydir . '/' . $name . '_BSrel.out';
 
-        my $command = "HYPHYMP $aBSREL 'Universal' $geneList[$i] $tree_output 'All' ";
+        my $command = "HYPHYMP CPU=$thread $aBSREL 'Universal' $geneList[$i] $tree_output 'All' ";
         print "$command\n";
         if ( system($command) ) { die "Error running $command.\n"; }
 
