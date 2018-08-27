@@ -77,8 +77,9 @@ for (my $i=0; $i<=$#files; $i++){
    if ($program=~/pal2nal/){`pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
 #   if ($program=~/pal2nal/){`pal2nal.pl $files[$i] $ref_file_path/$ref_file_name.fna -output fasta > $ref_file_path/$ref_file_name.cdn`;}
    if ($program=~ /translate/){
-    print "Translating $files[$i] to $ref_file_path/$ref_file_name.faa";
-    `translate.pl $files[$i] > $ref_file_path/$ref_file_name.faa`;}
+    print "Translating $files[$i] to $ref_file_path/$ref_file_name.faa\n";
+    `translate.pl $files[$i] > $ref_file_path/$ref_file_name.faa`;
+		print "Translation Complete!\n";}
    elsif ($program=~ /muscle/i){`muscle $muscle_options -in $files[$i] -out $ref_file_path$ref_file_name.msa`;}
 $pm->finish;
 }
