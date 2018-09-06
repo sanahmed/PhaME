@@ -213,6 +213,8 @@ sub identifyGaps {
     my $name      = shift;
     my $type      = shift;
     my $project   = shift;
+    my $error     = shift;
+    my $log       = shift;
     my $gapdir    = $dir . '/gaps';
     my $repeatdir = $dir . '/stats';
     my %query;
@@ -220,6 +222,8 @@ sub identifyGaps {
     my $all_gapfile;
     my $gap_start;
     my $gap_end;
+
+    open( OUT, ">>$log" );
 
     if ( $type =~ /map/ ) {
         $all_gapfile = "$dir\/$project\_mapping_gaps.txt";
@@ -249,7 +253,7 @@ sub identifyGaps {
             while (<IN>) { $line++; print GAP "$_"; }
             close IN;
             if ( $line == 0 ) {
-                print "Empty Gap Files: $gapfile\n";
+                print OUT "Empty Gap Files: $gapfile\n";
                 $line = 0;
             }
         }
@@ -317,9 +321,10 @@ sub identifyGaps {
         #   last OUTER;
     }
     closedir REPEAT;
+    close OUT;
     return $all_gapfile;
 }
-
+#------------------------------------------------------------------------------#
 # Identify CDS coords
 sub codingRegions {
     my $dir        = shift;
@@ -441,11 +446,14 @@ sub completeNUCmer {
     my $buildSNPdb = shift;
     my $outdir    = $indir . '/results';
 
-    print "\n";
+    open( OUT, ">>$log" );
+    print OUT "\n";
     my $nucmer
         = "runNUCmer.pl -r $reference -q $indir -d $outdir -t $thread -l $list -c $code -b $buildSNPdb 2>$error > $log\n\n";
-    print $nucmer;
+    print OUT $nucmer;
     if ( system($nucmer) ) { die "Error running $nucmer.\n"; }
+
+    close OUT;
 }
 
 # Run NUCmer on contigs
@@ -462,11 +470,13 @@ sub contigNUCmer {
     my $log       = shift;
     my $outdir    = $indir . '/results';
 
-    print "\n";
+    open( OUT, ">>$log" );
+    print OUT "\n";
     my $con_nucmer
         = "runContigNUCmer.pl -r $reference -q $indir -d $outdir -l $list -t $thread -y $type 2>>$error >> $log\n\n";
-    print $con_nucmer;
+    print OUT $con_nucmer;
     if ( system($con_nucmer) ) { die "Error running $con_nucmer.\n"; }
+    close OUT;
 }
 
 # Removes gaps using a gap file
@@ -510,7 +520,7 @@ sub readsMapping {
         if ( $file =~ /.+\.vcf$/ ) {
             my $vcf_file = $outdir . '/' . $file;
             `mv $vcf_file $outdir/snps`;
-            print "Moved $file to the snps directory\n";
+            # print "Moved $file to the snps directory\n";
         }
     }
     closedir CLEAN;
@@ -529,11 +539,14 @@ sub buildSNPDB {
     my $log        = shift;
     my $gap_cutoff = shift;
 
-    print "\n";
+    open( OUT, ">>$log" );
+    print OUT "\n";
     my $SNPdb
         = "buildSNPDB.pl -i $outdir -r $reference -l $list -p $project -c $signal -g $gap_cutoff 2>>$error >> $log\n\n";
-    print $SNPdb;
+    print OUT $SNPdb;
     if ( system($SNPdb) ) { die "Error running $SNPdb.\n"; }
+
+    close OUT;
     return ("SNP database complete");
 }
 
@@ -570,17 +583,19 @@ sub buildTree {
     my $error  = shift;
     my $log    = shift;
 
+    open( OUT, ">>$log" );
+
     if ( $tree == 1 || $tree == 3 ) {
-        print "Reconstructing phylogeny using FastTree\n";
+        print OUT "Reconstructing phylogeny using FastTree\n";
         my $fasttree
             = "export OMP_NUM_THREADS=$thread; FastTree -quiet -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error \n\n";
-        print $fasttree;
+        print OUT $fasttree;
         if ( system($fasttree) ) { die "Error running $fasttree.\n"; }
 
     }
     if ( $tree == 2 || $tree == 3 ) {
-        print "Reconstructing phylogeny using raxmlHPC-PTHREADS\n";
-        print "\n";
+        print OUT "Reconstructing phylogeny using raxmlHPC-PTHREADS\n";
+        print OUT "\n";
         my $raxml
             = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -s $outdir/$name\_snp_alignment.fna -w $outdir -n $name 2>>$error >> $log\n\n";
         print $raxml;
@@ -594,7 +609,6 @@ sub buildTree {
         #}
     }
 
-    open( OUT, ">>$log" );
     print OUT "Tree phylogeny complete.\n";
     close OUT;
 

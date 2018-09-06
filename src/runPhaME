@@ -138,7 +138,7 @@ sub parse_version {
     $ver = defined $1 ? $1 : 0;
         err ("Need $cmd >= $min but you have $ver - please upgrade it.")
         if $ver < $min;
-    msg("Checking version: $cmd is >= $min - ok, have $ver");
+    print_timeInterval($runtime, "Checking version: $cmd is >= $min - ok, have $ver\n");
     return $ver;
 }
 
@@ -151,8 +151,7 @@ sub check_version {
     parse_version( 'FastTree',           2.1,   qr/version\s(\d+\.\d+)/ms );
     parse_version( 'bbmap.sh -v',        38.06, qr/Version\s(\d+\.\d+)/ms );
     parse_version( 'raxmlHPC-PTHREADS -version', 8.2, qr/version\s(\d+\.\d+)/ms );
-    msg("Dependencies look good!");
-    # exit(0);
+    print_timeInterval($runtime, "Dependencies look good!\n");
 }
 
 #----------------------------------------------------------------------
@@ -358,7 +357,7 @@ print "\tCode:\t$type\n";
 print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
 
-&print_timeInterval( $runtime, "Checking directories and files... " );
+&print_timeInterval( $runtime, "Checking directories and files... \n" );
 my $check = PhaME::check( $workdir, $refdir, $time, $data, $name, $logfile,
     $project );
 if ( $data == 7 ) { $check = 0; }
@@ -540,7 +539,7 @@ if ( $time == 1 ) {
 }
 if ( $time == 2 && $check == 1 ) { exit; }
 if ( $check == 0 ) {
-    print "Complete.\n";
+    &print_timeInterval( $runtime, "Complete. \n" );
 }
 
 &print_timeInterval( $runtime, "Preparing files... \n" );
@@ -628,7 +627,7 @@ if ( $check == 0 ) {
         }
     }    # workdir
     closedir DIR;
-    print "Complete\n";
+    &print_timeInterval( $runtime, "Complete. \n" );
 }    # check=0
 
 $name =~ s/\W/_/g;    # Replacing special characters with _
@@ -689,7 +688,7 @@ if ( $read_mapping == 1 ) {
         &print_timeInterval( $runtime, "Identifying all gaps\n" );
         $mappingGaps
             = PhaME::identifyGaps( $outdir, "$workdir/fasta_list.txt", $name,
-            "map", $project );
+            "map", $project, $error, $logfile );
         PhaME::removeGaps( $bindir, $reference, $mappingGaps );
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end
@@ -711,15 +710,15 @@ if ( $read_mapping == 1 ) {
 }
 
 if ( $buildSNP == 1 ) {
-    &print_timeInterval( $runtime, "Identifying SNPs\n" );
+    &print_timeInterval( $runtime, "Beginning SNP detection pipeline\n" );
     &print_timeInterval( $runtime, "Starting with gaps\n" );
     PhaME::identifyGaps( $outdir, "$workdir/working_list.txt", $name, "snp",
-        $project );
+        $project, $error, $logfile );
     &print_timeInterval( $runtime, "Gap identification complete\n" );
     if ( $gsignal == 1 ) {
-        &print_timeInterval( $runtime, "Preparing to identify SNPs\n" );
-        print
-            "\tGFF file provided, SNPs will be differentiated as coding vs noncoding\n\n";
+        # &print_timeInterval( $runtime, "Preparing to identify SNPs\n" );
+        &print_timeInterval( $runtime,
+            "GFF file provided, SNPs will be differentiated as coding vs noncoding\n");
         my ( $genname, $genpath, $gensuffix )
             = fileparse( "$annotation", qr/\.[^.]*/ );
         PhaME::codingRegions( $outdir, $annotation, $genname );
@@ -730,8 +729,8 @@ if ( $buildSNP == 1 ) {
         "$workdir/working_list.txt", $project, $gsignal, $error, $logfile,
         $cutoff );
     if ( $gsignal == 1 ) {
-        print "\tSNPs from contigs and/or raw reads will be parsed\n";
-        print "\tto synonymous and non-synonymous if given\n\n";
+        # print "\tSNPs from contigs and/or raw reads will be parsed\n";
+        # print "\tto synonymous and non-synonymous if given\n\n";
         my ( $genname, $genpath, $gensuffix )
             = fileparse( "$annotation", qr/\.[^.]*/ );
         my $cds_gff     = $outdir . "/$genname\_cds.gff";
@@ -744,22 +743,24 @@ if ( $buildSNP == 1 ) {
     &print_timeInterval( $runtime, "$end\n" );
 }
 
-if ( $buildtree == 1 || $bs == 1 ) {
-    &print_timeInterval( $runtime, "Preparing all SNP phylogeny\n" );
-    my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
+if ( $buildtree == 1 || $bs == 1) {
+    if ($tree > 0 ){
+        &print_timeInterval( $runtime, "Reconstructing all SNPs phylogeny\n" );
+        my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
         "$project\_all", $error, $logfile );
-    &print_timeInterval( $runtime, "DONE\n" );
-    if ( $gsignal == 1 ) {
-        &print_timeInterval( $runtime, "Preparing CDS phylogeny\n" );
-        PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds",
+        &print_timeInterval( $runtime, "All SNPs Phylogeny Complete.\n" );
+        if ( $gsignal == 1 ) {
+            &print_timeInterval( $runtime, "Reconstructing CDS SNP phylogeny\n" );
+            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds",
             $error, $logfile );
-        &print_timeInterval( $runtime, "DONE\n" );
-    }
-    &print_timeInterval( $runtime, "$end\n" );
-    if ( $bsignal == 1 ) {
-        my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
+            &print_timeInterval( $runtime, "CDS SNPs phylogeny Complete.\n" );
+        }
+        if ( $bsignal == 1 ) {
+            &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
+            my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
             "$project\_all", $bootstrap, $error, $logfile );
-        &print_timeInterval( $runtime, "$end\n" );
+            &print_timeInterval( $runtime, "Bootstrapping complete....\n" );
+        }
     }
 }
 
@@ -897,7 +898,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 ################################################################################
 if ($clean) { PhaME::clean($outdir); }
 
-&print_timeInterval( $runtime, "End of run!\n" );
+&print_timeInterval( $runtime, "Run Complete!, Check $workdir/results folder for results.\n" );
 
 close STDOUT;
 ###########################################################
