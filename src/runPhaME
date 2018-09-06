@@ -105,7 +105,7 @@ my $bindir = getBinDirectory();
 # command line options
 
 GetOptions(
-    'vcheck'    => sub {check_version()},
+    'vcheck'    => sub {check_version();exit(0);},
     'version|v' => sub { version() },
     'help|h'    => sub { printusage() }
 
@@ -129,7 +129,7 @@ sub parse_version {
     # from snippy
     my ( $cmd, $min, $re ) = @_;
     open my $ver, '-|', $cmd . ' 2>&1'
-        or err ("Could not open pipe to '$cmd'");
+        or err ("Could not open pipe to '$cmd', install '$cmd' and try again!");
     my $blob = join '', <$ver>;
         err ("Could not read output of '$cmd'") unless $blob;
 
@@ -143,7 +143,6 @@ sub parse_version {
 }
 
 sub check_version {
-# quit now if --vcheck was provided
     parse_version( 'samtools --version', 1.3,   qr/samtools\s(\d+\.\d+)/ms );
     parse_version( 'bcftools --version', 1.3,   qr/bcftools\s(\d+\.\d+)/ms );
     parse_version( 'nucmer --version',   3.1,   qr/version\s(\d+\.\d+)/ms );
@@ -152,8 +151,8 @@ sub check_version {
     parse_version( 'FastTree',           2.1,   qr/version\s(\d+\.\d+)/ms );
     parse_version( 'bbmap.sh -v',        38.06, qr/Version\s(\d+\.\d+)/ms );
     parse_version( 'raxmlHPC-PTHREADS -version', 8.2, qr/version\s(\d+\.\d+)/ms );
-    msg("Dependences look good!");
-    exit(0);
+    msg("Dependencies look good!");
+    # exit(0);
 }
 
 #----------------------------------------------------------------------
@@ -172,6 +171,9 @@ sub err {
 }
 
 #...............................................................................
+
+## Before run, run check version anyways
+check_version();
 
 ## Read in control file
 open( CTL, "$control" ) || die "Please provide a control file";
@@ -596,7 +598,6 @@ if ( $check == 0 ) {
                 && $files !~ /.+\.contig$|\.contigs$|\.ctg$]$/ )
             {
                 my $fastq = $refdir . '/' . $files;
-                print "$qname\n";
                 my $read_list_name;
                 if ( $qname =~ /(.+)[_.]R?[12]$/ ) {
                     if ( $reads == 2 ) {
