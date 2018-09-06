@@ -4,20 +4,17 @@
 export PATH=src:$PATH
 if [[ $1 -eq 1 ]] || [[ -z $1 ]];then
 	############# #1 Test with just paired reads and picked reference ##############
+	############# #1 Throws error at the end about molecular evolution analysis as all genes had gaps ##############
 	mkdir -p test/workdirs/t1_ebola_preads
 	cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
 	runPhaME test/ctl_files/t1_ebola_preads.ctl
 	a=$(grep -c ">" < test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna)
-	b=2
+	b=11
 	if [ "$a" -eq "$b" ];then
 		echo "Test 1 finished without any errors";
 	else
 		echo "Test 1: There is something wrong!"
 		echo "t1_all_snp_alignment.fna does not have 2 sequences."
-		cat test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna
-		cat test/workdirs/t1_ebola_preads/results/t1_PhaME.log
-		cat test/workdirs/t1_ebola_preads/results/t1.error
-		ls -lh test/workdirs/t1_ebola_preads/results/
 
 		exit 1
 	fi

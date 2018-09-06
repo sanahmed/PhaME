@@ -228,7 +228,7 @@ while (<CTL>) {
     # if (/modelTest\s*=\s*(0|1)\s*#{0,1}.*$/){$modeltest=$1;}
     if (/bootstrap\s*=\s*(0|1)\s*#{0,1}.*$/)     { $bsignal    = $1; }
     if (/N\s*=\s*(\d+)\s*#{0,1}.*$/)             { $bootstrap  = $1; }
-    if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; }
+    if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; $gsignal = 1 }
 
     if    (/code\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $code = $1; }
     if    ( $code == 1 )                     { $type = "virus"; }
@@ -759,7 +759,7 @@ if ( $buildtree == 1 || $bs == 1) {
             &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
             my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
             "$project\_all", $bootstrap, $error, $logfile );
-            &print_timeInterval( $runtime, "Bootstrapping complete....\n" );
+            &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
         }
     }
 }
@@ -846,8 +846,10 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
         }
     }
 
+
     # PREPARE FILES FOR RUNNING PAML OR HYPHY ANALYSIS
     # start extracting genes
+    &print_timeInterval( $runtime, "Extracting genes that have SNPs\n" );
     $end
         = PhaME::extractGenes( $outdir, $stats_file, $reference, $bindir,
         "$workdir/working_list.txt", $threads, $gapfile, $genefile, $error,
@@ -855,36 +857,44 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
     &print_timeInterval( $runtime, "$end\n" );
 
     # translate genes
+    &print_timeInterval( $runtime, "Translating genes that have SNPs\n" );
     $end = PhaME::translateGenes( $outdir, $bindir, $threads, "translate",
         $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # align genes
+    &print_timeInterval( $runtime, "Align proteins that have SNPs\n" );
     $end = PhaME::alignGenes( $outdir, $bindir, $threads, "mafft", $error,
         $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # reverse translate genes
+    &print_timeInterval( $runtime, "Reverse translate amino acids to codon\n" );
     $end = PhaME::revTransGenes( $outdir, $bindir, $threads, "pal2nal",
         $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # core genome cdn alignment
+    &print_timeInterval( $runtime, "Join all alignments to create core gene alignment\n" );
     my $core = $genedir . "/" . $project . "_core_genome.cdn";
     $end = PhaME::core( $outdir, $bindir, $core, $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # RUN PAML
+    &print_timeInterval( $runtime, "Running PAML...\n" );
     if ( $pselection == 1 || $pselection == 3 ) {
-        PhaME::paml(
+        $end = PhaME::paml(
             $outdir, $bindir,     $ptree, 0,
             "Sites", "0,1,2,7,8", $core,  $threads,
             $error,  $logfile
         );
+        &print_timeInterval( $runtime, "$end\n" );
+        &print_timeInterval( $runtime, "Running PAML with branch length...\n" );
         PhaME::paml(
             $outdir, $bindir,  $ptree, 2, "BrSites", 0,
             $core,   $threads, $error, $logfile
         );
+        &print_timeInterval( $runtime, "$end\n" );
     }
 
     # RUN HYPHY

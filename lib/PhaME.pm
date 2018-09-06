@@ -506,13 +506,14 @@ sub readsMapping {
     my $reference = $outdir . '/temp/' . $name . '.fna';
     my $type;
 
+    open( OUT, ">>$log" );
     if ( !-e $reference || -z $reference ) {
         $reference = $indir . '/files/' . $name . '.fna';
     }
-    print "\n";
+    print OUT "\n";
     my $map
         = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner 2>>$error >> $log\n\n";
-    print $map;
+    print OUT $map;
     if ( system($map) ) { die "Error running $map.\n"; }
 
     opendir( CLEAN, "$outdir" );
@@ -525,6 +526,7 @@ sub readsMapping {
     }
     closedir CLEAN;
     return ("Read Mapping complete");
+    close OUT;
 
 }
 
@@ -667,11 +669,13 @@ sub extractGenes {
     my $log      = shift;
     my $genedir  = $dir . '/PSgenes';
 
-    print "\n";
+    open( OUT, ">>$log" );
+    print OUT "\n";
     my $extract
         = "extractGenes.pl -d $dir -t $thread -l $list -s $stat -f $file -p $gapfile -g $genefile 2>>$error >> $log\n\n";
-    print $extract;
-    if ( system($extract) ) { die "Error running $extract.\n"; }
+    print OUT $extract;
+    if ( system($extract) ) { 
+        die "Error running $extract Check $log and $error for details"; }
 
     opendir( DIR, "$genedir" ) || die "$!";
 OUTER: while ( my $files = readdir(DIR) ) {
@@ -682,7 +686,7 @@ OUTER: while ( my $files = readdir(DIR) ) {
             while (<IN>) {
                 if ( !/^>/ ) {
                     if ( !/^ATG/ ) {
-                        print "$file\n";
+                        # print "$file\n";
                         `rm $file`;
                         next OUTER;
                     }
@@ -692,7 +696,8 @@ OUTER: while ( my $files = readdir(DIR) ) {
         }
     }
     close DIR;
-    return ("Genes with SNPs in PSgenes Directory");
+    close OUT;
+    return ("Genes with SNPs are now in PSgenes Directory");
 }
 
 sub translateGenes {
@@ -704,12 +709,13 @@ sub translateGenes {
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
 
-    print "\n";
+    open( OUT, ">>$log" );
+    print OUT "\n";
     my $translate
         = "parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
-    print $translate;
+    print OUT $translate;
     if ( system($translate) ) { die "Error running $translate.\n"; }
-
+    close OUT;
     return ("Gene translation complete");
 }
 
@@ -722,12 +728,13 @@ sub alignGenes {
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
 
-    print "\n";
+    open( OUT, ">>$log" );
+    print OUT "\n";
     my $align
         = "parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
-    print $align;
+    print OUT $align;
     if ( system($align) ) { die "Error running $align.\n"; }
-
+    close OUT;
     return ("MSA complete");
 }
 
@@ -740,12 +747,14 @@ sub revTransGenes {
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
 
+    open( OUT, ">>$log" );
+    print OUT "\n";    
     my $revTrans
         = "parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
-    print $revTrans;
+    print OUT $revTrans;
     if ( system($revTrans) ) { die "Error running $revTrans.\n"; }
-
-    return ("Codon MSA complete");
+    close OUT;
+    return ("Reverse translation complete,codon MSA complete");
 }
 
 sub core {
@@ -755,11 +764,13 @@ sub core {
     my $error   = shift;
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
-
+    
+    open( OUT, ">>$log" );
+    print OUT "\n";   
     my $core = "catAlign.pl $genedir $output 2>>$error >> $log\n\n";
-    print $core;
+    print OUT $core;
     if ( system($core) ) { die "Error running $core.\n"; }
-
+    close OUT;
     return ("Core gene alignment complete");
 }
 
@@ -777,11 +788,13 @@ sub paml {
     my $branch  = 1;
     my $pamldir = $dir . '/paml';
 
+    open( OUT, ">>$log" );
+
     if ( $model == 0 ) {
-        print "\n";
+        print OUT "\n";
         my $ps
             = "runPAML.pl -i $dir -t $thread -r $tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
-        print $ps;
+        print OUT $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
         if (@site_files) { # @site_files is not empty...
@@ -796,31 +809,33 @@ sub paml {
     }
 
     if ( $model == 2 ) {
-        print "\n";
+        print OUT "\n";
         my $edit = "ParseTree.pl $tree 2>>$error >> $log\n\n";
-        print $edit;
+        print OUT $edit;
         if ( system($edit) ) { die "Error running $edit.\n"; }
 
         # make the tree with branch label
         my($tree_name, $dirs, $tree_suffix) = File::Basename::fileparse($tree, qr/\.[^.]*/);
         my $branch_labeled_tree = $pamldir . "/$tree_name"."_BranchNumber" . "$tree_suffix";
-        print "\n";
+        print OUT "\n";
         my $ps
             = "runPAML.pl -i $dir -t $thread -r $branch_labeled_tree -m $model -n $NSsites -s $suffix 2>>$error >> $log\n\n";
-        print $ps;
+        print OUT $ps;
         if ( system($ps) ) { die "Error running $ps.\n"; }
         my @site_files = glob("$pamldir/*/*$suffix");
         if (@site_files) { # @site_files is not empty...
             `mv $pamldir/*/*$suffix $pamldir`;
-            print "\n";
+            print OUT "\n";
         }
 
         my $parse
             = "parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
-        print $parse;
+        print OUT $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
 
     }
+    close OUT;
+    return ("PAML run complete.");
 }
 
 
@@ -969,22 +984,24 @@ sub SNPsAnalysis {
     my $error = shift;
     my $snp_file;
 
+    open( OUT, ">>$log" );
     opendir( DIR, $snp_dir );
     while ( my $files = readdir(DIR) ) {
         next if ( $files =~ /^..?$/ );
         if ( $files =~ /contigs?.snps$/ ) {
             $snp_file = $snp_dir . '/' . $files;
             my $p = "SNP_analysis.pl -gff $cds_gff -SNP $snp_file -format nucmer -fasta $ref_fasta -output $snp_dir 2>>$error >> $log\n\n";
-            print $p;
+            print OUT $p;
             if ( system($p) ) { die "Error running $p.\n"; }
         }
         elsif ( $files =~ /.+\.vcf/ ) {
             $snp_file = $snp_dir . '/' . $files;
             my $p = "SNP_analysis.pl -gff $cds_gff -SNP $snp_file -format vcf -fasta $ref_fasta 2>>$error -output $snp_dir >> $log\n\n";
-            print $p;
+            print OUT $p;
             if ( system($p) ) { die "Error running $p.\n"; }
             }
     }
+    close OUT;
 }
 
 
