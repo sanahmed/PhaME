@@ -594,11 +594,11 @@ sub buildTree {
 
     }
     if ( $tree == 2 || $tree == 3 ) {
-        print OUT "Reconstructing phylogeny using raxmlHPC-PTHREADS\n";
+        print OUT "Reconstructing phylogeny using RaxML\n";
         print OUT "\n";
         my $raxml
             = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -s $outdir/$name\_snp_alignment.fna -w $outdir -n $name 2>>$error >> $log\n\n";
-        print $raxml;
+        print OUT $raxml;
         if ( system($raxml) ) { die "Error running $raxml.\n"; }
         # dont need a rooted tree, removing it for now
         #my $rooted_tree_cmd
@@ -638,19 +638,20 @@ sub bootstrap {
 #    print $bestTree;
 #    if (system ($bestTree)){die "Error running $bestTree.\n";}
 # }
-
+    open( OUT, ">>$log" );
     if ( $tree > 1 ) {
         my $bootTrees
             = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
-        print $bootTrees;
+        print OUT $bootTrees;
         if ( system($bootTrees) ) { die "Error running $bootTrees.\n"; }
         my $bestTree
             = "raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
-        print $bestTree;
+        print OUT $bestTree;
         if ( system($bestTree) ) { die "Error running $bestTree.\n"; }
 
     }
     return "Bootstrap complete";
+    close OUT;
 }
 
 sub extractGenes {
