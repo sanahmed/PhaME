@@ -746,6 +746,7 @@ sub print_summary {
 
     foreach my $query ( sort keys %query_gaps ) {
         print BASE "$query\tGap_length\t", $query_gaps{$query}, "\n";
+        print BASE "$query\tLinear_coverage\t", sprintf("%.3f", ($ref_len - $query_gaps{$query})/$ref_len), "\n";
     }
 
     print BASE "Reference used:\t$name\n";
