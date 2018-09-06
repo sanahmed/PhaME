@@ -81,8 +81,8 @@ if [[ $1 -eq 5 ]] || [[ -z $1 ]];then
 	mkdir -p test/workdirs/t5_ebola_complete_contigs
 	cp test/data/ebola_contigs/*.contigs test/workdirs/t5_ebola_complete_contigs/
 	runPhaME test/ctl_files/t5_ebola_cmp_ctgs.ctl
-	a=$(grep -c ">" test/workdirs/t5_ebola_complete_contigs/results/t5_all_snp_alignment.fna)
-	b=9
+	#a=$(grep -c ">" test/workdirs/t5_ebola_complete_contigs/results/t5_all_snp_alignment.fna)
+	#b=9
 	a=$(grep -c "LRT" test/workdirs/t5_ebola_complete_contigs/results/PSgenes/cds0_470_2689.cdn.ABSREL.json)
 	b=16
 	if [ "$a" -eq "$b" ];then
