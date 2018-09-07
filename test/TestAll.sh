@@ -43,10 +43,10 @@ then
 	############## #3 Test with just contigs using ANI based reference ##############
 	echo "Test with just contigs using ANI based reference";
 	mkdir -p test/workdirs/t3_ebola_contigs
-	cp test/data/ebola_contigs/*.contigs test/workdirs/t3_ebola_contigs/
+	cp test/data/ebola_contigs/*.contig test/workdirs/t3_ebola_contigs/
 	runPhaME test/ctl_files/t3_ebola_contigs.ctl
-	a=$(wc -l < test/workdirs/t3_ebola_contigs/results/t3_all_snp_alignment.fna)
-	b=20
+	a=$(wc -l < test/workdirs/t3_ebola_contigs/results/paml/PAMLsitesResults.txt)
+	b=4
 	if [ "$a" -eq "$b" ];then
 		echo "Test 3 finished without any errors";
 	else

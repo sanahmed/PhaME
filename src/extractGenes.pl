@@ -225,7 +225,7 @@ foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
             # print "$gene\n\n";
             #         print "$entry\n";
             my $strand = $genes{"$start:$end"}->{strand};
-            print "$strand\n";
+            # print "$strand\n";
 
             #            print "$first\t$start\t$end\n";
             foreach my $position ( sort { $a <=> $b } keys %alternative ) {

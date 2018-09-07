@@ -799,12 +799,12 @@ sub paml {
         my @site_files = glob("$pamldir/*/*$suffix");
         if (@site_files) { # @site_files is not empty...
             `mv $pamldir/*/*$suffix $pamldir`;
-            print "\n";
+            print OUT "\n";
         } 
 
         my $parse
             = "parseSitePAML.pl $pamldir $NSsites 2>>$error >> $log\n\n";
-        print $parse;
+        print OUT $parse;
         if ( system($parse) ) { die "Error running $parse. \n"; }
     }
 
