@@ -484,11 +484,15 @@ sub removeGaps {
     my $bindir    = shift;
     my $reference = shift;
     my $readgaps  = shift;
-
-    print "\n";
-    my $remove = "time removeGaps.pl $reference $readgaps\n\n";
-    print $remove;
+    my $error     = shift;
+    my $log       = shift;
+    
+    open( OUT, ">>$log" );
+    print OUT "\n";
+    my $remove = "removeGaps.pl $reference $readgaps\n\n";
+    print OUT $remove;
     if ( system($remove) ) { die "Error running $remove.\n"; }
+    close OUT;
 }
 
 # Runs bowtie on paired-end reads
@@ -501,6 +505,7 @@ sub readsMapping {
     my $name      = shift;
     my $error     = shift;
     my $aligner	  = shift;
+    my $ploidy    = shift;
     my $log       = shift;
     my $outdir    = $indir . "/results";
     my $reference = $outdir . '/temp/' . $name . '.fna';
@@ -512,7 +517,7 @@ sub readsMapping {
     }
     print OUT "\n";
     my $map
-        = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner 2>>$error >> $log\n\n";
+        = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner -p $ploidy 2>>$error >> $log\n\n";
     print OUT $map;
     if ( system($map) ) { die "Error running $map.\n"; }
 

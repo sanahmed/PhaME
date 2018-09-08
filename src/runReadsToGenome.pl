@@ -20,6 +20,7 @@
 # 20120112 add -aligner
 # 20120327 add proper and unproper paired comparision plot and -plot_only flag
 # 20180123 use samtools 1.6 and bcftools 1.6
+# 20180907 added ploidy option
 
 use Getopt::Long;
 use File::Basename;
@@ -33,7 +34,7 @@ use Parallel::ForkManager;
 my $debug = 0;
 
 $| = 1;
-my ( $file1, $file2, @ref_files, $outDir, $pacbio, $offset );
+my ( $file1, $file2, @ref_files, $outDir, $pacbio, $offset, $ploidy );
 my $file_long        = "";
 my $singleton        = "";
 my $paired_files     = "";
@@ -93,6 +94,7 @@ GetOptions(
     'no_plot'                   => \$no_plot,
     'no_snp'                    => \$no_snp,
     'debug'                     => \$debug,
+    'ploidy'                    => \$ploidy,
     'help|?', sub { Usage() }
 );
 
@@ -345,9 +347,16 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
     { # skip the alignment steps, SNP steps, assume bam and pileup files were generated.
         ## SNP call
         if ( !$no_snp ) {
-            print "SNPs/Indels call on $ref_file_name\n";
-            `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
-            `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            if ($ploidy eq "haploid") {
+                print "SNPs/Indels call on $ref_file_name\n";
+                `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call --ploidy 1 -cO b - > $bcf_output 2>/dev/null`;
+                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            }
+            else {
+                print "SNPs/Indels call on $ref_file_name\n";
+                `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
+                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            }
         }
 
         ## index BAM file

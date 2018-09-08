@@ -18,7 +18,7 @@ use Parallel::ForkManager;
 $ENV{PATH} = "$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 ###############Set up variables#################################################
-my ( $indir, $reference, $prefix, $thread, $list, $aligner );
+my ( $indir, $reference, $prefix, $thread, $list, $aligner, $ploidy );
 my @command;
 my $outdir = `pwd`;
 $outdir =~ s/\n//;
@@ -31,6 +31,7 @@ GetOptions(
     't|thread=i'    => \$thread,
     'l|list=s'      => \$list,
     'a|aligner=s'   => \$aligner,
+    'p|ploidy=s'    => \$ploidy,
     'h|help'        => sub { usage() }
 );
 
@@ -175,7 +176,7 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
+            = "runReadsToGenome.pl -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
 
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
@@ -183,8 +184,8 @@ sub create_bowtie_commands {
     elsif ( $temp =~ /sread/i ) {
         $prefix .= "\_$name";
         my $bowtie_command
-            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
-        $bowtie_command= "runReadsToGenome.pl -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0" if ($aligner =~ /minimap/);
+            = "runReadsToGenome.pl -ploidy $ploidy -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
+        $bowtie_command= "runReadsToGenome.pl -ploidy $ploidy -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0" if ($aligner =~ /minimap/);
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }
@@ -198,7 +199,7 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread `-bowtie_options '-p $thread'";
+            = "runReadsToGenome.pl -ploidy $ploidy -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread `-bowtie_options '-p $thread'";
 
         print "[RUNNING:] $bowtie_command\n";
 

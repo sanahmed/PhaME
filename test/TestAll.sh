@@ -46,7 +46,7 @@ then
 	cp test/data/ebola_contigs/*.contig test/workdirs/t3_ebola_contigs/
 	runPhaME test/ctl_files/t3_ebola_contigs.ctl
 	a=$(wc -l < test/workdirs/t3_ebola_contigs/results/paml/PAMLsitesResults.txt)
-	b=4
+	b=3
 	if [ "$a" -eq "$b" ];then
 		echo "Test 3 finished without any errors";
 	else
@@ -203,7 +203,7 @@ then
 	cp test/workdirs/t3_ebola_contigs/working_list.txt test/workdirs/t13_realignment/
 	runPhaME test/ctl_files/t13_realignment.ctl
 	a=$(grep -c ">" test/workdirs/t13_realignment/results/t13_all_snp_alignment.fna)
-	b=10
+	b=11
 	if [ "$a" -eq "$b" ];then
 		echo "Test 13 finished without any errors";
 	else

@@ -25,7 +25,7 @@ $ENV{PERL5LIB}
 =head
 
 DESCRIPTION
-   runPhaME.pl is a wrapper to run the PhaME analysis pipeline 
+   runPhaME is a wrapper to run the PhaME analysis pipeline 
 
 USAGE
    Control file "phame.ctl" needs to be copied and edited in the working directory. 
@@ -100,6 +100,7 @@ my $ptree;
 my $buildSNPdb = 0;
 my $message;
 my $bindir = getBinDirectory();
+my $ploidy;
 
 #...............................................................................
 # command line options
@@ -228,7 +229,8 @@ while (<CTL>) {
     # if (/modelTest\s*=\s*(0|1)\s*#{0,1}.*$/){$modeltest=$1;}
     if (/bootstrap\s*=\s*(0|1)\s*#{0,1}.*$/)     { $bsignal    = $1; }
     if (/N\s*=\s*(\d+)\s*#{0,1}.*$/)             { $bootstrap  = $1; }
-    if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; $gsignal = 1 }
+    if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; }
+    if ($pselection > 0) {$gsignal = 1; } # if ME is selected automaticall turn this on
 
     if    (/code\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $code = $1; }
     if    ( $code == 1 )                     { $type = "virus"; }
@@ -678,6 +680,11 @@ if ( $contig_nucmer == 1 ) {
 }
 close STAT;
 
+# based on type, assign ploidy info to ploidy variable. Will be used later when calling SNPs
+# print "$type\n\n\";
+if ($type eq "eukaryote") {$ploidy = "diploid";}
+else {$ploidy = "haploid";}
+
 if ( $read_mapping == 1 ) {
     open( READ, ">$workdir/reads_list.txt" ) || die "$!";
     foreach my $names ( keys %read_list ) { print ALL "$names\n"; }
@@ -689,11 +696,11 @@ if ( $read_mapping == 1 ) {
         $mappingGaps
             = PhaME::identifyGaps( $outdir, "$workdir/fasta_list.txt", $name,
             "map", $project, $error, $logfile );
-        PhaME::removeGaps( $bindir, $reference, $mappingGaps );
+        PhaME::removeGaps( $bindir, $reference, $mappingGaps, $error, $logfile );
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end
             = PhaME::readsMapping( $workdir, $bindir,
-            "$workdir/reads_list.txt", $threads, $name, $error, $aligner,
+            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $ploidy,
             $logfile );
         &print_timeInterval( $runtime, "$end\n" );
     }
@@ -703,7 +710,7 @@ if ( $read_mapping == 1 ) {
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end
             = PhaME::readsMapping( $workdir, $bindir,
-            "$workdir/reads_list.txt", $threads, $name, $error, $aligner,
+            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $ploidy,
             $logfile );
         &print_timeInterval( $runtime, "$end\n" );
     }
