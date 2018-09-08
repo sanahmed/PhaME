@@ -5,12 +5,14 @@ use warnings;
 use File::Basename;
 use Getopt::Long;
 
-my $group_file;
+my $group_file="";
+my $list="";
 my $threshold = 0.5;
-my $version = 0.1;
+my $version = 0.2;
 my $symbol = "-";
 GetOptions(
 	"group=s"     => \$group_file,
+	"list=s"      => \$list,
 	"threshold=f" => \$threshold,
 	"symbol=s"    => \$symbol,
 	"version"     => sub{printVersion()},
@@ -25,12 +27,18 @@ sub Usage{
 	print <<"END";
 	Usage: perl $0 [options] --group <group_file> <snp_alignment>  > output.fasta
 
-	--group    Group inforamtion in tab-delimited text file
+	--group    Group inforamtion in tab-delimited text file [mutually exclusive to list]
                    ex:   ID               Group
 		         fasta_header_A	  A
 			 fasta_header_B   A 
 			 fasta_header_C   B
 			 fasta_header_D   B
+	  OR
+
+        --list     file with a list fasta headers. one per line [mutually exclusive to group]
+                   The list will be treated as One group. All other sequences in the input 
+                   alignment will be as Another group.
+
 	Options:
 	--threshold    Fraction of nucleotide in a group for defining Canonical SNPs (default :0.5)
 	--symbol       Not Canonical nt will use symbol in the output (default: "-")
@@ -40,14 +48,27 @@ END
 exit;
 }
 
-if(!@ARGV){ &Usage("No alignment input");}
-if(! -e $group_file){ &Usage("No group file input");}
+if(!@ARGV){ &Usage("No alignment input.");}
+if(! -e $group_file && ! -e $list ){ &Usage("No group file input or given list.");}
+if(-e $group_file &&  -e $list ){ &Usage("group and list options are mutually exclusive.");}
 if ( $threshold <0 or $threshold >1){ &Usage("threshold is between 0 and 1");}
 
 ## Read group info 
 ## Return $group hash reference:  ID -> Group
 #@ Return $group_count hash reference: Group -> Count in number
-my ($group,$group_count) = &readGroup($group_file);
+my ($group, $group_count);
+if ( -e $list){
+	open (my $lfh,"<",$list);
+	while(<$lfh>){
+		chomp;
+		$_ =~ s/\s//g;
+		$group->{$_}="A";
+		$group_count->{"A"}++;
+	}
+	close $lfh;
+}elsif(-e $group_file){
+	($group,$group_count) = &readGroup($group_file);
+}
 
 my %seq; # sequence hash: fasta header -> sequence
 my %unique; # unique count hash store {group}{position}{nucleotide}{count}
@@ -62,13 +83,28 @@ while( my $sequenceEntry= <$fh>){
 	$sequenceEntry =~ s/^[^\n]+\n//;
 	$sequenceEntry =~ s/[^A-Za-z0-9 \n]//g;
 	
-	if ($group->{$sequenceTitle}){
+	if (-e $list){
 		$seq{$sequenceTitle}=$sequenceEntry;
 		my $group_id = $group->{$sequenceTitle};
+		if (!$group_id){
+			$group_id="B";
+			$group->{$sequenceTitle}="B";
+			$group_count->{"B"}++;	
+		}
 		my @nts = split //,$sequenceEntry;
 		for my $i (0 .. $#nts){
 			my $nt=uc($nts[$i]);
 			$unique{$group_id}{$i}{$nt}++;
+		}
+	}else{
+		if ($group->{$sequenceTitle}){
+			$seq{$sequenceTitle}=$sequenceEntry;
+			my $group_id = $group->{$sequenceTitle};
+			my @nts = split //,$sequenceEntry;
+			for my $i (0 .. $#nts){
+				my $nt=uc($nts[$i]);
+				$unique{$group_id}{$i}{$nt}++;
+			}
 		}
 	}
 }
@@ -102,9 +138,12 @@ foreach my $id (sort keys %seq){
 					$flag=1;
 					last OUTER;
 				}
-				if ($unique{$group_id}{$j}{$n} and ($unique{$group_id}{$j}{$n}/$group_num) >= $threshold){
-					$flag2=1;
-				}
+				if ( -e $list && $group_id eq "B"){
+					if($unique{"A"}{$j}{$n} and ($unique{"A"}{$j}{$n}/$group_num) >= $threshold){
+						$flag2=1;}
+				}elsif ($unique{$group_id}{$j}{$n} and ($unique{$group_id}{$j}{$n}/$group_num) >= $threshold){
+                    $flag2=1;
+					}
 			}
 		}
 		if ($flag){
