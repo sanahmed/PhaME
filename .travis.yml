@@ -45,7 +45,6 @@ install:
 script:
   - test/TestAll.sh 1
   - test/TestAll.sh 2
-  - test/TestAll.sh 3
   # - cover -test
   # - docker run --rm migun/phame-1 sh test/TestAll.sh 
 
