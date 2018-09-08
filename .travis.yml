@@ -27,6 +27,9 @@ install:
   - conda install --yes -c bioconda perl-app-cpanminus=1.7039
   - conda install --yes -c bioconda bcftools
   - conda install --yes -c bioconda bwa
+  - conda install --yes -c bioconda fasttree
+  - conda install --yes -c bioconda bbmap
+  - conda install --yes -c bioconda raxml
   - cpanm Getopt::Long@2.45
   - cpanm Test::Exception@0.43
   - cpanm Statistics::Distributions@1.02
