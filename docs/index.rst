@@ -16,5 +16,7 @@ PhaME: **Ph**\ylogenetics **a**\nd **M**\olecular **E**\volution analysis tool
    third_party
    troubleshooting
    copyright
+   citation
    contact
+
 

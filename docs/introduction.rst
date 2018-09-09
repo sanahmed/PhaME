@@ -11,10 +11,16 @@ Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/
 How to run PhaME?
 =================
 After installation, PhaME only requires a control file along with your input files.
+::
 
+$ runPhaME phame.ctl
+::
+
+What is in control file?
+========================
 In a control file, parameters and input folders are specified. Here is how a control file looks like with the description of their options.
 
-```
+::
        refdir = test/data/ebola_ref  # directory where reference (Complete) files are located
       workdir = test/workdirs/ebola_complete # directory where contigs/reads files are located and output is stored
 
@@ -40,7 +46,7 @@ po.8
   
     PosSelect = 1  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both # these analysis need gff file to parse genomes to genes
 
-         code = 0  # 0:Bacteria; 1:Virus; 2: Eukarya
+         code = 0  # 0:Bacteria; 1:Virus; 2: Eukarya # Bacteria and Virus sets ploidy to haploid
 
         clean = 0  # 0:no clean; 1:clean # remove intermediate and temp files after analysis is complete
 
@@ -49,11 +55,11 @@ po.8
        cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
 
-```
+::
 
 It is a simple text file similar to the ones used PAML analysis.
 
-PhaME requires inputs in two folder:
+PhaME requires inputs in two folders:
 1. *refdir*
   A directory with reference genomes (complete genomes) and their annotation file in gff format (optional). Each file should represent a genome and have following extensions. The path to the folder should be either absolute or relative to the location of the control file. Please avoid filenames that have multiple `.` or has special characters like `:` in their name.
   - `*`.fasta
@@ -63,18 +69,19 @@ PhaME requires inputs in two folder:
 
 For example, a typical reference folder with reference genomes look like this:
 
-```
+::
 $ ls ref/
 
 GCA_000006925_2_ASM692v2_genomic.fna   GCA_000017745_1_ASM1774v1_genomic.fna  GCA_000026245_1_ASM2624v1_genomic.fna   GCA_000227625_1_ASM22762v1_genomic.fna
 GCA_000007405_1_ASM740v1_genomic.fna   GCA_000017765_1_ASM1776v1_genomic.fna  GCA_000026265_1_ASM2626v1_genomic.fna   GCA_000245515_1_ASM24551v1_genomic.fna
 GCA_000008865_1_ASM886v1_genomic.fna   GCA_000017985_1_ASM1798v1_genomic.fna  GCA_000026265_1_ASM2626v1_genomic.gff   GCA_000257275_1_ASM25727v1_genomic.fna
 
-```
+::
+
 Each of these files represent one genome. Each genome may have multiple sequences representing multiple replicons or contigs, but are all part of one genome. `gff` files corresponding to a genome must have the same exact name and in the same folder, just different extension. For example, `gff` file for genome `GCA_000006925_2_ASM692v2_genomic.fna` is `GCA_000006925_2_ASM692v2_genomic.gff`.
 
 2. *workdir*
-  - This is the folder where intermediate and final files of analysis are stored. The path to the folder should be either absolute or relative to the location of the control file. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
+  - This is the folder where intermediate and final results of analysis are stored. The path to the folder should be either absolute or relative to the location of the control file. Additionally, if the analysis includes incomplete genomes or contig files and raw reads, they must be in this folder. Contigs file must have following extensions to be recognised as contig file.
      - `*`.contig
      - `*`.contigs
 
@@ -86,7 +93,7 @@ workdir/GCA_000155105_1_ASM15510v1_genomic.contig  workdir/GCA_000968895_2_ASM96
 workdir/GCA_000190495_1_ASM19049v1_genomic.contig  workdir/GCA_000968905.2_ASM96890v2_genomic.contig   workdir/GCA_001514845_1_ASM151484v1_genomic.contig
 workdir/GCA_000191665_1_ecmda7_genomic.contig      workdir/GCA_001471755_1_ASM147175v1_genomic.contig  workdir/GCA_001514865_1_ASM151486v1_genomic.contig
 ```
-  If the analysis includes reads files, they must be in working folder as well and decompressed. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
+  If the analysis includes reads, they must be in `workdir` as well and decompressed. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
 
 ```
 $ ls *.fastq
@@ -95,10 +102,10 @@ GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2
 ```
 
 3. `reference`
-  - This is where you specify which of the genomes in `refdir` you want to pick as a reference genome. The available options are
+  - This is where you specify how do you want to pick your reference genome. The available options are:
     - 0: randomly pick a genome from `refdir` folder as the reference genome.
     - 1: use the specified genome as the reference. Genome's filename is specified in the `reffile` option.
-    - 2: picks a `mid point` genome based on the average Average Nucleotide Identity (ANI) among all ganomes. It uses mash to calculate ANI.
+    - 2: picks a `mid point` genome based on the  Average Nucleotide Identity (ANI) among all genomes. It uses mash (implemented in BBMap) to calculate ANI.
 
 4. `reffile`
   - This is where you specify the reference genome, if option 1 is picked in previous option. File name of the genome is written here and the program will look for that file in `reffile` folder. For example, `KJ660347.fasta` in the control file example above is found in the `reffile` folder.
@@ -107,7 +114,7 @@ GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2
   - The name of the project. All the important downstream output filenames will have the specified project name as their prefix.
 
 6. `cdsSNPS`
-  - This option allows users to parse SNPs based on their position into coding and non-coding sequences. It can be turned ON (0) or OFF (1). If turned ON, the picked reference genome must have a corresponding gff file. This option must be tunred ON for molecular evolution analysis.
+  - This option allows users to parse SNPs based on their position into coding and non-coding sequences. It can be turned ON (0) or OFF (1). If turned ON, the picked reference genome must have a corresponding gff file. This option is automatically turned ON, if Molecular evolutionary analyses is turned ON (see below).
 
 7. `buildSNPdb`
   - This option will turn ON (1) or OFF (0) database creation, which is essentially all possible pairwise alignment of all genomes in `refdir`. Turning this ON will significantly increase the runtime.
