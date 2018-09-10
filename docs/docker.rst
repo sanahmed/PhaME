@@ -6,18 +6,21 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 1. Install .. _Docker: https://docs.docker.com/install/
 
 
-2. Download the latest PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame/):: 
-	::
+2. Download the latest PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame/) 
+	
+	.. code-block:: console
+		
 		$ docker pull quay.io/biocontainers/phame
 
 
-3. Check if the image is correctly downloaded by running the provided test::
-	::
+3. Check if the image is correctly downloaded by running the provided test:
+	
+	.. code-block:: console
 		$ docker run --rm migun/phame sh test/TestAll.sh 
 
 4. Run your own data using docker. A step by step guide::
 	- Create a folder to mount onto your docker::
-	::
+
 		$ mkdir -p phame_analysis_folder
 
 	
@@ -25,7 +28,6 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
   		This folder will contain fasta files representing complete genomes.::
 
-	::
 		$ cd phame_analysis_folder
 		$ mkdir -p refdir
 
@@ -34,10 +36,10 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 	- Create a `workdir` folder within the `phame_analysis_folder`.
     This folder will have all the intermediate and final outputs of the analysis including input contigs and reference.::
 
-	::
 		$ mkdir -p workdir
 
 	- Create a control file (See below).
+
     All the inputs and parameters of a PhaME analysis is set in the control file. Using the provided template create a control file with apprpriate parameters and save it in the `phame_analysis_foler`.
 
 	- Run the analysis using docker.
