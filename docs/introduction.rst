@@ -11,7 +11,8 @@ Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/
 How to run PhaME?
 =================
 After installation, PhaME only requires a control file along with your input files.
-::
+
+.. code-block:: console
 
 	$ runPhaME phame.ctl
 
@@ -223,8 +224,6 @@ Directory structures
 			- `g1_g2.snps`: contains pairwise snps between `g1` and `g2`. For example:
 	
 	.. code-block:: console
-
-    	source
 
 		[P1] [SUB]   [SUB]   [P2]    [BUFF]  [DIST]  [FRM]   [TAGS]
 		127     T       C    127        22      127     1       1   KJ660347_1_18959    ZEBOV_2002_Ilembe_1_18958
