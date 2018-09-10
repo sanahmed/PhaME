@@ -7,7 +7,7 @@ PhaME: **Ph**\ylogenetics **a**\nd **M**\olecular **E**\volution analysis tool
    
    introduction
    installation
-   RunPhaME
+   runphame
    cases
    docker
    gui
