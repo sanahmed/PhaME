@@ -1,5 +1,5 @@
 How to run PhaME?
-=================
+#################
 After installation, PhaME only requires a control file along with your input files.
 
 .. code-block:: console
