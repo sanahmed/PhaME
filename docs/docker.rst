@@ -19,8 +19,8 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 		$ docker run --rm migun/phame sh test/TestAll.sh 
 
-4. Run your own data using docker. A step by step guide::
-	- Create a folder to mount onto your docker::
+4. Run your own data using docker. A step by step guide
+	- Create a folder to mount onto your docker
 
 	.. code-block:: console
 	
@@ -29,7 +29,7 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 	
 	- Create a `refdir` folder with complete genomes within `phame_analysis_folder`
 
-  		This folder will contain fasta files representing complete genomes.::
+  		This folder will contain fasta files representing complete genomes.
 
   		.. code-block:: console
   		
@@ -39,7 +39,7 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 		Copy or download genomes and their gff files (if needed) onto this folder.
 
 	- Create a `workdir` folder within the `phame_analysis_folder`.
-    	This folder will have all the intermediate and final outputs of the analysis including input contigs and reference.::
+    	This folder will have all the intermediate and final outputs of the analysis including input contigs and reference.
 
 		.. code-block:: console
 		
