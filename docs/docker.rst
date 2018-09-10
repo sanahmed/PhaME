@@ -24,7 +24,6 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 	.. code-block:: console
 	
-	    $ source
 		$ mkdir -p phame_analysis_folder
 
 	
@@ -34,7 +33,6 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
   		.. code-block:: console
   		
-  		  source
 		$ cd phame_analysis_folder
 		$ mkdir -p refdir
 
@@ -45,7 +43,7 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 		.. code-block:: console
 		
-		    source$ mkdir -p workdir
+			$ mkdir -p workdir
 
 	- Create a control file.
     	All the inputs and parameters of a PhaME analysis is set in the control file. Using the provided template create a control file with apprpriate parameters and save it in the `phame_analysis_foler`.
@@ -54,7 +52,6 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 	.. code-block:: console
 	
-	    $ source
 		$ docker run --rm -v $(pwd)/phame_analysis_folder:/data migun/phame src/runPhaME /data/ecoli.ctl
 		$ git clone https://github.com/mshakya/phame_examples.git
 		$ docker run --rm -v $(pwd)/phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
