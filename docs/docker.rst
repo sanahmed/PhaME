@@ -1,5 +1,5 @@
 Running PhaME with Docker
-=========================
+#########################
 
 To bypass the installation steps, we have provided a docker [image](https://stackoverflow.com/questions/23735149/what-is-the-difference-between-a-docker-image-and-a-container) for PhaME. To run PhaME from a docker image, follow these steps:
 

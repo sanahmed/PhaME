@@ -7,9 +7,8 @@ PhaME: **Ph**\ylogenetics **a**\nd **M**\olecular **E**\volution analysis tool
    
    introduction
    installation
-   Run PhaME
-   Use cases
-   dependencies
+   RunPhaME
+   cases
    docker
    gui
    commandline
