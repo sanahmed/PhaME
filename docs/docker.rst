@@ -19,6 +19,7 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 		$ docker run --rm migun/phame sh test/TestAll.sh 
 
+
 4. Run your own data using docker. A step by step guide
 	- Create a folder to mount onto your docker
 
@@ -33,8 +34,8 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
   		.. code-block:: console
   		
-		$ cd phame_analysis_folder
-		$ mkdir -p refdir
+			$ cd phame_analysis_folder
+			$ mkdir -p refdir
 
 		Copy or download genomes and their gff files (if needed) onto this folder.
 
