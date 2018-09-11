@@ -149,7 +149,7 @@ sub check_version {
     parse_version( 'nucmer --version',   3.1,   qr/version\s(\d+\.\d+)/ms );
     parse_version( 'bowtie2 --version',  2.3,   qr/version\s(\d+\.\d+)/ms );
     parse_version( 'bwa',                0.7,   qr/Version:\s(\d+\.\d+)/ms );
-    parse_version( 'FastTree',           2.1,   qr/version\s(\d+\.\d+)/ms );
+    parse_version( 'FastTree -expert',   2.1,   qr/FastTree\s(\d+\.\d+)/ms );
     parse_version( 'bbmap.sh -v',        38.06, qr/Version\s(\d+\.\d+)/ms );
     parse_version( 'raxmlHPC-PTHREADS -version', 8.2, qr/version\s(\d+\.\d+)/ms );
     print_timeInterval($runtime, "Dependencies look good!\n");
