@@ -9,6 +9,7 @@ After installation, PhaME only requires a control file along with your input fil
 
 What is in control file?
 ========================
+.. _control_file:
 In a control file, parameters and input folders are specified. Here is how a control file looks like with the description of their options.
 ::
 
