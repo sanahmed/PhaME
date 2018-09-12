@@ -46,6 +46,9 @@ In a control file, parameters and input folders are specified. Here is how a con
 
 	   cutoff = 0.1  # Linear alignment (LA) coverage against reference - ignores SNPs from organism that have lower cutoff.
 
+	   * When using data option 1,2,5 need a complete reference to align/map to.
+	   * Use data option 7 when need to extract SNPs using a sublist of already aligned genomes.
+
 
 It is a simple text file similar to the ones used PAML analysis.
 
@@ -86,9 +89,10 @@ This is the folder where intermediate and final results of analysis are stored. 
 	workdir/GCA_000191665_1_ecmda7_genomic.contig      workdir/GCA_001471755_1_ASM147175v1_genomic.contig  workdir/GCA_001514865_1_ASM151486v1_genomic.contig
 
 
-	If the analysis includes reads, they must be in `workdir` as well and decompressed. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
+If the analysis includes reads, they must be in `workdir` as well and decompressed. If reads are paired, they must have same file name at the beginning of the name and `R1` and `R2` at the end of the name and needs to have `.fastq` as their extension (`*_`R1.fastq `*_`R2.fastq). Any file that have `*.fastq` as their extension but dont have paired reads will be treated as single reads. For example, a working folder with paired raw read files loole like this:
 
 ::
+
 	$ ls *.fastq
 	GGB_SRR2000383_QC_trimmed_R1.fastq  GGB_SRR2000383_QC_trimmed_R2.fastq  GGC_SRR2164314_QC_trimmed_R1.fastq  GGC_SRR2164314_QC_trimmed_R2.fastq
 
@@ -115,7 +119,38 @@ This is the folder where intermediate and final results of analysis are stored. 
 	This options default is 1, which reruns everything. The option 2, which only recalculates the SNP matrix only works when SNP database is turned ON in previous step.
 
 9. *data*
-	Select the appropriate option based on the type of data that was included in the analysis. See the example control file above for details.
+	Select the appropriate option based on the type of data that was included in the analysis. 
+		- 0: only full/complete(F);
+
+		    + Select this option if you only have full/complete genomes or you only want to analyze these genomes from the dataset. Full/COmplete genomes are the ones that are found in *refdir*.
+		    
+		- 1: only contig(C); 
+
+		    + Select this option if you only have contigs and one reference that is complete. PhaME requires users to input a complete genome as reference. This option will only report contigs in the final alignments and the tree.
+
+		- 2: only reads(R);
+
+		    + Select this option if you only want to analyze reads file. Remember similar to option 1, a reference must be given.
+
+		- 3: combination F+C;
+
+		    + Select this option if you have full/complete genome and contigs.
+
+		- 4: combination F+R;
+
+		    + Select thsi option if you have full/complete genomes and only reads.
+
+		- 5: combination C+R; 
+
+		    + Select this option if you have full/complete genomes and reads. However, it still requires at least one Full/Complete genome.
+
+		- 6:combination F+C+R;
+
+		    + Select this option if you have full/complete, contigs, and read datasets in your analysis.
+
+		- 7:realignment 
+
+		    + Select this option if you want to realign using a subset of genomes that have already been aligned using one of the option above. It requires editing the `working_list.txt` file.
 
 10. *reads*
 	This option is dependent on option chosen in `data`. If the analysis contains only single reads, enter 1, if paired reads enter 2, and if both are present enter 3.
