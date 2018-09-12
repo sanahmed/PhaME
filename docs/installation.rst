@@ -1,7 +1,7 @@
 Installing PhaME
 ################
 
-PhaME for a linux machine can be installed using conda. If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. After installtion of conda, add channels for bioconda and conda-forge using:
+PhaME can be installed using conda. If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. After installtion of conda, add channels for bioconda and conda-forge using:
  
  .. code-block:: console
  

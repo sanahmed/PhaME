@@ -180,4 +180,38 @@ Save the above control file in the same directory where *ref* is, for example as
 Zoom-in analysis
 ================
 
-PhaME allows 
+PhaME has a unique feature that allows subsetting genomes from a PhaME analysis. 
+
+1. One can select genomes of interest by creating a copy of *working_list.txt*, a text file generated during the first run that contains list of all genomes then deleting lines containing names of genomes that are not of interest. For example, 
+
+.. code-block:: console
+
+    $ cat working_list.txt
+    SRR1610032_pread
+	SRR1610033_pread
+	GCF_000703365_1_Ec2011C_3609_genomic
+	SRR1609871_pread
+	SRR1609862_pread
+	SRR160986_pread
+	SRR1610031_pread
+	SRR1610034_pread
+	SRR1610028_pread
+	SRR1610029_pread
+
+2. Remove lines with genomes that are not of interest.
+
+.. code-block:: console
+
+        $ cat working_list.txt
+    SRR1610032_pread
+	SRR1610033_pread
+	GCF_000703365_1_Ec2011C_3609_genomic
+	SRR1609871_pread
+
+3. Change the *data* option in control file to *data = 7*, maybe also change the `project` name, and save as zoom_in.ctl
+   
+4. Then rerun the PhaME as
+
+.. code-block:: console
+
+    $ runPhaME zoom_in.ctl
