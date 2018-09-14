@@ -27,6 +27,7 @@ my $refheader;
 my $coding = 0;
 my $project;
 my $allSNPoutfile;
+my $all_outfile;
 my $SNPstats;
 my $SNPcomps;
 my $cdsSNPoutfile;
@@ -88,6 +89,7 @@ if ( $indir =~ /.+\/$/ ) { my $tmp = chop($indir); }
 my ( $name, $path, $suffix ) = fileparse( "$reffile", qr/\.[^.]*/ );
 
 $allSNPoutfile = "$indir\/$project\_all_snp_alignment.fna";
+$all_outfile = "$indir\/$project\_all_alignment.fna";
 $SNPstats      = "$indir\/$project\_stats.txt";
 $SNPcomps      = "$indir\/$project\_comparisons.txt";
 if ( $coding == 1 ) {
@@ -107,6 +109,7 @@ $cdsMatrixfile  = "$indir\/$project\_snp_CDSMatrix.txt";
 $intMatrixfile  = "$indir\/$project\_snp_intergenicMatrix.txt";
 $coreSNPstat   = "$indir\/$project\_core_stats.txt";
 
+open( ALL_OUT,    ">$all_outfile" )  || die "$!";
 open( OUT,    ">$allSNPoutfile" )  || die "$!";
 open( CORE_STAT, ">$coreSNPstat" ) || die "$!";
 open( STAT,   ">$SNPstats" )       || die "$!";
@@ -148,7 +151,9 @@ read_directory($indir);
 print_summary();
 
 print "Creating SNP alignment.\n";
+create_mono_snp_array();
 create_ALLsnp_array();
+
 if ( $coding == 1 ) {
     create_CDSsnp_array();
     create_INTsnp_array();
@@ -162,6 +167,7 @@ create_matrix();
 
 print "SNP alignment complete.\n";
 
+close ALL_OUT;
 close OUT;
 close STAT;
 close AMB;
@@ -297,6 +303,52 @@ sub read_directory {
         }
     }
 }
+
+################################################################################
+sub create_mono_snp_array {
+    my $ref         = 0;
+    my $current_snp = 0;
+    my $first       = 0;
+    my $second      = 0;
+    my $SNPcount    = 0;
+    my %SNPcount;
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { print $second, "\n"; next; }
+        }
+        for ( 1 .. length($ref_sequence) ) {
+            if ( !defined $gap_location{$_} )
+            {    # Check if the position corresponds to gaps
+                    $SNPcount{$_} = 1;
+            }
+        }
+    }
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { print $second, "\n"; next; }
+            print ALL_OUT ">$second\n";
+        }
+
+        for ( sort keys %SNPcount ) {
+            $current_snp = $_ - 1;
+            if ( defined $snp_location{$_}{$comparison} ) {
+                $SNPcount{$_} = 1;
+                print ALL_OUT $snp_location{$_}{$comparison};
+            }
+            else {
+                $ref = substr( $ref_sequence, $current_snp, 1 );
+                print ALL_OUT $ref;
+            }
+        }    #snp_location
+        print ALL_OUT "\n";
+    }
+}
+
+
 ################################################################################
 
 sub create_ALLsnp_array {
