@@ -6,19 +6,19 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 1. Install .. _Docker: https://docs.docker.com/install/
 
 
-2. Download the latest PhaME image from [Dockerhub](https://hub.docker.com/r/migun/phame/) 
+2. Download the latest PhaME image from [quay.io](https:quay.io/) 
 	
 	.. code-block:: console
 		
-		$ docker pull quay.io/biocontainers/phame
+		$ docker pull quay.io/biocontainers/phame:1.0.1--0
 
 
 3. Check if the image is correctly downloaded by running the provided test:
 	
 	.. code-block:: console
 
-		$ docker run --rm migun/phame sh test/TestAll.sh 
-
+		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 runPhaME -h
+		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 runPhaME -vcheck
 
 4. Run your own data using docker. A step by step guide
 	- Create a folder to mount onto your docker

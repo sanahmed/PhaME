@@ -186,6 +186,10 @@ What output files are produced?
 Summary files ( all files are found under folder `workdir/results`)
 
 	- SNP alignment files
+
+	    + all positions (including monomorphic sites)
+
+	        * `project`_all_alignment.fna
 		- all detected SNPs
 			`project`_all_snp_alignment.fna
 		- SNPs in CDS (coding sequence)
