@@ -18,6 +18,10 @@ LABEL tags="genomics"
 
 ############################# INSTALLATION #####################################
 
-RUN conda install phame
+RUN conda config --add channels r
+RUN	conda config --add channels defaults
+RUN conda config --add channels conda-forge
+RUN	conda config --add channels bioconda
+RUN conda install -c bioconda phame 
 # RUN sh test/TestAll.sh
 #############################ENVIRONMENT#####################################
