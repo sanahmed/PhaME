@@ -7,7 +7,7 @@ if [[ $1 -eq 1 ]] || [[ -z $1 ]];then
 	############# #1 Throws error at the end about molecular evolution analysis as all genes had gaps ##############
 	mkdir -p test/workdirs/t1_ebola_preads
 	cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
-	runPhaME test/ctl_files/t1_ebola_preads.ctl
+	phame test/ctl_files/t1_ebola_preads.ctl
 	a=$(grep -c ">" < test/workdirs/t1_ebola_preads/results/t1_all_snp_alignment.fna)
 	b=11
 	if [ "$a" -eq "$b" ];then
@@ -26,7 +26,7 @@ then
 	############## #2 Test with just single reads and random reference #############
 	mkdir -p test/workdirs/t2_ebola_sreads
 	cp test/data/ebola_reads/*R1.fastq test/workdirs/t2_ebola_sreads/
-	runPhaME test/ctl_files/t2_ebola_sreads.ctl
+	phame test/ctl_files/t2_ebola_sreads.ctl
 	a=$(grep -c ">" test/workdirs/t2_ebola_sreads/results/t2_all_snp_alignment.fna)
 	b=2
 	if [ "$a" -eq "$b" ];then
@@ -44,7 +44,7 @@ then
 	echo "Test with just contigs using ANI based reference";
 	mkdir -p test/workdirs/t3_ebola_contigs
 	cp test/data/ebola_contigs/*.contig test/workdirs/t3_ebola_contigs/
-	runPhaME test/ctl_files/t3_ebola_contigs.ctl
+	phame test/ctl_files/t3_ebola_contigs.ctl
 	a=$(wc -l < test/workdirs/t3_ebola_contigs/results/paml/PAMLsitesResults.txt)
 	b=3
 	if [ "$a" -eq "$b" ];then
@@ -60,7 +60,7 @@ if [[ $1 -eq 4 ]] || [[ -z $1 ]];
 then
 	######## #4 Test with just complete and uses given reference, tests PAML####
 	mkdir -p test/workdirs/t4_ebola_complete
-	runPhaME test/ctl_files/t4_ebola_complete.ctl
+	phame test/ctl_files/t4_ebola_complete.ctl
 	a=$(grep -c ">" < test/workdirs/t4_ebola_complete/results/t4_all_snp_alignment.fna)
 	b=9
 	if [ "$a" -eq "$b" ];then
@@ -77,7 +77,7 @@ if [[ $1 -eq 5 ]] || [[ -z $1 ]];then
 	### #5 Test with complete and contigs, uses given reference and tests HyPhy ####
 	mkdir -p test/workdirs/t5_ebola_complete_contigs
 	cp test/data/ebola_contigs/*.contigs test/workdirs/t5_ebola_complete_contigs/
-	runPhaME test/ctl_files/t5_ebola_cmp_ctgs.ctl
+	phame test/ctl_files/t5_ebola_cmp_ctgs.ctl
 	#a=$(grep -c ">" test/workdirs/t5_ebola_complete_contigs/results/t5_all_snp_alignment.fna)
 	#b=9
 	a=$(grep -c "LRT" test/workdirs/t5_ebola_complete_contigs/results/PSgenes/cds0_470_2689.cdn.ABSREL.json)
@@ -95,7 +95,7 @@ if [[ $1 -eq 6 ]] || [[ -z $1 ]];then
 	########### #6 Test with complete and sread, picks a random reference ##########
 	mkdir -p test/workdirs/t6_ebola_complete_sread
 	cp test/data/ebola_reads/*R1.fastq test/workdirs/t6_ebola_complete_sread/
-	runPhaME test/ctl_files/t6_ebola_cmp_sreads.ctl
+	phame test/ctl_files/t6_ebola_cmp_sreads.ctl
 	a=$(grep -c ">" test/workdirs/t6_ebola_complete_sread/results/t6_all_snp_alignment.fna)
 	b=11
 	if [ "$a" -eq "$b" ];then
@@ -113,7 +113,7 @@ then
 	echo "Test with complete and pread using BWA, designated reference"
 	mkdir -p test/workdirs/t7_ebola_complete_pread
 	cp test/data/ebola_reads/SRR3359589*R[1-2].fastq test/workdirs/t7_ebola_complete_pread/
-	runPhaME test/ctl_files/t7_ebola_cmp_preads.ctl
+	phame test/ctl_files/t7_ebola_cmp_preads.ctl
 	a=$(grep -c ">" test/workdirs/t7_ebola_complete_pread/results/t7_cds_snp_alignment.fna)
 	b=10
 	if [ "$a" -eq "$b" ];then
@@ -131,7 +131,7 @@ then
 	mkdir -p test/workdirs/t8_ebola_contigs_sread
 	cp test/data/ebola_reads/*R1.fastq test/workdirs/t8_ebola_contigs_sread/
 	cp test/data/ebola_contigs/*.contigs test/workdirs/t8_ebola_contigs_sread/
-	runPhaME test/ctl_files/t8_ebola_ctg_sreads.ctl
+	phame test/ctl_files/t8_ebola_ctg_sreads.ctl
 	a=$(grep -c ">" test/workdirs/t8_ebola_contigs_sread/results/t8_all_snp_alignment.fna)
 	b=12
 	if [ "$a" -eq "$b" ];then
@@ -149,7 +149,7 @@ then
 	mkdir -p test/workdirs/t9_ebola_contigs_pread
 	cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t9_ebola_contigs_pread/
 	cp test/data/ebola_contigs/*.contigs test/workdirs/t9_ebola_contigs_pread/
-	runPhaME test/ctl_files/t9_ebola_ctg_preads.ctl
+	phame test/ctl_files/t9_ebola_ctg_preads.ctl
 	a=$(grep -c ">" test/workdirs/t9_ebola_contigs_pread/results/t9_all_snp_alignment.fna)
 	b=3
 	if [ "$a" -eq "$b" ];then
@@ -165,8 +165,8 @@ if [[ $1 -eq 10 ]] || [[ -z $1 ]];
 then
 	################### #10 Test exit messages for incorrect ctl files #############
 	mkdir -p test/workdirs/t10_error_messages
-	runPhaME test/ctl_files/t10A_error_message.ctl > test/workdirs/t10_error_messages/A.error
-	runPhaME test/ctl_files/t10B_error_message.ctl > test/workdirs/t10_error_messages/B.error
+	phame test/ctl_files/t10A_error_message.ctl > test/workdirs/t10_error_messages/A.error
+	phame test/ctl_files/t10B_error_message.ctl > test/workdirs/t10_error_messages/B.error
 	a=$(wc -l < test/workdirs/t10_error_messages/A.error)
 	b=$(wc -l < test/workdirs/t10_error_messages/B.error)
 	c=14
@@ -183,7 +183,7 @@ if [[ $1 -eq 11 ]] || [[ -z $1 ]];
 then
 	################### #11 Test the threshold option#########################
 	mkdir -p test/workdirs/t11_flu
-	runPhaME test/ctl_files/t11_flu_test_coverage_threshold.ctl
+	phame test/ctl_files/t11_flu_test_coverage_threshold.ctl
 	a=$(grep -c ">" test/workdirs/t11_flu/results/t11_all_snp_alignment.fna)
 	b=25
 	if [ "$a" -eq "$b" ];then
@@ -201,7 +201,7 @@ then
 	mkdir -p test/workdirs/t13_realignment
 	cp -r test/workdirs/t7_ebola_complete_pread/* test/workdirs/t13_realignment/
 	cp test/workdirs/t3_ebola_contigs/working_list.txt test/workdirs/t13_realignment/
-	runPhaME test/ctl_files/t13_realignment.ctl
+	phame test/ctl_files/t13_realignment.ctl
 	a=$(grep -c ">" test/workdirs/t13_realignment/results/t13_all_snp_alignment.fna)
 	b=11
 	if [ "$a" -eq "$b" ];then
@@ -220,7 +220,7 @@ then
 	cp -r test/workdirs/t4_ebola_complete/* test/workdirs/t14_secondtime/
 	# echo "ebola_contig" >> test/workdirs/t14_secondtime/working_list.txt
 	cp test/data/ebola_reads/*R[1-2].fastq test/workdirs/t14_secondtime/
-	runPhaME test/ctl_files/t14_secondtime.ctl
+	phame test/ctl_files/t14_secondtime.ctl
 	a=$(grep -c ">" test/workdirs/t14_secondtime/results/t14_all_snp_alignment.fna)
 	b=11
 	if [ "$a" -eq "$b" ];then
