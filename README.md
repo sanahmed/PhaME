@@ -56,5 +56,4 @@ This project is funded by U.S. Defense Threat Reduction Agency [R-00059-12-0 and
 --------------------------------------------------------------
 ## Copyright
 
-Los Alamos National Security, LLC (LANS) owns the copyright to PhaME, which it identifies internally as LA-CC-xx-xxxx.  The license is GPLv3.  See [LICENSE](https://github.com/losalamos/PhaME/blob/master/LICENSE) for the full text.
-
+Los Alamos National Security, LLC (LANS) owns the copyright to EDGE, which it identifies internally as LA-XX-XX-XXX. The license is BSD-3. See LICENSE for the full text.
