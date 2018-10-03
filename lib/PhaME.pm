@@ -861,6 +861,7 @@ sub PickRefGenome {
     my @contigs;
     my $contigfiles;
 
+    open( OUT, ">>$log" );
     if ( $workdir =~ /.+\/$/ ) { my $temp = chop($workdir); }
     $sketch_dir = $workdir . '/sketches';
     mkdir $sketch_dir unless -d $sketch_dir;
@@ -895,7 +896,7 @@ sub PickRefGenome {
             = File::Basename::fileparse( $_, qr/\.[^.]*/ );
 
         my $out_sketch = $sketch_dir . "/$filename" . ".sketch";
-
+        print OUT "Sketching $_ \n";
         system(
             "sketch.sh in=$_ out=$out_sketch  mode=single name0=$_ fname=$_ name=$_ 2>>$error >> $log\n\n"
         );
@@ -911,9 +912,9 @@ sub PickRefGenome {
     my $all_sketch = join ",", @fullsketch;
 
     my $ref_sketch = $sketch_dir . "/*.sketch";
-
+    print OUT "Comparing sketches....\n";
     system(
-        "comparesketch.sh ref=$all_sketch alltoall compareself=f format=3 mode=single | uniq | grep ^$refdir | sed 's/\t\t/\t/g'> $sketch_output"
+        "comparesketch.sh alltoall compareself=f format=3 $sketch_dir/*.sketch| uniq | grep ^$refdir | sed 's/\t\t/\t/g'> $sketch_output"
 
     );
 
@@ -929,6 +930,7 @@ sub PickRefGenome {
    my $ref_genome1 = ( split / /, $ref_genome )[0];
 
     return $ref_genome1;
+    close OUT;
 }
 
 
