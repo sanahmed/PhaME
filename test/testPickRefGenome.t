@@ -14,6 +14,6 @@ require_ok('PhaME');
 
 my $ref_genome
     = PhaME::PickRefGenome( "test", "test/ref","test/results/ebola.error",
-    "test/results/ebola_PhaME.log", "test/sketch_output.txt");
+    "test/results/ebola.log", "test/sketch_output.txt");
 is( $ref_genome, 'test/ref/ZEBOV_2007_9Luebo.fna', "test if it picks the right reference genome" );
 done_testing();

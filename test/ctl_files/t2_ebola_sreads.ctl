@@ -1,7 +1,7 @@
       refdir = ../data/ebola_ref  # directory where reference files are located
       workdir = ../workdirs/t2_ebola_sreads # directory where contigs/reads files are located and output is stored
 
-    reference = 0  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
+    reference = 2  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
       reffile = KJ660347.fasta  # reference filename 
 
       project = t2  # main alignment file name

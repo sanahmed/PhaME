@@ -4,7 +4,7 @@ After installation, PhaME only requires a control file along with your input fil
 
 .. code-block:: console
 
-	$ runPhaME phame.ctl
+	$ phame phame.ctl
 
 
 What is in control file?
@@ -238,7 +238,7 @@ Summary files ( all files are found under folder `workdir/results`)
 			- intergenic only
 	  			`project`_snp_intergenicMatrix.txt
 	- Log file
-		`project`_PhaME.log
+		`project`.log
 	
 	- Error file
  		`project`.error 
