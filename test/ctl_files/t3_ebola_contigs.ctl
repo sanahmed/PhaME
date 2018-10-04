@@ -8,7 +8,7 @@
 
       cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
 
-      buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
+      buildSNPdb = 1 # 0: only align to reference 1: build SNP database of all complete genome
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 
@@ -25,7 +25,7 @@
 
          code = 1  # 0:Bacteria; 1:Virus
 
-        clean = 0  # 0:no clean; 1:clean
+        clean = 1  # 0:no clean; 1:clean
 
       threads = 2  # Number of threads to use
 

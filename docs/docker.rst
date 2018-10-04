@@ -17,8 +17,8 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 	
 	.. code-block:: console
 
-		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 runPhaME -h
-		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 runPhaME -vcheck
+		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 phame -h
+		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 phame -vcheck
 
 4. Run your own data using docker. A step by step guide
 	- Create a folder to mount onto your docker
@@ -53,8 +53,8 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 
 	.. code-block:: console
 	
-		$ docker run --rm -v $(pwd)/phame_analysis_folder:/data migun/phame src/runPhaME /data/ecoli.ctl
+		$ docker run --rm -v $(pwd)/phame_analysis_folder:/data migun/phame src/phame /data/ecoli.ctl
 		$ git clone https://github.com/mshakya/phame_examples.git
-		$ docker run --rm -v $(pwd)/phame_examples:/data migun/phame-1 perl src/runPhaME.pl /data/ecoli/ecoli.ctl
+		$ docker run --rm -v $(pwd)/phame_examples:/data migun/phame-1 perl src/phame /data/ecoli/ecoli.ctl
 
 

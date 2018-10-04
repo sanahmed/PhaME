@@ -11,6 +11,16 @@ use File::Basename;
 use Time::Piece;
 use PhaME;
 use Cwd;
+# use Statistics::Distribution;
+# use Parallel::ForkManagers;
+use Bio::SeqIO;
+use Bio::Tools::CodonTable;
+use Cwd 'abs_path';
+use Data::Dumper;
+use FileHandle;
+use Getopt::Std;
+use diagnostics;
+use fastq_utility;
 
 $| = 1;
 
@@ -368,12 +378,13 @@ if ( $data == 7 ) { $check = 0; }
 my $snpdir  = $outdir . '/snps';
 my $gapdir  = $outdir . '/gaps';
 my $statdir = $outdir . '/stats';
-my $summary = $outdir . '/' . "$project\_summaryStatistics.txt";
+my $summary = $outdir . '/' . "$project\_genome_lengths.txt";
 `mkdir -p $snpdir $gapdir $statdir`;
 
 if ( $time == 1 && $check == 0 && $data != 7 ) {
     open( ALL, ">$workdir/working_list.txt" ) || die "$!";
     open( STAT, ">$summary" ) || die "$!";
+    print STAT "Genome\tLength(bp)\n";
 }
 
 if ( $time == 1 && $check > 0 ) {
@@ -382,6 +393,7 @@ if ( $time == 1 && $check > 0 ) {
 elsif ( $time == 2 || $data == 7 ) {
     open( ALL, ">>$workdir/working_list.txt" ) || die "$!";
     open( STAT, ">>$summary" ) || die "$!";
+    print STAT "Genome\tLength(bp)\n";
 }
 
 if ( $check == 0 ) {
@@ -644,7 +656,7 @@ if ( $nucmer == 1 ) {
     foreach my $names ( sort keys %fasta_list ) {
         print FAS "$names\n";
         print ALL "$names\n";
-        print STAT "$names\tTotal_length\t", $fasta_list{$names}, "\n"
+        print STAT "$names\t", $fasta_list{$names}, "\n"
             if ( $time ne "2" );
 
         #      print "$names\t",$fasta_list{$names},"\n";
@@ -662,7 +674,7 @@ if ( $contig_nucmer == 1 ) {
     foreach my $names ( sort keys %contig_list ) {
         print CON "$names\n";
         print ALL "$names\n";
-        print STAT "$names\tTotal_length\t", $contig_list{$names}, "\n";
+        print STAT "$names\t", $contig_list{$names}, "\n";
     }
     if ( $buildSNPdb == 1 ) {
 

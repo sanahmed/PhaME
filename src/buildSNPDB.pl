@@ -68,6 +68,7 @@ my $ref;
 my $query;
 my %positions;
 my $coreSNPstat;
+my $coverageFile;
 
 # When 60% linear reference lenght are gap (query compared to)
 # The query will not use to build snp alignment
@@ -108,6 +109,7 @@ $coreMatrixfile = "$indir\/$project\_snp_coreMatrix.txt";
 $cdsMatrixfile  = "$indir\/$project\_snp_CDSMatrix.txt";
 $intMatrixfile  = "$indir\/$project\_snp_intergenicMatrix.txt";
 $coreSNPstat   = "$indir\/$project\_core_stats.txt";
+$coverageFile   = "$indir\/$project\_coverage.txt";
 
 open( ALL_OUT,    ">$all_outfile" )  || die "$!";
 open( OUT,    ">$allSNPoutfile" )  || die "$!";
@@ -119,6 +121,8 @@ open( GAPF,   ">$allgapfile" )     || die "$!";
 open( BASE,   ">>$basefile" )      || die "$!";
 open( PMAT,   ">$pairMatrixfile" ) || die "$!";
 open( CMAT,   ">$coreMatrixfile" ) || die "$!";
+open( COV,   ">>$coverageFile" ) || die "$!";
+print COV "Genome\t\Gaps\tLinear Coverage\n";
 if ( $coding == 1 ) {
     open( IMAT,   ">$intMatrixfile" ) || die "$!";
     open( CDSMAT, ">$cdsMatrixfile" ) || die "$!";
@@ -174,6 +178,7 @@ close AMB;
 close COMP;
 close GAPF;
 close BASE;
+close COV;
 close PMAT;
 close CMAT;
 close CDSMAT;
@@ -402,7 +407,7 @@ sub create_ALLsnp_array {
         print OUT "\n";
     }    #header list
     $SNPcount = scalar( keys %SNPcount );
-    print BASE "Total SNPs:\t$SNPcount\n";
+    print BASE "Total SNPs\t$SNPcount\n";
 }
 ################################################################################
 
@@ -452,7 +457,7 @@ sub create_CDSsnp_array {
         print CDSOUT "\n";
     }    #header list
     $CDScount = scalar( keys %CDSSNPcount );
-    if ( $coding == 1 ) { print BASE "CDS SNPs:\t$CDScount\n"; }
+    if ( $coding == 1 ) { print BASE "CDS SNPs\t$CDScount\n"; }
 }
 ################################################################################
 
@@ -797,11 +802,12 @@ sub print_summary {
     my $ref_len   = length $ref_sequence;
 
     foreach my $query ( sort keys %query_gaps ) {
-        print BASE "$query\tGap_length\t", $query_gaps{$query}, "\n";
-        print BASE "$query\tLinear_coverage\t", sprintf("%.3f", ($ref_len - $query_gaps{$query})/$ref_len), "\n";
+        # print BASE "$query\tGap_length\t", $query_gaps{$query}, "\n";
+        # print BASE "$query\tLinear_coverage\t", sprintf("%.3f", ($ref_len - $query_gaps{$query})/$ref_len), "\n";
+        print COV "$query\t", $query_gaps{$query}, "\t", sprintf("%.3f", ($ref_len - $query_gaps{$query})/$ref_len), "\n";
     }
 
-    print BASE "Reference used:\t$name\n";
+    print BASE "Reference used\t$name\n";
 
     my ( $start, $end );
     foreach my $keys ( sort { $a <=> $b } keys %gap_location ) {
@@ -822,9 +828,9 @@ sub print_summary {
     }
 
     my $base_total = $ref_len - $gap_total;
-    print BASE "Reference sequence length:\t", $ref_len,
-        "\nTotal gap length:\t$gap_total
-Core genome length:\t$base_total\n";
+    print BASE "Reference genome length\t", $ref_len,
+        "\nTotal gap length\t$gap_total
+Core genome length\t$base_total\n";
 
     close GAPF;
 }

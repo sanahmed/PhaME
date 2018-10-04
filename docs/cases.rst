@@ -54,7 +54,7 @@ Save the above file in the same directory where *ref* is, for example as *comple
   
   .. code-block:: console
   
-		$ runPhaME complete_phame.ctl
+		$ phame complete_phame.ctl
 
 
 With complete genomes and contigs
@@ -113,7 +113,7 @@ Save the above control file in the same directory where *ref* is, for example as
   
   .. code-block:: console
   
-    	$ runPhaME contig_and_complete_phame.ctl
+    	$ phame contig_and_complete_phame.ctl
 
 
 With raw reads, complete genomes, and contigs
@@ -173,7 +173,7 @@ Save the above control file in the same directory where *ref* is, for example as
   
   .. code-block:: console
   
-    	$ runPhaME read_contig_and_complete_phame.ctl
+    	$ phame read_contig_and_complete_phame.ctl
 
 
 
@@ -214,4 +214,4 @@ PhaME has a unique feature that allows subsetting genomes from a PhaME analysis.
 
 .. code-block:: console
 
-    $ runPhaME zoom_in.ctl
+    $ phame zoom_in.ctl
