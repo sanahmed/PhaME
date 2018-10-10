@@ -35,7 +35,7 @@ $ENV{PERL5LIB}
 =head
 
 DESCRIPTION
-   runPhaME is a wrapper to run the PhaME analysis pipeline 
+   phame is a wrapper to run the PhaME analysis pipeline 
 
 USAGE
    Control file "phame.ctl" needs to be copied and edited in the working directory. 
@@ -126,7 +126,7 @@ if ( !@ARGV ) {
     print(@ARGV);
     print "$0: Argument required.\n";
     print "For help message use:\n";
-    print "runPhaME -h.\n";
+    print "phame -h.\n";
     exit 1;
 }
 
@@ -232,11 +232,9 @@ while (<CTL>) {
 
     #     0=Finished; 1=contig; 2=reads; 3=F+C; 4=F+R; 5=C+R 6=F+C+R
     if (/\s+reads\s*=\s*(1|2|3)\s*#{0,1}.*$/) { $reads = $1; }
-    if (/tree\s*=\s*(0|1|2|3)\s*#{0,1}.*$/)   { $tree  = $1; }
+    if (/tree\s*=\s*(0|1|2|3|4)\s*#{0,1}.*$/)   { $tree  = $1; }
+    #0=no tree; 1=fasttree; 2=raxml; 3=iqtree;4=both
 
-    #     0=no tree; 1=fasttree; 2=raxml; 3=both
-    # no more testing for the model, GTR should be sufficient.
-    # if (/modelTest\s*=\s*(0|1)\s*#{0,1}.*$/){$modeltest=$1;}
     if (/bootstrap\s*=\s*(0|1)\s*#{0,1}.*$/)     { $bsignal    = $1; }
     if (/N\s*=\s*(\d+)\s*#{0,1}.*$/)             { $bootstrap  = $1; }
     if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; }
@@ -766,11 +764,11 @@ if ( $buildtree == 1 || $bs == 1) {
     if ($tree > 0 ){
         &print_timeInterval( $runtime, "Reconstructing all SNPs phylogeny\n" );
         my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
-        "$project\_all", $error, $logfile );
+        "$project\_all", $bootstrap, $error, $logfile );
         &print_timeInterval( $runtime, "All SNPs Phylogeny Complete.\n" );
         if ( $gsignal == 1 ) {
             &print_timeInterval( $runtime, "Reconstructing CDS SNP phylogeny\n" );
-            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds",
+            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds", $bootstrap, 
             $error, $logfile );
             &print_timeInterval( $runtime, "CDS SNPs phylogeny Complete.\n" );
         }
@@ -824,7 +822,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project\_all", $error, $logfile );
+                "$project\_all", $bootstrap, $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
             `cp $tbest $pamldir`;
@@ -852,7 +850,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project\_all", $error, $logfile );
+                "$project\_all", $bootstrap, $error, $logfile );
             $hyphydir = $outdir . '/paml';
             if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
             `cp $tbest $hyphydir`;
@@ -927,6 +925,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 ################################################################################
 if ($clean) { PhaME::clean($outdir); }
 
+PhaME::movefiles($outdir, $tree);
 &print_timeInterval( $runtime, "Run Complete!, Check $workdir/results folder for results.\n" );
 
 close STDOUT;
@@ -960,7 +959,7 @@ sub version {
 
 sub printusage {
     print "\n$PACKAGENAME (version $PACKAGEVERSION)\n";
-    print "\nUSAGE: runPhaME <control file>\n\n";
+    print "\nUSAGE: phame <control file>\n\n";
     print "-h show this help message and exit\n";
     print "-v show version number and exit\n";
     print "--vcheck checks if all depenencies are correct and in path.\n";

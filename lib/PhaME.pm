@@ -430,6 +430,28 @@ sub clean {
     );
 }
 
+sub movefiles {
+    # Function to move files to directories
+    my $dir = shift;
+    my $trees = shift;
+    print "\nFinalizing...\n";
+    system(
+        "mkdir $dir/alignments $dir/tables $dir/miscs; mv $dir/*.fna $dir/alignments/; mv $dir/*.txt $dir/tables; mv $dir/*.delta $dir/miscs; mv $dir/*.*filter $dir/miscs"
+    );
+    if ($trees > 0){
+        system("mkdir $dir/trees");
+        if ($trees == 1 || $trees == 4){
+            system("mv $dir/*.fasttree $dir/trees/");
+        }
+        elsif ($trees == 2 || $trees == 4){
+            system("mv $dir/RAxML* $dir/trees/");
+        }
+        elsif ($trees == 3 || $trees == 4){
+            system("mv $dir/*.fna.* $dir/trees/");
+        }
+    }
+}
+
 #-------------------------------------------------------------------------
 #  SCRIPT RUNNERS
 
@@ -587,12 +609,13 @@ sub buildTree {
     my $thread = shift;
     my $tree   = shift;
     my $name   = shift;
+    my $bootstrap = shift;
     my $error  = shift;
     my $log    = shift;
 
     open( OUT, ">>$log" );
 
-    if ( $tree == 1 || $tree == 3 ) {
+    if ( $tree == 1 || $tree == 4 ) {
         print OUT "Reconstructing phylogeny using FastTree\n";
         my $fasttree
             = "export OMP_NUM_THREADS=$thread; FastTree -quiet -nt -gtr < $outdir/$name\_snp_alignment.fna > $outdir/$name\.fasttree 2>>$error \n\n";
@@ -600,7 +623,7 @@ sub buildTree {
         if ( system($fasttree) ) { die "Error running $fasttree.\n"; }
 
     }
-    if ( $tree == 2 || $tree == 3 ) {
+    if ( $tree == 2 || $tree == 4 ) {
         print OUT "Reconstructing phylogeny using RaxML\n";
         print OUT "\n";
         my $raxml
@@ -616,6 +639,15 @@ sub buildTree {
         #}
     }
 
+    if ( $tree == 3 || $tree == 4 ) {
+        print OUT "Reconstructing phylogeny using IQ-tree after finding the best model\n";
+        print OUT "Also bootstraping IQ-Trees trees\n";
+        print OUT "\n";
+        my $iqtree
+            = "iqtree -m TEST -s $outdir/$name\_snp_alignment.fna -nt $thread -bc $bootstrap 2>>$error >> $log\n\n";
+        print OUT $iqtree;
+        if ( system($iqtree) ) { die "Error running $iqtree.\n"; }
+    }
     print OUT "Tree phylogeny complete.\n";
     close OUT;
 
@@ -646,7 +678,7 @@ sub bootstrap {
 #    if (system ($bestTree)){die "Error running $bestTree.\n";}
 # }
     open( OUT, ">>$log" );
-    if ( $tree > 1 ) {
+    if ( $tree == 2 || $tree == 4 ) {
         my $bootTrees
             = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
         print OUT $bootTrees;
@@ -657,6 +689,7 @@ sub bootstrap {
         if ( system($bestTree) ) { die "Error running $bestTree.\n"; }
 
     }
+
     return "Bootstrap complete";
     close OUT;
 }
