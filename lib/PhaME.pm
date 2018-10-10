@@ -436,7 +436,7 @@ sub movefiles {
     my $trees = shift;
     print "\nFinalizing...\n";
     system(
-        "mkdir $dir/alignments $dir/tables $dir/miscs; mv $dir/*.fna $dir/alignments/; mv $dir/*.txt $dir/tables; mv $dir/*.delta $dir/miscs; mv $dir/*.*filter $dir/miscs"
+        "mkdir $dir/alignments $dir/tables $dir/miscs; mv $dir/*.fna $dir/alignments/; mv $dir/*.txt $dir/tables; [ -f dir/*.delta ] && mv $dir/*.delta $dir/miscs;[ -f dir/*.*filter ] && mv $dir/*.*filter $dir/miscs"
     );
     if ($trees > 0){
         system("mkdir $dir/trees");
