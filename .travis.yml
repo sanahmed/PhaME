@@ -20,7 +20,12 @@ install:
   - ./miniconda.sh -b -f
   - export PATH="/home/travis/miniconda3/bin:$PATH"
   - conda update --yes -n base conda
-  - conda install --yes -c bioconda phame
+  - conda config --add channels r
+  - conda config --add channels defaults
+  - conda config --add channels conda-forge
+  - conda config --add channels bioconda
+  - conda create -n phame_env
+  - conda install --yes -c bioconda phame -n phame_env
   # - conda install --yes -c bioconda samtools>=1.7
   # - conda install --yes -c bioconda bbmap>=37.62
   # - conda install --yes -c bioconda bowtie2=2.3.0
@@ -37,12 +42,13 @@ install:
   # - cpanm File::Basename@2.85
   # - cpanm File::Copy@2.21
   # - cpanm Parallel::ForkManager@1.17
-  - export PATH="$HOME/build/mshakya/PhaME-1/src:$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
+  # - export PATH="$HOME/build/mshakya/PhaME-1/src:$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
 
 # before_script:
   # - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
 
 script:
+  - source activate phame_env
   - test/TestAll.sh 2
   - test/TestAll.sh 3
   # - cover -test
