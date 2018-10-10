@@ -50,7 +50,7 @@ install:
 script:
   - source activate phame_env
   - test/TestAll.sh 2
-  - test/TestAll.sh 3
+  - test/TestAll.sh 7
   # - cover -test
   # - docker run --rm migun/phame-1 sh test/TestAll.sh 
 
