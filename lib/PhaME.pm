@@ -454,7 +454,7 @@ sub movefiles {
     }
     if ($reads == 2 || $reads == 4 || $reads == 5 || $reads == 6){
         system(
-            "mkdir $dir/maps; mv $dir/*.coverage $dir/maps/; mv $dir/*.raw.bcf $dir/maps/; mv $dir/*plots.pdf $dir/maps/;mv $dir/*.bam* $dir/maps/");
+            "mkdir $dir/maps; mv $dir/*.coverage $dir/maps/; mv $dir/*plots.pdf $dir/maps/;mv $dir/*.bam* $dir/maps/");
     
     }
 }
