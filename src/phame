@@ -111,7 +111,7 @@ my $buildSNPdb = 0;
 my $message;
 my $bindir = getBinDirectory();
 my $ploidy;
-my $snp_filter = 0.6;
+my $snp_filter = 0.0;
 
 #...............................................................................
 # command line options

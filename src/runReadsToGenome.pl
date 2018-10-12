@@ -63,7 +63,7 @@ my $min_alt_bases  = 3;         # minimum number of alternate bases
 my $max_depth      = 1000000;   # maximum read depth
 my $min_depth      = 7;         #minimum read depth
 my $snp_gap_filter = 3;         #SNP within INT bp around a gap to be filtered
-my $snp_filter     = 0.6;       #SNPs that are in majority
+my $snp_filter     = 0.0;       #SNPs that are in majority
 
 $ENV{PATH} = "$Bin:$Bin/../bin/:$ENV{PATH}";
 
@@ -1123,7 +1123,7 @@ Usage: perl $0
                -max_depth                maximum read depth [1000000]
                -min_depth                minimum read depth [7]
                -snp_gap_filter           SNP within INT bp around a gap to be filtered [3]
-               -snp_filter               Proportion of coverage to call it a SNP [0.6]
+               -snp_filter               Proportion of coverage to call it a SNP [0.0]
          
 
 Synopsis:
