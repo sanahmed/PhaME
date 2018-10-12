@@ -111,6 +111,7 @@ my $buildSNPdb = 0;
 my $message;
 my $bindir = getBinDirectory();
 my $ploidy;
+my $snp_filter = 0.6;
 
 #...............................................................................
 # command line options
@@ -229,7 +230,7 @@ while (<CTL>) {
     # default is NO.
     if (/FirstTime\s*=\s*(1|2)\s*#{0,1}.*$/) { $time = $1; }
     if (/data\s*=\s*(\d)\s*#{0,1}.*$/)       { $data = $1; }
-
+    if (/SNPSfilter\s*=\s*(\d+\.*\d+)\s*#.*$/) { $snp_filter = $1; }
     #     0=Finished; 1=contig; 2=reads; 3=F+C; 4=F+R; 5=C+R 6=F+C+R
     if (/\s+reads\s*=\s*(1|2|3)\s*#{0,1}.*$/) { $reads = $1; }
     if (/tree\s*=\s*(0|1|2|3|4)\s*#{0,1}.*$/)   { $tree  = $1; }
@@ -710,7 +711,7 @@ if ( $read_mapping == 1 ) {
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end
             = PhaME::readsMapping( $workdir, $bindir,
-            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $ploidy,
+            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $ploidy, $snp_filter,
             $logfile );
         &print_timeInterval( $runtime, "$end\n" );
     }
@@ -720,7 +721,7 @@ if ( $read_mapping == 1 ) {
         &print_timeInterval( $runtime, "Mapping reads to reference\n" );
         my $end
             = PhaME::readsMapping( $workdir, $bindir,
-            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $ploidy,
+            "$workdir/reads_list.txt", $threads, $name, $error, $aligner, $ploidy, $snp_filter,
             $logfile );
         &print_timeInterval( $runtime, "$end\n" );
     }
@@ -925,7 +926,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 ################################################################################
 if ($clean) { PhaME::clean($outdir); }
 
-PhaME::movefiles($outdir, $tree);
+PhaME::movefiles($outdir, $tree, $data);
 &print_timeInterval( $runtime, "Run Complete!, Check $workdir/results folder for results.\n" );
 
 close STDOUT;

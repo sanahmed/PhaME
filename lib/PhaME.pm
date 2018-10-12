@@ -434,6 +434,8 @@ sub movefiles {
     # Function to move files to directories
     my $dir = shift;
     my $trees = shift;
+    my $reads = shift;
+    
     print "\nFinalizing...\n";
     system(
         "mkdir $dir/alignments $dir/tables $dir/miscs; mv $dir/*.fna $dir/alignments/; mv $dir/*.txt $dir/tables; [ -f dir/*.delta ] && mv $dir/*.delta $dir/miscs;[ -f dir/*.*filter ] && mv $dir/*.*filter $dir/miscs"
@@ -449,6 +451,11 @@ sub movefiles {
         elsif ($trees == 3 || $trees == 4){
             system("mv $dir/*.fna.* $dir/trees/");
         }
+    }
+    if ($reads == 2 || $reads == 4 || $reads == 5 || $reads == 6){
+        system(
+            "mkdir $dir/maps; mv $dir/*.coverage $dir/maps/; mv $dir/*.raw.bcf $dir/maps/; mv $dir/*plots.pdf $dir/maps/;mv $dir/*.bam* $dir/maps/");
+    
     }
 }
 
@@ -528,6 +535,7 @@ sub readsMapping {
     my $error     = shift;
     my $aligner	  = shift;
     my $ploidy    = shift;
+    my $snp_filter    = shift;
     my $log       = shift;
     my $outdir    = $indir . "/results";
     my $reference = $outdir . '/temp/' . $name . '.fna';
@@ -539,7 +547,7 @@ sub readsMapping {
     }
     print OUT "\n";
     my $map
-        = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner -p $ploidy 2>>$error >> $log\n\n";
+        = "runReadsMapping.pl -r $reference -q $indir -d $outdir -t $thread -l $list -a $aligner -p $ploidy -s $snp_filter 2>>$error >> $log\n\n";
     print OUT $map;
     if ( system($map) ) { die "Error running $map.\n"; }
 

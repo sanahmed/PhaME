@@ -302,7 +302,7 @@ sub read_directory {
                 read_nucmer_snp($snp_file);
             }
         }
-        elsif ( $files =~ /.+\.vcf/ ) {
+        elsif ( $files =~ /.+\.filtered\.vcf/ ) {
             $snp_file = $snp_dir . '/' . $files;
             read_vcf_snp($snp_file);
         }

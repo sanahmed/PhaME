@@ -17,6 +17,7 @@
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 1  # 1: single reads; 2: paired reads; 3: both types present;
+        SNPSfilter = 0.99 # Only use snps that are above given threshold
 
          tree = 0  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
