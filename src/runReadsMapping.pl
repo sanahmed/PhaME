@@ -32,7 +32,7 @@ GetOptions(
     'l|list=s'      => \$list,
     'a|aligner=s'   => \$aligner,
     'p|ploidy=s'    => \$ploidy,
-    's|snp_filter=s'    => \$snp_filter,
+    's|snp_filter=f'    => \$snp_filter,
     'h|help'        => sub { usage() }
 );
 

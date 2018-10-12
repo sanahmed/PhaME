@@ -96,7 +96,7 @@ GetOptions(
     'no_snp'                    => \$no_snp,
     'debug'                     => \$debug,
     'ploidy'                    => \$ploidy,
-    'snp_filter'                => \$snp_filter,
+    'snp_filter=f'              => \$snp_filter,
     'help|?', sub { Usage() }
 );
 
