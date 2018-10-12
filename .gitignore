@@ -25,3 +25,4 @@ thirdParty/messages.log
 thirdParty/evolver.out
 thirdParty/errors.log
 messages.log
+*.log
