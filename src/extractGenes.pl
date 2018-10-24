@@ -256,7 +256,7 @@ $pm->wait_all_children;
 
 $indexArray = @indexArray;
 if ($indexArray == 0 ){
-    print "All the genes have gaps. No Molecular Evolutionary analysis will be perforemd\n";
+    print "All the genes have gaps. No Molecular Evolutionary analyses will be performed\n";
     print "Exiting!\n";
     exit 42;
 }
