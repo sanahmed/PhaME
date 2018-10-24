@@ -48,6 +48,7 @@ bioRxiv doi: http://dx.doi.org/10.1101/032250
 ## Contact
 
 [Migun Shakya](mailto:migun@lanl.gov)
+[Patrick Chain](mailto:pchain@lanl.gov)
 
 --------------------------------------------------------------
 ## ACKNOWLEDGEMENTS
