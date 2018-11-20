@@ -19,8 +19,8 @@ Step by step guide to run PhaME using web interface in a local machine. Docker a
     POSTGRES_HOST=postgres
     POSTGRES_PORT=5432
     POSTGRES_DB=phame_api01
-    POSTGRES_USER=debug
-    POSTGRES_PASSWORD=debug
+    POSTGRES_USER=<user>
+    POSTGRES_PASSWORD=<postgres_password>
 
 
 4. cd to the project root  directory `phame_api01`
