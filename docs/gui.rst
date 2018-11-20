@@ -7,7 +7,7 @@ Step by step guide to run PhaME using web interface in a local machine. Docker a
 
 .. code-block:: console
 
-    git clone
+    git clone git@github.com:LANL-Bioinformatics/phame-api.git
 
 
 2. create a `.postegres` file within the cloned directory `phame_api01/.envs/.local/.postgres`, and add following lines to it.
