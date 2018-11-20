@@ -10,6 +10,8 @@
 
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 
+    SNPsfilter = 0.6 # threshold to call SNPs
+
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 
          data = 0  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
@@ -20,7 +22,7 @@
 
       aligner = bowtie # support bowtie/bwa/minimap2
 
-         tree = 0  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
+         tree = 0  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:IQ-TREE; 4: use all
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below
             N = 100  # Number of bootstraps to run *See below    
   

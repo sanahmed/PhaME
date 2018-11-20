@@ -1,6 +1,6 @@
 #!/usr/bin/env perl
 ################################################################
-# Written by Sanaa Ahmed
+# Written by Sanaa Ahmed , Migun Shakya, Chien-Chi Lo
 # Jan. 03, 2013
 
 # Given a directory containing snp files creates SNP alignment
@@ -27,6 +27,7 @@ my $refheader;
 my $coding = 0;
 my $project;
 my $allSNPoutfile;
+my $all_outfile;
 my $SNPstats;
 my $SNPcomps;
 my $cdsSNPoutfile;
@@ -66,6 +67,8 @@ my $frm;
 my $ref;
 my $query;
 my %positions;
+my $coreSNPstat;
+my $coverageFile;
 
 # When 60% linear reference lenght are gap (query compared to)
 # The query will not use to build snp alignment
@@ -87,11 +90,11 @@ if ( $indir =~ /.+\/$/ ) { my $tmp = chop($indir); }
 my ( $name, $path, $suffix ) = fileparse( "$reffile", qr/\.[^.]*/ );
 
 $allSNPoutfile = "$indir\/$project\_all_snp_alignment.fna";
+$all_outfile = "$indir\/$project\_all_alignment.fna";
 $SNPstats      = "$indir\/$project\_stats.txt";
 $SNPcomps      = "$indir\/$project\_comparisons.txt";
 if ( $coding == 1 ) {
     $cdsSNPoutfile = "$indir\/$project\_cds_snp_alignment.fna";
-    #TODO: int_snp_alingment.fna is not correct, it prints all positions
     $intSNPoutfile = "$indir\/$project\_int_snp_alignment.fna";
     $CDScoords     = "$indir\/CDScoords.txt";
     $noncoding     = "$indir\/noncoding.txt";
@@ -105,8 +108,12 @@ $pairMatrixfile = "$indir\/$project\_snp_pairwiseMatrix.txt";
 $coreMatrixfile = "$indir\/$project\_snp_coreMatrix.txt";
 $cdsMatrixfile  = "$indir\/$project\_snp_CDSMatrix.txt";
 $intMatrixfile  = "$indir\/$project\_snp_intergenicMatrix.txt";
+$coreSNPstat   = "$indir\/$project\_core_stats.txt";
+$coverageFile   = "$indir\/$project\_coverage.txt";
 
+open( ALL_OUT,    ">$all_outfile" )  || die "$!";
 open( OUT,    ">$allSNPoutfile" )  || die "$!";
+open( CORE_STAT, ">$coreSNPstat" ) || die "$!";
 open( STAT,   ">$SNPstats" )       || die "$!";
 open( AMB,    ">$ambiguous" )      || die "$!";
 open( COMP,   ">$SNPcomps" )       || die "$!";
@@ -114,6 +121,8 @@ open( GAPF,   ">$allgapfile" )     || die "$!";
 open( BASE,   ">>$basefile" )      || die "$!";
 open( PMAT,   ">$pairMatrixfile" ) || die "$!";
 open( CMAT,   ">$coreMatrixfile" ) || die "$!";
+open( COV,   ">>$coverageFile" ) || die "$!";
+print COV "Genome\t\Gaps\tLinear Coverage\n";
 if ( $coding == 1 ) {
     open( IMAT,   ">$intMatrixfile" ) || die "$!";
     open( CDSMAT, ">$cdsMatrixfile" ) || die "$!";
@@ -142,11 +151,13 @@ print "Reading Gaps file.\n";
 my $skip_query_ref = read_gap($gapfile);
 
 print "Printing Summary Statistics.\n";
-print_summary();
 read_directory($indir);
+print_summary();
 
 print "Creating SNP alignment.\n";
+create_mono_snp_array();
 create_ALLsnp_array();
+
 if ( $coding == 1 ) {
     create_CDSsnp_array();
     create_INTsnp_array();
@@ -154,22 +165,26 @@ if ( $coding == 1 ) {
 
 print "Creating SNP stats file. \n";
 create_stats();
+create_core_stats();
 create_comparison();
 create_matrix();
 
 print "SNP alignment complete.\n";
 
+close ALL_OUT;
 close OUT;
 close STAT;
 close AMB;
 close COMP;
 close GAPF;
 close BASE;
+close COV;
 close PMAT;
 close CMAT;
 close CDSMAT;
 close IMAT;
 close CDSOUT;
+close CORE_STAT;
 ################################################################################
 
 sub read_reference {
@@ -287,12 +302,58 @@ sub read_directory {
                 read_nucmer_snp($snp_file);
             }
         }
-        elsif ( $files =~ /.+\.vcf/ ) {
+        elsif ( $files =~ /.+\.filtered\.vcf/ ) {
             $snp_file = $snp_dir . '/' . $files;
             read_vcf_snp($snp_file);
         }
     }
 }
+
+################################################################################
+sub create_mono_snp_array {
+    my $ref         = 0;
+    my $current_snp = 0;
+    my $first       = 0;
+    my $second      = 0;
+    my $SNPcount    = 0;
+    my %SNPcount;
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { print $second, "\n"; next; }
+        }
+        for ( 1 .. length($ref_sequence) ) {
+            if ( !defined $gap_location{$_} )
+            {    # Check if the position corresponds to gaps
+                    $SNPcount{$_} = 1;
+            }
+        }
+    }
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { print $second, "\n"; next; }
+            print ALL_OUT ">$second\n";
+        }
+
+        for ( sort keys %SNPcount ) {
+            $current_snp = $_ - 1;
+            if ( defined $snp_location{$_}{$comparison} ) {
+                $SNPcount{$_} = 1;
+                print ALL_OUT $snp_location{$_}{$comparison};
+            }
+            else {
+                $ref = substr( $ref_sequence, $current_snp, 1 );
+                print ALL_OUT $ref;
+            }
+        }    #snp_location
+        print ALL_OUT "\n";
+    }
+}
+
+
 ################################################################################
 
 sub create_ALLsnp_array {
@@ -346,7 +407,7 @@ sub create_ALLsnp_array {
         print OUT "\n";
     }    #header list
     $SNPcount = scalar( keys %SNPcount );
-    print BASE "Total SNPs:\t$SNPcount\n";
+    print BASE "Total SNPs\t$SNPcount\n";
 }
 ################################################################################
 
@@ -396,7 +457,7 @@ sub create_CDSsnp_array {
         print CDSOUT "\n";
     }    #header list
     $CDScount = scalar( keys %CDSSNPcount );
-    if ( $coding == 1 ) { print BASE "CDS SNPs:\t$CDScount\n"; }
+    if ( $coding == 1 ) { print BASE "CDS SNPs\t$CDScount\n"; }
 }
 ################################################################################
 
@@ -413,7 +474,7 @@ sub create_INTsnp_array {
             if ( $skip_query_ref->{$second} ) { next; }
         }
         for ( 1 .. length($ref_sequence) ) {
-            if ( !defined $gap_location{$_} && defined !$coding_location{$_} )
+            if ( !defined $gap_location{$_} && !defined $coding_location{$_} )
             {    # Check SNP is not present in gaps.
                 if ( defined $snp_location{$_}{$comparison} ) {
                     $INTSNPcount{$_} = 1;
@@ -471,17 +532,82 @@ sub create_stats {
                         }
                         elsif ( defined $coding_location{$_} ) {
                             my $snp = $_;
-                            my ( $start, $end, $product ) = split /,/,
+                            my ( $start, $end, $gene, $product ) = split /,/,
                                 $coding_location{$_};
 
                             # print "$start\t$end\n";
                             print STAT
-                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\n";
+                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$gene\t$product\n";
                         }
                     }
                     else {
                         print STAT
                             "$first\t$second\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
+                    }
+                }
+            }
+        }
+    }
+}
+
+################################################################################
+
+sub create_core_stats {
+    my $ref         = 0;
+    my $current_snp = 0;
+    my $first       = 0;
+    my $second      = 0;
+    my $start       = 0;
+    my $end         = 0;
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { next; }
+        }
+        foreach ( sort { $a <=> $b } keys %snp_location ) {
+            $current_snp = $_ - 1;
+            if ( !defined $gap_location{$_} ) {
+                if ( $first ne $second )
+                {  
+                    $ref = substr( $ref_sequence, $current_snp, 1 );
+                    if ( $coding == 1 ) {
+                        if ( !defined $coding_location{$_} ) {
+                            if ( defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tnoncoding SNP\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
+                                }
+
+                            elsif ( !defined $snp_location{$_}{$comparison} ) {
+
+                                print CORE_STAT
+                                "$first\t$second\tnoncoding_conserved_core\t$_\t$positions{$_}{$comparison}\t$ref\t$ref\n";
+                            }
+                        }
+                        elsif ( defined $coding_location{$_} ) {
+                            my $snp = $_;
+                            my ( $start, $end, $gene, $product ) = split /,/,
+                                $coding_location{$_};
+                            if ( defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tcoding SNP\t$snp\t$positions{$snp}{$comparison}\t$ref\t$snp_location{$snp}{$comparison}\t$start\t$end\t$gene\t$product\n";
+                                }
+                            elsif ( !defined $snp_location{$_}{$comparison} ) {
+                                print CORE_STAT
+                                "$first\t$second\tcoding_conserved_core\t$snp\t$positions{$snp}{$comparison}\t$ref\t$ref\t$start\t$end\t$gene\t$product\n";
+                            }
+                        }
+                    }
+                    else {
+                        if ( defined $snp_location{$_}{$comparison} ) {
+                            print CORE_STAT
+                            "$first\t$second\tsnp_core\t$_\t$positions{$_}{$comparison}\t$ref\t$snp_location{$_}{$comparison}\n";
+                                }
+                        elsif ( !defined $snp_location{$_}{$comparison} ) {
+                            print CORE_STAT
+                                "$first\t$second\tconserved_core\t$_\t$positions{$_}{$comparison}\t$ref\t$ref\n";
+                            
+                        }
                     }
                 }
             }
@@ -676,32 +802,35 @@ sub print_summary {
     my $ref_len   = length $ref_sequence;
 
     foreach my $query ( sort keys %query_gaps ) {
-        print BASE "$query\tGap_legnth\t", $query_gaps{$query}, "\n";
+        # print BASE "$query\tGap_length\t", $query_gaps{$query}, "\n";
+        # print BASE "$query\tLinear_coverage\t", sprintf("%.3f", ($ref_len - $query_gaps{$query})/$ref_len), "\n";
+        print COV "$query\t", $query_gaps{$query}, "\t", sprintf("%.3f", ($ref_len - $query_gaps{$query})/$ref_len), "\n";
     }
 
-    print BASE "Reference used:\t$name\n";
+    print BASE "Reference used\t$name\n";
 
     my ( $start, $end );
     foreach my $keys ( sort { $a <=> $b } keys %gap_location ) {
+        $gap_total++;
         if ($first) { $start = $keys; $last = $keys; $first = 0; }
         elsif ( $last != $keys - 1 ) {
             print GAPF "$start\t$last\n";
             my $gap_length = $last - $start + 1;
-            $gap_total += $gap_length;
+            # $gap_total += $gap_length;
             $start = $keys;
         }
         $last = $keys;
     }
-    if ( $last == $ref_len ) {
+    if ( $last <= $ref_len ) {
         print GAPF "$start\t$last\n";
         my $gap_length = $last - $start + 1;
-        $gap_total += $gap_length;
+        # $gap_total += $gap_length;
     }
 
     my $base_total = $ref_len - $gap_total;
-    print BASE "Reference sequence length:\t", $ref_len,
-        "\nTotal gap length:\t$gap_total
-Core genome length:\t$base_total\n";
+    print BASE "Reference genome length\t", $ref_len,
+        "\nTotal gap length\t$gap_total
+Core genome length\t$base_total\n";
 
     close GAPF;
 }
@@ -823,9 +952,9 @@ sub read_cds_coords {
     open( CDS, "$CDScoords" ) || die "$!";
     while (<CDS>) {
         chomp;
-        my ( $id, $start, $end, $product ) = split /\s+/, $_;
+        my ( $id, $start, $end, $gene, $product ) = split /\t/, $_;
         for ( $start .. $end ) {
-            $coding_location{$_} = "$start,$end,$product";
+            $coding_location{$_} = "$start,$end,$gene,$product";
         }
 
         # if ($snp>=$start && $snp<=$end){return ($start,$end);}

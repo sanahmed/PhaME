@@ -64,6 +64,7 @@ if ($fh->open("< $file")){
    $fh->close;
 }
 
+# if there are no repeats
 if (-z $coords){
    open (OUT, ">$outfasta");
    print OUT ">${header}_1_$length\n$sequence\n";
@@ -75,11 +76,11 @@ my %repeats;
 open (IN, $coords) || die "$!";
 while (<IN>){
    chomp;
-   my ($ref,$rep,$rstart,$rend,$length)= split /\s/,$_;
+   my ($ref,$rep,$rstart,$rend,$xlength)= split /\s/,$_;
    $repeats{$rstart}=$rend;
 }
 &get_sequence_file($header);
-
+#==============================================================================#
 sub get_sequence_file
 {
 my $reference=shift;
@@ -127,7 +128,7 @@ foreach my $repeat(sort {$a<=>$b} keys %repeats){
 }
 if ($length>$r_end){
    $start= $r_end;
-   $end= $length+1;
+   $end= $length;
    $contig=$reference.'_'.$start.'_'.$end;
 #   print "$start\t$end\n";
    my $output= substr($sequence,$start-1,$end-$start+1);
@@ -137,6 +138,8 @@ if ($length>$r_end){
 my $difference= $length-$count;
 print STAT "$count\t$difference\n";
 }
+
+#==============================================================================#
 close OUT;
 close IN;
 

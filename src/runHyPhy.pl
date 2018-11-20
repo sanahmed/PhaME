@@ -292,8 +292,10 @@ ExecuteAFile (fileToExecute,inputRedirect);
 }
 
 ################################################################################
+# need to figure out a way here for it to get the tamplate file from conda installation
+#
 sub runBranchSiteREL {
-    my $aBSREL = "$RealBin/../thirdParty/hyphy-2.3.11/res/TemplateBatchFiles/SelectionAnalyses/aBSREL.bf";
+    my $aBSREL = "$RealBin/../thirdParty/hyphy_batch_files/TemplateBatchFiles/SelectionAnalyses/aBSREL.bf";
     my $pm = new Parallel::ForkManager($thread);
     for ( my $i = 0; $i <= $#geneList; $i++ ) {
         $pm->start($i) and next;
@@ -303,7 +305,7 @@ sub runBranchSiteREL {
         my $batch  = $hyphydir . '/' . $name . '_BSrel.bf';
         my $output = $hyphydir . '/' . $name . '_BSrel.out';
 
-        my $command = "HYPHYMP $aBSREL 'Universal' $geneList[$i] $tree_output 'All' ";
+        my $command = "HYPHYMP CPU=$thread $aBSREL 'Universal' $geneList[$i] $tree_output 'All' ";
         print "$command\n";
         if ( system($command) ) { die "Error running $command.\n"; }
 

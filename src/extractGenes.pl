@@ -27,6 +27,7 @@ my ( $first, $second );
 my $gff_file;
 my $outfile;
 my @indexArray;
+my $indexArray;
 my %reference;
 my $name;
 my %alternative;
@@ -162,7 +163,7 @@ open( GAP, ">$gapgenes" ) || die "$!";
 OUTER:
 foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
     my ( $start, $end ) = $coord =~ /(\d+):(\d+)/;
-    print "$start\n";
+    # print "$start\n";
 
     foreach my $gap ( keys %gaps ) {
         if ( $gap >= $start && $gaps{$gap} <= $end ) {
@@ -205,7 +206,7 @@ foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
 
     # parsing through the working_list.txt file, @header_list contains lines from working_list.txt
     foreach my $comparison (@header_list) {
-        print "$comparison\n\n";
+        # print "$comparison\n\n";
         # $comparison string contains following
         # "KJ660347_2_ebolavirus_GIN_Gueckedou_C07:KR653305_1_Zaire_ebolavirus_isolate_Ebola_virus_H_sapiens_wt_SLE_2014_Makona_20141043__partial_genome_contig"
         if ( $comparison =~ /(.+):(.+)/ ) {
@@ -219,12 +220,12 @@ foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
             # subsets nucleotide using gene coordinates
 
             my $gene = substr( $reference{$name}, $start - 1, $gene_len );
-            print "$name\nname";
+            # print "$name\nname";
             # print "$reference{$name}\n";
             # print "$gene\n\n";
             #         print "$entry\n";
             my $strand = $genes{"$start:$end"}->{strand};
-            print "$strand\n";
+            # print "$strand\n";
 
             #            print "$first\t$start\t$end\n";
             foreach my $position ( sort { $a <=> $b } keys %alternative ) {
@@ -253,7 +254,14 @@ foreach my $coord ( sort { $coords{$a} <=> $coords{$b} } keys %coords ) {
 }
 $pm->wait_all_children;
 
+$indexArray = @indexArray;
+if ($indexArray == 0 ){
+    print "All the genes have gaps. No Molecular Evolutionary analyses will be performed\n";
+    print "Exiting!\n";
+    exit 42;
+}
+
 open( IND, ">$index_file" ) || die "$!";
 foreach my $index (@indexArray) { print IND $index, "\n"; }
 close IND;
-
+close GAP;

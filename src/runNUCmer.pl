@@ -105,9 +105,9 @@ my @remove_list;
 # my @remove_list = PhaME::filter_genomes( $sketch_output, $ref_genome, $cutoff,
     # $query_dir );
 
-print "$ref_genome\n";
-print "$cutoff\n";
-print "$query_dir\n";
+# print "$ref_genome\n";
+# print "$cutoff\n";
+# print "$query_dir\n";
 # print "Warning: These genomes will be removed as they do not pass given ANI cutoff of $cutoff% with reference:$ref_genome\n";
 # print join("\n", @remove_list);
 

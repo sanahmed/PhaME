@@ -18,7 +18,7 @@ use Parallel::ForkManager;
 $ENV{PATH} = "$RealBin:$RealBin/../ext/bin:$ENV{PATH}";
 
 ###############Set up variables#################################################
-my ( $indir, $reference, $prefix, $thread, $list, $aligner );
+my ( $indir, $reference, $prefix, $thread, $list, $aligner, $ploidy, $snp_filter );
 my @command;
 my $outdir = `pwd`;
 $outdir =~ s/\n//;
@@ -31,6 +31,8 @@ GetOptions(
     't|thread=i'    => \$thread,
     'l|list=s'      => \$list,
     'a|aligner=s'   => \$aligner,
+    'p|ploidy=s'    => \$ploidy,
+    's|snp_filter=f'    => \$snp_filter,
     'h|help'        => sub { usage() }
 );
 
@@ -124,21 +126,21 @@ sub read_directory {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp, $thread );
+                create_bowtie_commands( $query, $prefix, $temp, $thread, $snp_filter );
             }
             $temp = $1 . '_read';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp, $thread );
+                create_bowtie_commands( $query, $prefix, $temp, $thread, $snp_filter );
             }
             $temp = $1 . '_sread';
             if ( exists $queries{$temp} && !exists $check{$temp} ) {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp, $thread );
+                create_bowtie_commands( $query, $prefix, $temp, $thread, $snp_filter );
             }
         }
         if ( $files !~ /$name/ && $files =~ /(.+)\.fa?s?t?q$/ ) {
@@ -147,7 +149,7 @@ sub read_directory {
                 $check{$temp}++;
                 $query  = $dir . '/' . $files;
                 $prefix = "$name";
-                create_bowtie_commands( $query, $prefix, $temp, $thread );
+                create_bowtie_commands( $query, $prefix, $temp, $thread, $snp_filter );
             }
         }
     }
@@ -160,6 +162,7 @@ sub create_bowtie_commands {
     my $prefix = shift;
     my $temp   = shift;
     my $thread = shift;
+    my $snp_filter = shift;
     my $read1;
     my $read2;
     my $readu;
@@ -175,7 +178,7 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
+            = "runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
 
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
@@ -183,8 +186,8 @@ sub create_bowtie_commands {
     elsif ( $temp =~ /sread/i ) {
         $prefix .= "\_$name";
         my $bowtie_command
-            = "runReadsToGenome.pl -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
-        $bowtie_command= "runReadsToGenome.pl -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0" if ($aligner =~ /minimap/);
+            = "runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -u $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0";
+        $bowtie_command= "runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -long $read -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0" if ($aligner =~ /minimap/);
         print "[RUNNING:] $bowtie_command\n";
         push( @command, $bowtie_command );
     }
@@ -198,7 +201,7 @@ sub create_bowtie_commands {
         }
 
         my $bowtie_command
-            = "runReadsToGenome.pl -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread `-bowtie_options '-p $thread'";
+            = "runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p $read1,$read2 -u $readu -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread `-bowtie_options '-p $thread'";
 
         print "[RUNNING:] $bowtie_command\n";
 

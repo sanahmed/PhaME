@@ -1,26 +1,58 @@
 sudo: required
+
+# services:
+#   - docker
+
 language: perl
 perl:
-  - "5.16"
+  - "5.22"
 
 before_install:
-  # - eval "${MATRIX_EVAL}"
+  # - docker pull migun/phame-1 
   - sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
   - sudo apt-get update -qq
-  - sudo apt-get -y install -qq gcc-5 g++-5
-  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
+  # - sudo apt-get -y install -qq gcc-5 g++-5
+  # - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-5 60 --slave /usr/bin/g++ g++ /usr/bin/g++-5
 
 install:
-  - ./INSTALL.sh
-  - export PATH="$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
+  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - chmod +x miniconda.sh
+  - ./miniconda.sh -b -f
+  - export PATH="/home/travis/miniconda3/bin:$PATH"
+  - conda update --yes -n base conda
+  - conda config --add channels r
+  - conda config --add channels defaults
+  - conda config --add channels conda-forge
+  - conda config --add channels bioconda
+  - conda create --yes -n phame_env
+  - conda install --yes -c bioconda phame -n phame_env
+  # - conda install --yes -c bioconda samtools>=1.7
+  # - conda install --yes -c bioconda bbmap>=37.62
+  # - conda install --yes -c bioconda bowtie2=2.3.0
+  # - conda install --yes -c bioconda perl-app-cpanminus=1.7039
+  # - conda install --yes -c bioconda bcftools
+  # - conda install --yes -c bioconda bwa
+  # - conda install --yes -c bioconda fasttree
+  # - conda install --yes -c bioconda bbmap
+  # - conda install --yes -c bioconda raxml
+  # - cpanm Getopt::Long@2.45
+  # - cpanm Test::Exception@0.43
+  # - cpanm Statistics::Distributions@1.02
+  # - cpanm File::Path@2.09
+  # - cpanm File::Basename@2.85
+  # - cpanm File::Copy@2.21
+  # - cpanm Parallel::ForkManager@1.17
+  # - export PATH="$HOME/build/mshakya/PhaME-1/src:$HOME/build/mshakya/PhaME-1/thirdParty/miniconda/bin:$PATH"
 
-before_script:
-  - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
+# before_script:
+  # - cpanm --quiet --notest --skip-satisfied Devel::Cover::Report::Codecov
 
 script:
-  - source activate phame
-  - test/TestAll.sh
-  - cover -test
+  - source activate phame_env
+  - test/TestAll.sh 2
+  - test/TestAll.sh 7
+  # - cover -test
+  # - docker run --rm migun/phame-1 sh test/TestAll.sh 
 
-after_success:
-  - cover -report codecov
+#after_success:
+#  - cover -report codecov

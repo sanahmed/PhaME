@@ -20,6 +20,7 @@
 # 20120112 add -aligner
 # 20120327 add proper and unproper paired comparision plot and -plot_only flag
 # 20180123 use samtools 1.6 and bcftools 1.6
+# 20180907 added ploidy option
 
 use Getopt::Long;
 use File::Basename;
@@ -33,7 +34,7 @@ use Parallel::ForkManager;
 my $debug = 0;
 
 $| = 1;
-my ( $file1, $file2, @ref_files, $outDir, $pacbio, $offset );
+my ( $file1, $file2, @ref_files, $outDir, $pacbio, $offset, $ploidy );
 my $file_long        = "";
 my $singleton        = "";
 my $paired_files     = "";
@@ -62,6 +63,7 @@ my $min_alt_bases  = 3;         # minimum number of alternate bases
 my $max_depth      = 1000000;   # maximum read depth
 my $min_depth      = 7;         #minimum read depth
 my $snp_gap_filter = 3;         #SNP within INT bp around a gap to be filtered
+my $snp_filter     = 0.0;       #SNPs that are in majority
 
 $ENV{PATH} = "$Bin:$Bin/../bin/:$ENV{PATH}";
 
@@ -93,6 +95,8 @@ GetOptions(
     'no_plot'                   => \$no_plot,
     'no_snp'                    => \$no_snp,
     'debug'                     => \$debug,
+    'ploidy'                    => \$ploidy,
+    'snp_filter=f'              => \$snp_filter,
     'help|?', sub { Usage() }
 );
 
@@ -340,14 +344,24 @@ for my $ref_file_i ( 0 .. $#ref_files ) {
     my $stats_output     = "$outDir/$prefix.alnstats.txt";
     my $consensusSeq     = "$outDir/$prefix.consensus.fasta";
     my $ref_window_gc    = "$outDir/$prefix.windows_gc.txt";
+    my $vcf_filtered     = "$outDir/$prefix.filtered.vcf";
 
     unless ($plot_only)
     { # skip the alignment steps, SNP steps, assume bam and pileup files were generated.
         ## SNP call
         if ( !$no_snp ) {
-            print "SNPs/Indels call on $ref_file_name\n";
-            `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
-            `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            if ($ploidy eq "haploid") {
+                print "SNPs/Indels call on $ref_file_name\n";
+                `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call --ploidy 1 -cO b - > $bcf_output 2>/dev/null`;
+                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            }
+            else {
+                print "SNPs/Indels call on $ref_file_name\n";
+                `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
+                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            }
+            print "Filtering SNPs\n";
+            `bcftools filter -i '(DP4[0]+DP4[1])==0 || (DP4[2]+DP4[3])/(DP4[0]+DP4[1]+DP4[2]+DP4[3]) > $snp_filter' $vcf_output > $vcf_filtered`;
         }
 
         ## index BAM file
@@ -1109,6 +1123,7 @@ Usage: perl $0
                -max_depth                maximum read depth [1000000]
                -min_depth                minimum read depth [7]
                -snp_gap_filter           SNP within INT bp around a gap to be filtered [3]
+               -snp_filter               Proportion of coverage to call it a SNP [0.0]
          
 
 Synopsis:

@@ -1,7 +1,7 @@
-       refdir = ../data/ebola_ref  # directory where reference files are located
+      refdir = ../data/ebola_ref  # directory where reference files are located
       workdir = ../workdirs/t2_ebola_sreads # directory where contigs/reads files are located and output is stored
 
-    reference = 0  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
+    reference = 2  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
       reffile = KJ660347.fasta  # reference filename 
 
       project = t2  # main alignment file name
@@ -17,6 +17,7 @@
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
                    # 6:combination F+C+R; 7:realignment  *See below 
         reads = 1  # 1: single reads; 2: paired reads; 3: both types present;
+        SNPSfilter = 0.99 # Only use snps that are above given threshold
 
          tree = 0  # 0:no tree; 1:use FastTree; 2:use RAxML; 3:use both;
     bootstrap = 0  # 0:no; 1:yes;  # Run bootstrapping  *See below

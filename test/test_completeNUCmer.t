@@ -56,7 +56,7 @@ completeNUCmer(
     my $code="bacteria",
     my $thread=4,
     my $error="test/ecoli.error",
-    my $log="test/ecoli_PhaME.log",
+    my $log="test/ecoli.log",
     my $buildSNPdb=0,
     my $cutoff=98
 );
