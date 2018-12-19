@@ -10,15 +10,15 @@ To bypass the installation steps, we have provided a docker [image](https://stac
 	
 	.. code-block:: console
 		
-		$ docker pull quay.io/biocontainers/phame:1.0.1--0
+		$ docker pull quay.io/biocontainers/phame:1.0.3--0
 
 
 3. Check if the image is correctly downloaded by running the provided test:
 	
 	.. code-block:: console
 
-		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 phame -h
-		$ docker run --rm quay.io/biocontainers/phame:1.0.1--1 phame -vcheck
+		$ docker run --rm quay.io/biocontainers/phame:1.0.3--0 phame -h
+		$ docker run --rm quay.io/biocontainers/phame:1.0.3--0 phame -vcheck
 
 4. Run your own data using docker. A step by step guide
 	- Create a folder to mount onto your docker
