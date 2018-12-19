@@ -4,9 +4,9 @@ PhaME: **Ph**\ylogenetics **a**\nd **M**\olecular **E**\volution analysis tool
 .. toctree::
    :numbered:
    :maxdepth: 2
-   
+
    introduction
-   installation
+   install
    runphame
    cases
    docker
