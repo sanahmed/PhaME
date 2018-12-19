@@ -1,4 +1,4 @@
-Using PhaME through a web-interface.
+Web-interface.
 ####################################
 
 Step by step guide to run PhaME using web interface in a local machine. Docker and git is required.

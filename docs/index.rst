@@ -6,24 +6,20 @@ Phylogenetic and Molecular Evolution (PhaME) analysis tool allows suite of analy
 Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/or reads, uses SNP multiple sequence alignment to construct a phylogenetic tree, and provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 
-
-Introduction
------
 .. toctree::
-   :numbered:
    :maxdepth: 2
-   introduction
+   :hidden:
+   :caption: Introduction
+    introduction
 
-Install
--------
 .. toctree::
-   install/conda.rst
-   install/docker.rst
-   install/web-interface.rst
+    :maxdepth: 2
+    :caption: Install
+    install/conda.rst
+    install/docker.rst
+    install/web-interface.rst
 
 
-Citation
---------
 .. toctree::
    citation
 

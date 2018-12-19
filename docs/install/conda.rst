@@ -1,7 +1,7 @@
-Installing PhaME using conda
+Conda
 ############################
 
-PhaME can be installed using conda. If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. After installtion of conda, add channels for bioconda and conda-forge using:
+PhaME can be installed using [conda](https://conda.io/docs/index.html). If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. After installtion of conda, add channels for bioconda and conda-forge using:
  
  .. code-block:: console
  
@@ -12,7 +12,6 @@ PhaME can be installed using conda. If you do not have anaconda or miniconda ins
 
 
 Then simply run
-
 
 .. code-block:: console
 
