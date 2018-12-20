@@ -26,3 +26,4 @@ thirdParty/evolver.out
 thirdParty/errors.log
 messages.log
 *.log
+docs/_build/*

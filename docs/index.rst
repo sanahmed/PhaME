@@ -8,20 +8,22 @@ Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/
 
 .. toctree::
    :maxdepth: 2
-   :hidden:
    :caption: Introduction
+   
     introduction
 
 .. toctree::
     :maxdepth: 2
     :caption: Install
+
     install/conda.rst
     install/docker.rst
     install/web-interface.rst
 
 
 .. toctree::
-   citation
+    :maxdepth: 2
+    citation
 
 Contact
 
