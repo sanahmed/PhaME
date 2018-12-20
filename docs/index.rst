@@ -10,7 +10,8 @@ Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/
     :maxdepth: 2
     :caption: INTRODUCTION
 
-    introduction.rst
+    introduction/introduction
+    introduction/runphame
 
 .. toctree::
     :maxdepth: 2
