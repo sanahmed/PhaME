@@ -1,5 +1,5 @@
 PhaME: **Ph**\ylogenetics **a**\nd **M**\olecular **E**\volution analysis tool
-##########################################################################
+##############################################################################
 
 Phylogenetic and Molecular Evolution (PhaME) analysis tool allows suite of analysis pertaining to phylogeny and moleuclar evolution.
 
@@ -7,25 +7,33 @@ Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/
 
 
 .. toctree::
-   :maxdepth: 2
-   :caption: Introduction
-   
-    introduction
+    :maxdepth: 2
+    :caption: INTRODUCTION
+
+    introduction.rst
 
 .. toctree::
     :maxdepth: 2
-    :caption: Install
+    :caption: INSTALL
 
-    install/conda.rst
-    install/docker.rst
-    install/web-interface.rst
+    install/conda
+    install/docker
+    install/web-interface
+
+.. toctree::
+    :maxdepth: 2
+    :caption: USAGE
+
+    usage/cases
 
 
 .. toctree::
     :maxdepth: 2
-    citation
+    :caption: CITATION
 
-Contact
+    citation.rst
+
+
 
 
 

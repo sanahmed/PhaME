@@ -1,8 +1,8 @@
 Introduction
-############
+#############
 
 What is PhaME?
-=============
+==============
 
 PhaME or Phylogenetic and Molecular Evolution (PhaME) analysis tool allows suite of analysis pertaining to phylogeny and moleuclar evolution.
 
