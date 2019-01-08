@@ -230,9 +230,10 @@ while (<CTL>) {
     # default is NO.
     if (/FirstTime\s*=\s*(1|2)\s*#{0,1}.*$/) { $time = $1; }
     if (/data\s*=\s*(\d)\s*#{0,1}.*$/)       { $data = $1; }
-    if (/SNPSfilter\s*=\s*(\d+\.*\d+)\s*#.*$/) { $snp_filter = $1; }
     #     0=Finished; 1=contig; 2=reads; 3=F+C; 4=F+R; 5=C+R 6=F+C+R
     if (/\s+reads\s*=\s*(1|2|3)\s*#{0,1}.*$/) { $reads = $1; }
+    if (/SNPsfilter\s*=\s*(\d+\.*\d+)\s*#.*$/) { $snp_filter = $1; }
+
     if (/tree\s*=\s*(0|1|2|3|4)\s*#{0,1}.*$/)   { $tree  = $1; }
     #0=no tree; 1=fasttree; 2=raxml; 3=iqtree;4=both
 
@@ -262,6 +263,7 @@ while (<CTL>) {
         }
     }
     if (/cutoff\s*=\s*(\d+\.*\d+)\s*#.*$/) { $cutoff = $1; }
+
 }
 close CTL;
 ##########################################################################################
@@ -364,6 +366,7 @@ END_MESSAGE
 
 }
 
+print "\tSNPs filter:\t$snp_filter\n";
 print "\tCode:\t$type\n";
 print "\tLog file:\t$logfile\n";
 print "\tError file:\t$error\n";
