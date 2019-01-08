@@ -1,51 +1,116 @@
 Web-interface.
-####################################
+##############
 
-Step by step guide to run PhaME using web interface in a local machine. Docker and git is required.
+Phame App
+=========
 
-1. clone the repo 
+This Dockerized application contains all of the code you need to run PhaME as a standalone app. It has containers for 
+the PhaME application, the web interface, Celery and Redis queues and a PostGREs database.
 
-.. code-block:: console
+Step by step guide to running PhaME using a web interface on a local machine. 
+*Docker and git are required.*
 
-    git clone git@github.com:LANL-Bioinformatics/phame-api.git
-
-
-2. create a `.postegres` file within the cloned directory `phame_api01/.envs/.local/.postgres`, and add following lines to it.
-
-.. code-block:: console
-
-    # PostgreSQL
-    # ------------------------------------------------------------------------------
-    POSTGRES_HOST=postgres
-    POSTGRES_PORT=5432
-    POSTGRES_DB=phame_api01
-    POSTGRES_USER=<user>
-    POSTGRES_PASSWORD=<postgres_password>
-
-
-4. cd to the project root  directory `phame_api`
+1. clone the repo
 
 .. code-block:: console
 
-    cd phame_api
+    $ git clone git@github.com:LANL-Bioinformatics/phame-app.git
+
+2. cd to the project root directory `phame-app`
+
+.. code-block:: console
+   
+   $ cd phame-app
+
+3. run 
+
+.. code-block:: console
+
+    $ cp .envs/.local/.postgres_template phame-app/.envs/.local/.postgres 
+    $ cp .envs/.local/.email_template phame-app/.envs/.local/.email
+
+4. Edit the `.postgres` file and change the values for `POSTGRES_USER` and `POSTGRES_PASSWORD`
 
 5. Create docker containers.
 
 .. code-block:: console
 
-    docker-compose build
+   $ docker-compose -f docker-compose-local.yml build
 
 6. start docker
 
 .. code-block:: console
 
-    docker-compose up -d
+   $ docker-compose -f docker-compose-local.yml up -d
 
-7. `docker-compose run --rm web /bin/bash -c "python -c  'import database; database.init_db()'"` to initialize the database.
+7. initialize the database.
 
 .. code-block:: console
 
-    docker-compose run --rm web /bin/bash -c "python -c  'import database; database.init_db()'"
+    $ docker-compose -f docker-compose-local.yml run --rm web /bin/bash -c "python -c  'import database; database.init_db()'"
+
+If all went well, you can go to `localhost` to see the phame webpage.
+
+Running PhaME using a web interface
+==================================================================================
+
+The user input files can require a lot of storage space. Use these instructions if you want to store the users' data on 
+a data volume that is different from the main volume where the Docker container is created. 
+
+Go through steps 1-3 as for the local installation and then:
+
+1. Run 
+
+.. code-block:: console
+
+    mkdir -p /path/to/api/uploads
 
 
-8. If all went well, you can go to open http://localhost to access the phame web-interface.
+2. Update paths in `docker-compose-production.yml` to the volume where you want to store the users' upload files for the 
+`phame` and `web` containers.
+
+.. code-block:: console
+
+    phame:
+        volumes:
+          - phame_data:/phame_api/media
+          - /path/to/api/uploads:/api/static/uploads
+    web:
+        volumes:
+          - phame_data:/phame_api/media
+          - /path/to/api/uploads:/api/static/uploads
+
+
+For example set volumes to `- /vol_d/api/uploads:/api/static/uploads` if you want to store the upload files
+on `/vol_d`
+
+5. Create docker containers.
+
+.. code-block:: console
+
+   docker-compose -f docker-compose-production.yml build
+
+6. start docker
+
+.. code-block:: console
+
+    docker-compose -f docker-compose-production.yml up -d
+
+Monitoring tasks
+================
+
+Browse to `localhost:5555` to see the Flower Dashboard. Here you can see the status of the celery workers and their tasks.
+
+You can look at projects run by other users if you create an `admin` account and login to that account. Click on the 
+admin user icon in the upper right corner and select the username for the projects you would like to view. 
+
+Email notifications
+===================
+
+If you would like users to receive email notifications with the error and execution logs when their projects have finished running:
+
+1. Setup an email client. We use https://www.mailgun.com/
+
+2. Edit the `.email` file and change the values for `API_KEY`, `EMAIL_URL` and `SENDER`
+
+3. Edit `phame-app/api/config.py` and set `SEND_NOTIFICATIONS = True`
