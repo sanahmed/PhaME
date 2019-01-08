@@ -23,11 +23,11 @@ Step by step guide to run PhaME using web interface in a local machine. Docker a
     POSTGRES_PASSWORD=<postgres_password>
 
 
-4. cd to the project root  directory `phame_api01`
+4. cd to the project root  directory `phame_api`
 
 .. code-block:: console
 
-    cd phame_api01
+    cd phame_api
 
 5. Create docker containers.
 
@@ -39,7 +39,7 @@ Step by step guide to run PhaME using web interface in a local machine. Docker a
 
 .. code-block:: console
 
-    docker-compose up
+    docker-compose up -d
 
 7. `docker-compose run --rm web /bin/bash -c "python -c  'import database; database.init_db()'"` to initialize the database.
 
@@ -48,4 +48,4 @@ Step by step guide to run PhaME using web interface in a local machine. Docker a
     docker-compose run --rm web /bin/bash -c "python -c  'import database; database.init_db()'"
 
 
-8. If all went well, :sunglasses: you can go to localhost:8080 to see the phame webpage.
+8. If all went well, you can go to open http://localhost to access the phame web-interface.
