@@ -8,6 +8,8 @@ This Dockerized application contains all of the code you need to run PhaME as a 
 the PhaME application, the web interface, Celery and Redis queues and a PostGREs database.
 
 Step by step guide to running PhaME using a web interface on a local machine. 
+==============================================================================
+
 *Docker and git are required.*
 
 1. clone the repo
@@ -51,8 +53,8 @@ Step by step guide to running PhaME using a web interface on a local machine.
 
 If all went well, you can go to `localhost` to see the phame webpage.
 
-Running PhaME using a web interface
-===================================
+Step by step guide to running PhaME using a web interface on a production machine.
+==================================================================================
 
 The user input files can require a lot of storage space. Use these instructions if you want to store the users' data on 
 a data volume that is different from the main volume where the Docker container is created. 
