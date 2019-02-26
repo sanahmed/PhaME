@@ -446,7 +446,7 @@ sub movefiles {
             system("mv $dir/*.fasttree $dir/trees/");
         }
         elsif ($trees == 2 || $trees == 4){
-            system("mv $dir/RAxML* $dir/trees/");
+            system("mv $dir/RAxML*.* $dir/trees/");
         }
         elsif ($trees == 3 || $trees == 4){
             system("mv $dir/*.fna.* $dir/trees/");
@@ -628,7 +628,7 @@ sub buildTree {
         print OUT "Also bootstraping IQ-Trees trees\n";
         print OUT "\n";
         my $iqtree
-            = "iqtree -m TEST -s $outdir/$name\_snp_alignment.fna -nt $thread -bc $bootstrap 2>>$error >> $log\n\n";
+            = "iqtree -m TEST -s $outdir/$name\_snp_alignment.fna -nt $thread 2>>$error >> $log\n\n";
         print OUT $iqtree;
         if ( system($iqtree) ) { die "Error running $iqtree.\n"; }
     }
@@ -637,7 +637,8 @@ sub buildTree {
 
     if ( $tree == 1 ) { return ("Fasttree phylogeny complete"); }
     if ( $tree == 2 ) { return ("RAxML phylogeny complete"); }
-    if ( $tree == 3 ) { return ("Phylogeny complete"); }
+    if ( $tree == 3 ) { return ("IQ-TREE Phylogeny complete"); }
+    if ( $tree == 4 ) { return ("All phylogeny complete"); }
 }
 
 sub bootstrap {
