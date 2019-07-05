@@ -20,10 +20,13 @@ To quickly get started with PhaME, you can install using conda.
 PhaME: Under the hood.
 ======================
 
-PhaME is a reference genome based tool where all input genomes and metagenomes are first aligned against a reference genome. As a first step in the PhaME pipeline, given a set of reference genomes in path set in parameter `refdir` `phame.ctl` file, one genome is picked as the reference genome. PhaME provides multiple options to pick the most appropriate reference genome. Reference genome can be picked randomly from the set, users can select the reference genome, or can use our MinHash option to pick a refeference genome that has 
+1. Selecting Reference genome:
+-----------------------------
+PhaME is a reference genome based tool where all input genomes and metagenomes are first aligned against a reference genome. As a first step in the PhaME pipeline, given a set of reference genomes in path set in parameter `refdir` `phame.ctl` file, one genome is picked as the reference genome. PhaME provides multiple options to pick the most appropriate reference genome. First, reference genome can be picked randomly from the set. Second, users can select reference genome from the list. Lastly, users can use MinHash option, which will calculate the MinHash distance between all reference genomes with each other and with input contigs and raw reads to pick a genome that has the shortest average distance with each other. MinHash distances are calculated using BBMap.
 
-PhaME is built on alignment tool nucmer for genome alignment. All genomes in fasta format that are complete and included as set of reference genomes are first aligned with self, called self-nucmerization, using `nucmer` to remove repeats within a genome. Following `nucmer` command is used for the self-nucmerization step:
-
+2. Self-nucmerization to remove repeats from reference genomes:
+---------------------------------------------------------------
+PhaME is built on alignment tool nucmer for genome alignment. All genomes in fasta format that are complete and included as set of reference genomes are first aligned with self, called `self-nucmerization`, using `nucmer` to remove repeats within a genome. Following `nucmer` command is used for the self-nucmerization step:
 
 ::
 
@@ -31,5 +34,15 @@ PhaME is built on alignment tool nucmer for genome alignment. All genomes in fas
 
 ::
 
-The identified repeat regions are then removed from downstream analyses. Among the reference 
+The identified repeat regions are then removed from downstream analyses.
+
+3. Genome Alignments
+--------------------
+All genomes that are in `refidir` are first aligned against the reference genome (see section 1) that have had its repeats removed. Likewise, incomplete genomes or contigs, the ones that are listed in the `workdir` with extension `.contig` are also aligned against the reference genome. Raw reads if included in the analyses are mapped to the reference genome using either `bowtie2` or `BWA`. For aligning genomes in fasta format against each other, following commands are used:
+
+::
+
+    nucmer --maxmatch refgenome.fasta genome.fasta
+    delta-filter -1 0 refgenome_genome.delta > workdir/refgenome_genome.snpfilter
+::
 
