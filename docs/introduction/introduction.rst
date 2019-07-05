@@ -121,18 +121,19 @@ For BWA and single end reads:
 ::
 
 
-5. Filtering alignments
------------------------
+5. Filtering genome alignments
+------------------------------
 Genome alignment produced using `nucmer` are filtered using `delta-filter` to only keep 1 to 1 alignments allowing for rearrangements. This filtering step is produced for all `nucmer` alignments.
 
 ::
 
-delta-filter -1 genome.delta > genome.snpfilter
+    delta-filter -1 genome.delta > genome.snpfilter
+
 ::
 
 
-6. Calling SNPs
----------------
+6. Calling SNPs from genome alignments
+--------------------------------------
 The pairwise `nucmer` alignments are then parsed to produce a SNP table using `show-snps`.
 
 ::
@@ -141,5 +142,49 @@ The pairwise `nucmer` alignments are then parsed to produce a SNP table using `s
 
 ::
 
-7. 
+Here, option C and T specifies not to report SNPs from ambiguous alignments and report the output in tab delimited file respectively.
+
+7. Reporting nucmer alignments
+----------------------------
+
+Each alignments are further parse to produce a tab delimited file that has information on regions and %ID of their alignments.
+::
+
+    show-coords -clTr genome.snpfilter > genome.coords
+
+::
+
+The parameter flag -clTr implies different headers to be reported in the report.
+
+::
+
+-c          Include percent coverage information in the output
+-l          Include the sequence length information in the output
+-r          Sort output lines by reference IDs and coordinates
+-T          Switch output to tab-delimited format
+
+::
+
+8. Calling SNPs from read mapping
+---------------------------------
+`bcftools mpileup` is used for calling SNPs from read mapping results (bam file). Maximum depth is set to 1000000 for both SNP and indel calling.  
+
+
+runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0
+
+::
+
+
+bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call --ploidy 1 -cO b - > $bcf_output 2>/dev/null`;
+                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            }
+            else {
+                print "SNPs/Indels call on $ref_file_name\n";
+                `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
+                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+            }
+            print "Filtering SNPs\n";
+            `bcftools filter -i '(DP4[0]+DP4[1])==0 || (DP4[2]+DP4[3])/(DP4[0]+DP4[1]+DP4[2]+DP4[3]) > $snp_filter' $vcf_output > $vcf_filtered`;
+
+::
 
