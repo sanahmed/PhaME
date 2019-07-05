@@ -34,15 +34,69 @@ PhaME is built on alignment tool nucmer for genome alignment. All genomes in fas
 
 ::
 
-The identified repeat regions are then removed from downstream analyses.
+The option `--maxmatch`  reports all matches is used to ensure all possible alignments are reported for maximal removal of repeats. The identified repeat regions are then removed from downstream analyses.
 
 3. Genome Alignments
---------------------
-All genomes that are in `refidir` are first aligned against the reference genome (see section 1) that have had its repeats removed. Likewise, incomplete genomes or contigs, the ones that are listed in the `workdir` with extension `.contig` are also aligned against the reference genome. Raw reads if included in the analyses are mapped to the reference genome using either `bowtie2` or `BWA`. For aligning genomes in fasta format against each other, following commands are used:
+--------------------------------
+All genomes that are in `refdir` are first aligned against the reference genome (see section 1) that have had its repeats removed (section 2). Likewise, incomplete genomes or contigs, the ones that are listed in the `workdir` with extension `.contig` are also aligned against the reference genome using `nucmer`. For aligning genomes in fasta format against each other, following command, same as the previous step for nucmer alignment is used:
 
 ::
 
     nucmer --maxmatch refgenome.fasta genome.fasta
-    delta-filter -1 0 refgenome_genome.delta > workdir/refgenome_genome.snpfilter
+
 ::
 
+All other options in nucmer alignments are kept at default, some of the important ones are listed below:
+
+::
+
+   -b|breaklen     Set the distance an alignment extension will attempt to
+                    extend poor scoring regions before giving up (default 200)
+    -c|mincluster   Sets the minimum length of a cluster of matches (default 65)
+    -D|diagdiff     Set the maximum diagonal difference between two adjacent
+                    anchors in a cluster (default 5)
+    -d|diagfactor   Set the maximum diagonal difference between two adjacent
+                    anchors in a cluster as a differential fraction of the gap
+                    length (default 0.12)
+    --[no]extend    Toggle the cluster extension step (default --extend)
+    -g|maxgap       Set the maximum gap between two adjacent matches in a
+                    cluster (default 90)
+    -l|minmatch     Set the minimum length of a single match (default 20)
+
+::
+
+4. Mapping of raw reads to reference genome
+-------------------------------------------
+If raw reads, single or paired end, are included in the analyses, they are mapped to the reference genome using either `bowtie2` or `BWA`, theyFor reads mapping of reference genome, following commands are used:
+
+First, it builds database from the reference genome.
+::
+
+    bowtie2-build refgenome refgenome
+
+::
+or, if BWA was chosen as the preferred aligner:
+
+::
+
+    bwa index refgenome
+
+::
+
+The raw reads are then mapped to the reference genomne using one of the following command:
+
+For paired reads:
+
+::
+
+    bowtie2 -a -x $refgenome -1 read1 -2 read2 -S paired.sam`;
+
+::
+The option `-a` reports all possible alignments.
+
+
+
+runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0
+
+
+Upon aligning genomes using `nucmer`, 
