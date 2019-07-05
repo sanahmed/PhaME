@@ -65,9 +65,11 @@ All other options in nucmer alignments are kept at default, some of the importan
 
 ::
 
+Also, `nucmer` only aligns `A``T``C``G`, all other characters are ignored. So, if there are `N`s in the provided genomes, thse positions are not included in the alignment.
+
 4. Mapping of raw reads to reference genome
 -------------------------------------------
-If raw reads, single or paired end, are included in the analyses, they are mapped to the reference genome using either `bowtie2` or `BWA`, theyFor reads mapping of reference genome, following commands are used:
+PhaME as of now only processes short raw reads from Illumina. If raw reads, single or paired end, are included in the analyses, they are mapped to the reference genome using either `bowtie2` or `BWA`. For reads mapping of reference genome, following commands are used:
 
 First, it builds database from the reference genome.
 ::
@@ -83,9 +85,9 @@ or, if BWA was chosen as the preferred aligner:
 
 ::
 
-The raw reads are then mapped to the reference genomne using one of the following command:
+The raw reads are then mapped to the reference genomne using one of the following commands:
 
-For paired reads:
+For bowtie2 and paired reads:
 
 ::
 
@@ -94,9 +96,50 @@ For paired reads:
 ::
 The option `-a` reports all possible alignments.
 
+For bowtie2 and single end reads:
+
+::
+
+    bowtie2 -a -x $refgenome -U read -S single.sam`;
+
+::
+
+For BWA and paired reads:
+
+::
+
+    bwa mem refgenome read1 read2 | samtools view -ubS -| samtools sort -T tmp_folder -O BAM -o paired.bam
+
+::
+
+For BWA and single end reads:
+
+::
+
+    bwa mem refgenome read |samtools view -ubS - | samtools sort -T tmp_folder -O BAM -o single.bam
+
+::
 
 
-runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0
+5. Filtering alignments
+-----------------------
+Genome alignment produced using `nucmer` are filtered using `delta-filter` to only keep 1 to 1 alignments allowing for rearrangements. This filtering step is produced for all `nucmer` alignments.
+
+::
+
+delta-filter -1 genome.delta > genome.snpfilter
+::
 
 
-Upon aligning genomes using `nucmer`, 
+6. Calling SNPs
+---------------
+The pairwise `nucmer` alignments are then parsed to produce a SNP table using `show-snps`.
+
+::
+
+    show-snps -CT genome.snpfilter > genome.snps
+
+::
+
+7. 
+
