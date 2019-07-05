@@ -67,6 +67,8 @@ All other options in nucmer alignments are kept at default, some of the importan
 
 Also, `nucmer` only aligns `A``T``C``G`, all other characters are ignored. So, if there are `N`s in the provided genomes, thse positions are not included in the alignment.
 
+*Note*: If an analysis requires running multiple iterations of PhaME on a same set of dataset or a subset of dataset, one doesn't need to perform the alignment over and over again. PhaME provides an option where it can keep all possible pairwise alignment of genomes from `refdir` for future analyses. All the steps mentioned in thi section are the same, except that all vs. all alignment is performed compared to just one reference. By doing all vs. all alignment one can also test the effect on their analyses with different reference genomes.
+
 4. Mapping of raw reads to reference genome
 -------------------------------------------
 PhaME as of now only processes short raw reads from Illumina. If raw reads, single or paired end, are included in the analyses, they are mapped to the reference genome using either `bowtie2` or `BWA`. For reads mapping of reference genome, following commands are used:
@@ -167,24 +169,25 @@ The parameter flag -clTr implies different headers to be reported in the report.
 
 8. Calling SNPs from read mapping
 ---------------------------------
-`bcftools mpileup` is used for calling SNPs from read mapping results (bam file). Maximum depth is set to 1000000 for both SNP and indel calling.  
+`bcftools mpileup` is used for calling SNPs from read mapping results (bam file) of every genomes represented by raw reads. Maximum depth is set to 1000000 for both SNP and indel calling and minimum gaps for calling an indel is set to 3. The output vcf file is then used to call SNPs using `bcftools call` where ploidy is specified as `1` if its a haploid or bacterial genome, else it is called using default parameter. Furthermore, based on the user specified parameter in the control file, SNPs are further filtered based on percentage of SNPs. Here are the snippets of commmand that are sun as part of this. All of them result in a vcf file.
 
+::
+
+    bcftools mpileup -d 1000000 -L 1000000 -m 3 -Ov -f $refgenome $bam_output | bcftools call --ploidy 1 -cO b > $bcf_output;
+    bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
+    bcftools filter -i '(DP4[0]+DP4[1])==0 || (DP4[2]+DP4[3])/(DP4[0]+DP4[1]+DP4[2]+DP4[3]) > $snp_filter' $vcf_output > $vcf_filtered`
+
+::
+
+
+9. Calculating core genome
+--------------------------
+
+As a first step in calculating the core genome, all alignments to reference are checked for linear coverage to assure the proportion of reference genome that was used in the alignment. If its lower than the threshold set in control file, that genome will be removed from further analyses. Then rest of the pairwise alignments that are either in vcf format or nucmer formats are then collated to calculate a core genome. Only the alignment position that are 100% conserved are kept, all other positions are removed from the final core genome alignment. PhaME produces multiple alignment files corresponding to core genome such as the one that has only the variant sites, has variant and invariant sites, and the ones that have SNPs from only the coding region.
+
+
+10. Reconstructing phylogeny
+----------------------------
+PhaME provides multiple tools to reconstruct phylogeny from one or all of the core genome alignments. The core genome alignments are fed to one or all of the phylogenetic reconstruction tools that PhaME provides (RAxML, FastTree, and IQ-TREE). 
 
 runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0
-
-::
-
-
-bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call --ploidy 1 -cO b - > $bcf_output 2>/dev/null`;
-                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
-            }
-            else {
-                print "SNPs/Indels call on $ref_file_name\n";
-                `bcftools mpileup -d $max_depth -L $max_depth -m $min_indel_candidate_depth -Ov -f $ref_file $bam_output | bcftools call -cO b - > $bcf_output 2>/dev/null`;
-                `bcftools view -v snps,indels,mnps,ref,bnd,other -Ov $bcf_output | vcfutils.pl varFilter -a$min_alt_bases -d$min_depth -D$max_depth > $vcf_output`;
-            }
-            print "Filtering SNPs\n";
-            `bcftools filter -i '(DP4[0]+DP4[1])==0 || (DP4[2]+DP4[3])/(DP4[0]+DP4[1]+DP4[2]+DP4[3]) > $snp_filter' $vcf_output > $vcf_filtered`;
-
-::
-
