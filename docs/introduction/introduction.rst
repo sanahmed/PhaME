@@ -16,11 +16,11 @@ Here, we have explained in detail how PhaME works using step by step process.
 
 1. Selecting Reference genome:
 -----------------------------
-PhaME is a reference genome based tool where all input genomes and metagenomes are first aligned against a reference genome. As a first step in the PhaME pipeline, given a set of reference genomes in path set in parameter `refdir` `phame.ctl` file, one genome is picked as the reference genome. PhaME provides multiple options to pick the most appropriate reference genome. First, reference genome can be picked randomly from the set. Second, users can select reference genome from the list. Lastly, users can use MinHash option, which will calculate the MinHash distance between all reference genomes with each other and with input contigs and raw reads to pick a genome that has the shortest average distance with each other. MinHash distances are calculated using BBMap.
+PhaME is a reference genome based tool where all input genomes and metagenomes are first aligned against a reference genome. As a first step in the PhaME pipeline, given a set of reference genomes in path set in parameter `refdir` `phame.ctl` file, one genome is picked as the reference genome. PhaME provides multiple options to pick the most appropriate reference genome. First, reference genome can be picked randomly from the set. Second, users can select reference genome from the list. Lastly, users can use MinHash option, which will calculate the MinHash distance between all reference genomes with each other and with input contigs and raw reads to pick a genome that has the shortest average distance with each other. MinHash distances are calculated using BBMap [Bushnell]_.
 
 2. Self-nucmerization to remove repeats from reference genomes:
 ---------------------------------------------------------------
-PhaME is built on alignment tool nucmer for genome alignment. All genomes in fasta format that are complete and included as set of reference genomes are first aligned with self, called `self-nucmerization`, using `nucmer` to remove repeats within a genome. Following `nucmer` command is used for the self-nucmerization step:
+PhaME is built on alignment tool nucmer [Kurtz 2004]_ for genome alignment. All genomes in fasta format that are complete and included as set of reference genomes are first aligned with self, called `self-nucmerization`, using `nucmer` to remove repeats within a genome. Following `nucmer` command is used for the self-nucmerization step:
 
 ::
 
@@ -182,7 +182,7 @@ As a first step in calculating the core genome, all alignments to reference are 
 
 10. Reconstructing core genome phylogeny
 ----------------------------------------
-PhaME provides multiple tools (RAxML, FastTree, and IQ-Tree) to reconstruct phylogeny from one core genome alignments that have invariant sites. If RAxML or FastTree option is chosen, users cannot modify the models as they are pre-selected. RAxML trees are reconstructed using GTRGAMMAI models that "GTR + Optimization of substitution rates + GAMMA model of rate heterogeneity (alpha parameter will be estimated)" with `I` but with estimate for invariable sites. FastTree uses GTR model only. IQ-TREE is run using option `-m TEST` that searches for the best model that fits the data before reconstructing the phylogeny. RAxML is the only option that is currently available that can also calculate the bootstraps.
+PhaME provides multiple tools (RAxML [Stamatakis 2014]_, FastTree [Price 2010]_, and IQ-Tree [Nguyen 2015]_) to reconstruct phylogeny from one core genome alignments that have invariant sites. If RAxML or FastTree option is chosen, users cannot modify the models as they are pre-selected. RAxML trees are reconstructed using GTRGAMMAI models that "GTR + Optimization of substitution rates + GAMMA model of rate heterogeneity (alpha parameter will be estimated)" with `I` but with estimate for invariable sites. FastTree uses GTR model only. IQ-TREE is run using option `-m TEST` that searches for the best model that fits the data before reconstructing the phylogeny. RAxML is the only option that is currently available that can also calculate the bootstraps.
 
 11. Selecting genes for molecular evolutionary analyses
 -------------------------------------------------------
@@ -190,6 +190,12 @@ To perform selection analyses using PAML or HyPhy, codon alignments of genes are
 
 12. Molecular Evoluationary analyses
 ------------------------------------
-The set of gene alignments are then used for molecular evolutionary analyses using either PAML [PAML]_ or HyPhy. PAML is run twice for the same gene using two differnt models (`model=0` and `model=2`), first that sets one omega ratio for all brances and another that sets different omega ratios for all lineages. For the first model, additional parameter variation model that specifies, neutral (1), selection (2), beta and omega ratio between 0 and 1 (7), and beta, omega and an additional omega is run. For the Model 2 with variable omega ratios across all branches, the model with one omega across all sites i used. If HyPhy is selected, it uses the aBSREL model.
+The set of gene alignments are then used for molecular evolutionary analyses using either PAML [Yang 2007]_ or HyPhy [Pond 2005]_. PAML is run twice for the same gene using two differnt models (`model=0` and `model=2`), first that sets one omega ratio for all brances and another that sets different omega ratios for all lineages. For the first model, additional parameter variation model that specifies, neutral (1), selection (2), beta and omega ratio between 0 and 1 (7), and beta, omega and an additional omega is run. For the Model 2 with variable omega ratios across all branches, the model with one omega across all sites i used. If HyPhy is selected, it uses the aBSREL model.
 
-.. [PAML] Yang Z: PAML 4: phylogenetic analysis by maximum likelihood. Mol Biol Evol 2007, 24:1586-1591.
+.. [Yang 2007] Yang Z: PAML 4: phylogenetic analysis by maximum likelihood. Mol Biol Evol 2007, 24:1586-1591.
+.. [Pond 2005] Pond SL, Frost SD, Muse SV: HyPhy: hypothesis testing using phylogenies. Bioinformatics 2005, 21:676-679.
+.. [Kurtz 2004] Kurtz S, Phillippy A, Delcher AL, Smoot M, Shumway M, Antonescu C, Salzberg SL: Versatile and open software for comparing large genomes. Genome Biol 2004, 5:R12.
+.. [Bushnell] Bushnell B: BBMap. 37.66 edition. sourceforge.net/projects/bbmap/.
+.. [Stamatakis 2014] Stamatakis A: RAxML version 8: a tool for phylogenetic analysis and post- analysis of large phylogenies. Bioinformatics 2014, 30:1312-1313.
+.. [Price 2010] Price MN, Dehal PS, Arkin AP: FastTree 2--approximately maximum- likelihood trees for large alignments. PLoS One 2010, 5:e9490.
+.. [Nguyen 2015] Nguyen LT, Schmidt HA, von Haeseler A, Minh BQ: IQ-TREE: a fast and effective stochastic algorithm for estimating maximum-likelihood phylogenies. Mol Biol Evol 2015, 32:268-274.
