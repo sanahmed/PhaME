@@ -9,16 +9,10 @@ PhaME or Phylogenetic and Molecular Evolution (PhaME) analysis tool allows suite
 Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/or reads, uses SNP multiple sequence alignment to construct a phylogenetic tree, and provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 
-Quick usage
-===========
-To quickly get started with PhaME, you can install using conda.
-
-.. code-block:: console
-
-    conda install phame
-
 PhaME: Under the hood.
 ======================
+
+Here, we have explained in detail how PhaME works using step by step process.
 
 1. Selecting Reference genome:
 -----------------------------
@@ -183,11 +177,19 @@ The parameter flag -clTr implies different headers to be reported in the report.
 9. Calculating core genome
 --------------------------
 
-As a first step in calculating the core genome, all alignments to reference are checked for linear coverage to assure the proportion of reference genome that was used in the alignment. If its lower than the threshold set in control file, that genome will be removed from further analyses. Then rest of the pairwise alignments that are either in vcf format or nucmer formats are then collated to calculate a core genome. Only the alignment position that are 100% conserved are kept, all other positions are removed from the final core genome alignment. PhaME produces multiple alignment files corresponding to core genome such as the one that has only the variant sites, has variant and invariant sites, and the ones that have SNPs from only the coding region.
+As a first step in calculating the core genome, all alignments to reference are checked for linear coverage to assure the proportion of reference genome that was used in the alignment. If its lower than the threshold set in control file, that genome will be removed from further analyses. Then rest of the pairwise alignments that are either in vcf format or nucmer formats are then collated to calculate a core genome. Only the alignment position that are 100% conserved are kept, all other positions are removed from the final core genome alignment. PhaME produces multiple alignment files corresponding to core genome such as the one that has only the variant sites, has variant and invariant sites, and the ones that have SNPs from only the coding region. The latter one requires a GFF formatted annotation file with information regarding genes.
 
 
-10. Reconstructing phylogeny
-----------------------------
-PhaME provides multiple tools to reconstruct phylogeny from one or all of the core genome alignments. The core genome alignments are fed to one or all of the phylogenetic reconstruction tools that PhaME provides (RAxML, FastTree, and IQ-TREE). 
+10. Reconstructing core genome phylogeny
+----------------------------------------
+PhaME provides multiple tools (RAxML, FastTree, and IQ-Tree) to reconstruct phylogeny from one core genome alignments that have invariant sites. If RAxML or FastTree option is chosen, users cannot modify the models as they are pre-selected. RAxML trees are reconstructed using GTRGAMMAI models that "GTR + Optimization of substitution rates + GAMMA model of rate heterogeneity (alpha parameter will be estimated)" with `I` but with estimate for invariable sites. FastTree uses GTR model only. IQ-TREE is run using option `-m TEST` that searches for the best model that fits the data before reconstructing the phylogeny. RAxML is the only option that is currently available that can also calculate the bootstraps.
 
-runReadsToGenome.pl -snp_filter $snp_filter -ploidy $ploidy -p '$read1 $read2' -ref $reference -pre $prefix -d $outdir -aligner $aligner -cpu $thread -consensus 0
+11. Selecting genes for molecular evolutionary analyses
+-------------------------------------------------------
+To perform selection analyses using PAML or HyPhy, codon alignments of genes are a requirement. Based on the position of SNPs in the reference genome, if a SNP is within a coding region and if that coding region does not have a gap, they are extracted from the core genome alignment. The nucleotide sequences of the genes are then translated to protein sequences, aligned using the program `mafft`, and then reverse translated back to nucleotide using `pal2lanl.pl`.
+
+12. Molecular Evoluationary analyses
+------------------------------------
+The set of gene alignments are then used for molecular evolutionary analyses using either PAML [PAML]_ or HyPhy. PAML is run twice for the same gene using two differnt models (`model=0` and `model=2`), first that sets one omega ratio for all brances and another that sets different omega ratios for all lineages. For the first model, additional parameter variation model that specifies, neutral (1), selection (2), beta and omega ratio between 0 and 1 (7), and beta, omega and an additional omega is run. For the Model 2 with variable omega ratios across all branches, the model with one omega across all sites i used. If HyPhy is selected, it uses the aBSREL model.
+
+.. [PAML] Yang Z: PAML 4: phylogenetic analysis by maximum likelihood. Mol Biol Evol 2007, 24:1586-1591.
