@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'phame'
-copyright = '2018, migun'
-author = 'migun'
+copyright = '2018, LANL'
+author = 'Migun Shakya, Chien-Chi Lo, Sanaa Ahmed, Mark Flynn, Patrick S.G Chain'
 
 # The short X.Y version
 version = ''
@@ -133,7 +133,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'phame.tex', 'phame Documentation',
+    (master_doc, 'phame.tex', 'PhaME',
      'migun', 'manual'),
 ]
 
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'phame', 'phame Documentation',
+    (master_doc, 'phame', 'PhaME',
      [author], 1)
 ]
 
@@ -154,7 +154,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'phame', 'phame Documentation',
+    (master_doc, 'phame', 'PhaME',
      author, 'phame', 'One line description of project.',
      'Miscellaneous'),
 ]
