@@ -19,14 +19,14 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'phame'
+project = 'PhaME'
 copyright = '2018, LANL'
 author = 'Migun Shakya, Chien-Chi Lo, Sanaa Ahmed, Mark Flynn, Patrick S.G Chain'
 
 # The short X.Y version
-version = ''
+version = '1.0.2'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '1.0.2'
 
 
 # -- General configuration ---------------------------------------------------
@@ -66,7 +66,7 @@ language = None
 exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 
 # The name of the Pygments (syntax highlighting) style to use.
-pygments_style = None
+pygments_style = 'sphinx'
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -106,7 +106,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'phame'
+htmlhelp_basename = 'PhaME'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -134,7 +134,7 @@ latex_elements = {
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
     (master_doc, 'phame.tex', 'PhaME',
-     'migun', 'manual'),
+     'PhaME Development Team', 'manual'),
 ]
 
 
@@ -143,7 +143,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'phame', 'PhaME',
+    (master_doc, 'PhaME', 'PhaME',
      [author], 1)
 ]
 
@@ -154,7 +154,7 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'phame', 'PhaME',
+    (master_doc, 'PhaME',
      author, 'phame', 'One line description of project.',
      'Miscellaneous'),
 ]
