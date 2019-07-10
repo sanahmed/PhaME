@@ -24,7 +24,7 @@ copyright = '2018, LANL'
 author = 'Migun Shakya, Chien-Chi Lo, Sanaa Ahmed, Mark Flynn, Patrick S.G Chain'
 
 # The short X.Y version
-version = '1.0.2'
+version = '1'
 # The full version, including alpha/beta/rc tags
 release = '1.0.2'
 
@@ -155,7 +155,7 @@ man_pages = [
 #  dir menu entry, description, category)
 texinfo_documents = [
     (master_doc, 'PhaME',
-     author, 'phame', 'One line description of project.',
+     author, 'PhaME', 'One line description of project.',
      'Miscellaneous'),
 ]
 
