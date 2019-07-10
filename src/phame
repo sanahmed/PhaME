@@ -91,7 +91,7 @@ my $code       = 0;
 my $type;
 my $clean   = 1;
 my $threads = 1;
-my $cutoff  = 0;
+my $cutoff  = 0.6;
 my $annotation;
 my $genefile;
 my $runtime       = time;
