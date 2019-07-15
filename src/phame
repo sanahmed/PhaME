@@ -63,7 +63,7 @@ AUTHORS
 #...............................................................................
 # global variables
 my $PACKAGENAME    = "PhaME";
-my $PACKAGEVERSION = "1.0.2";
+my $PACKAGEVERSION = "1.0.4";
 my $AUTHORS        = "Migun Shakya, Chien-Chi Lo, Sanaa Ahmed";
 my $URL            = 'https://github.com/LANL-Bioinformatics/PhaME';
 my $vcheck         = '';
