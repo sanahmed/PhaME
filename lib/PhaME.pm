@@ -586,7 +586,7 @@ sub buildSNPDB {
     close OUT;
     return ("SNP database complete");
 }
-
+#------------------------------------------------------------------------------------------------------------------------------------------------#
 sub buildTree {
     my $bindir = shift;
     my $outdir = shift;
@@ -616,13 +616,6 @@ sub buildTree {
             # = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -s $outdir/$name\_snp_alignment.fna -w $outdir -n $name 2>>$error >> $log\n\n";
         print OUT $raxml;
         if ( system($raxml) ) { die "Error running $raxml.\n"; }
-        # dont need a rooted tree, removing it for now
-        #my $rooted_tree_cmd
-        #    = "raxmlHPC-PTHREADS -T $thread -m GTRGAMMAI -f I -t $outdir/RAxML_bestTree.$name -w $outdir -n $name\_r 2>>$error >> $log\n\n";
-        #print $rooted_tree_cmd;
-        #if ( system($rooted_tree_cmd) ) {
-        #    die "Error running $rooted_tree_cmd.\n";
-        #}
     }
 
     if ( $tree == 3 || $tree == 4 ) {
@@ -642,7 +635,7 @@ sub buildTree {
     if ( $tree == 3 ) { return ("IQ-TREE Phylogeny complete"); }
     if ( $tree == 4 ) { return ("All phylogeny complete"); }
 }
-
+#------------------------------------------------------------------------------------------------------------------------------------------------#
 sub bootstrap {
     my $bindir    = shift;
     my $outdir    = shift;

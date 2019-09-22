@@ -32,6 +32,8 @@ my $SNPstats;
 my $SNPcomps;
 my $cdsSNPoutfile;
 my $intSNPoutfile;
+my $all_cdsSNPoutfile;
+my $all_intSNPoutfile;
 my $CDScoords;
 my $noncoding;
 my $ambiguous;
@@ -55,6 +57,8 @@ my $snp_file;
 my %pairSNPcount;
 my %coreSNPcount;
 my %cdsSNPcount;
+my %CDSSNPcount;
+my %AllCDSSNPcount;
 my %intSNPcount;
 my %snp_location;
 my $rpos;
@@ -96,6 +100,8 @@ $SNPcomps      = "$indir\/$project\_comparisons.txt";
 if ( $coding == 1 ) {
     $cdsSNPoutfile = "$indir\/$project\_cds_snp_alignment.fna";
     $intSNPoutfile = "$indir\/$project\_int_snp_alignment.fna";
+    $all_intSNPoutfile = "$indir\/$project\_int_all_alignment.fna";
+    $all_cdsSNPoutfile = "$indir\/$project\_cds_all_alignment.fna";
     $CDScoords     = "$indir\/CDScoords.txt";
     $noncoding     = "$indir\/noncoding.txt";
 }
@@ -128,6 +134,8 @@ if ( $coding == 1 ) {
     open( CDSMAT, ">$cdsMatrixfile" ) || die "$!";
     open( CDSOUT, ">$cdsSNPoutfile" ) || die "$!";
     open( INTOUT, ">$intSNPoutfile" ) || die "$!";
+    open( ALLCDSOUT, ">$all_cdsSNPoutfile" ) || die "$!";
+    open( ALLINTOUT, ">$all_intSNPoutfile" ) || die "$!";
 }
 
 #print BASE "Reference used:\t$name\n";
@@ -159,6 +167,7 @@ create_mono_snp_array();
 create_ALLsnp_array();
 
 if ( $coding == 1 ) {
+    create_allCDS_array();
     create_CDSsnp_array();
     create_INTsnp_array();
 }
@@ -311,6 +320,7 @@ sub read_directory {
 
 ################################################################################
 sub create_mono_snp_array {
+    # subroutine that creates alignment file with all alignment positions.
     my $ref         = 0;
     my $current_snp = 0;
     my $first       = 0;
@@ -458,6 +468,50 @@ sub create_CDSsnp_array {
     }    #header list
     $CDScount = scalar( keys %CDSSNPcount );
     if ( $coding == 1 ) { print BASE "CDS SNPs\t$CDScount\n"; }
+}
+
+sub create_allCDS_array {
+    my $ref         = 0;
+    my $current_snp = 0;
+    my $first       = 0;
+    my $second      = 0;
+    my $AllCDScount = 0;
+    my %AllCDSSNPcount;
+
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { print $second, "\n"; next; }
+        }
+        for ( 1 .. length($ref_sequence) ) {
+            if ( !defined $gap_location{$_} && defined $coding_location{$_} )
+                {
+                $AllCDSSNPcount{$_} = 1;
+                }
+        }
+    }
+    foreach my $comparison (@header_list) {
+        if ( $comparison =~ /(.+):(.+)/ ) {
+            ( $first, $second ) = ( $1, $2 );
+            if ( $skip_query_ref->{$second} ) { print $second, "\n"; next; }
+            print ALLCDSOUT ">$second\n";
+
+        }
+        for ( sort keys %AllCDSSNPcount ) {
+            $current_snp = $_ - 1;
+            if ( defined $snp_location{$_}{$comparison} ) {
+                $AllCDSSNPcount{$_} = 1;
+                print ALLCDSOUT $snp_location{$_}{$comparison};
+                $AllCDScount++;
+            }
+            else {
+                $ref = substr( $ref_sequence, $current_snp, 1 );
+                print ALLCDSOUT $ref;
+                $AllCDScount++;
+            }
+        }
+        print ALLCDSOUT "\n";
+    }    
 }
 ################################################################################
 

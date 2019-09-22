@@ -7,9 +7,9 @@ if [[ $1 -eq 1 ]] || [[ -z $1 ]];then
 	############# #1 Throws error at the end about molecular evolution analysis as all genes had gaps ##############
 	mkdir -p test/workdirs/t1_ebola_preads
 	cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t1_ebola_preads
-	phame test/ctl_files/t1_ebola_preads.ctl
+	src/phame test/ctl_files/t1_ebola_preads.ctl
 	a=$(grep -c ">" < test/workdirs/t1_ebola_preads/results/alignments/t1_all_snp_alignment.fna)
-	b=11
+	b=10
 	if [ "$a" -eq "$b" ];then
 		echo "Test 1 finished without any errors";
 	else
@@ -26,7 +26,7 @@ then
 	############## #2 Test with just single reads and random reference #############
 	mkdir -p test/workdirs/t2_ebola_sreads
 	cp test/data/ebola_reads/*R1.fastq test/workdirs/t2_ebola_sreads/
-	phame test/ctl_files/t2_ebola_sreads.ctl
+	src/phame test/ctl_files/t2_ebola_sreads.ctl
 	a=$(grep -c ">" test/workdirs/t2_ebola_sreads/results/alignments/t2_all_snp_alignment.fna)
 	b=2
 	if [ "$a" -eq "$b" ];then
@@ -44,7 +44,7 @@ then
 	echo "Test with just contigs using ANI based reference";
 	mkdir -p test/workdirs/t3_ebola_contigs
 	cp test/data/ebola_contigs/*.contig test/workdirs/t3_ebola_contigs/
-	phame test/ctl_files/t3_ebola_contigs.ctl
+	src/phame test/ctl_files/t3_ebola_contigs.ctl
 	a=$(wc -l < test/workdirs/t3_ebola_contigs/results/paml/PAMLsitesResults.txt)
 	b=3
 	if [ "$a" -eq "$b" ];then
@@ -60,7 +60,7 @@ if [[ $1 -eq 4 ]] || [[ -z $1 ]];
 then
 	######## #4 Test with just complete and uses given reference, tests PAML####
 	mkdir -p test/workdirs/t4_ebola_complete
-	phame test/ctl_files/t4_ebola_complete.ctl
+	src/phame test/ctl_files/t4_ebola_complete.ctl
 	a=$(grep -c ">" < test/workdirs/t4_ebola_complete/results/alignments/t4_all_snp_alignment.fna)
 	b=9
 	if [ "$a" -eq "$b" ];then

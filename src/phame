@@ -768,7 +768,7 @@ if ( $buildtree == 1 || $bs == 1) {
     if ($tree > 0 ){
         &print_timeInterval( $runtime, "Reconstructing all SNPs phylogeny\n" );
         my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
-        "$project\_all", $bootstrap, $error, $logfile );
+        "$project", $bootstrap, $error, $logfile );
         &print_timeInterval( $runtime, "All SNPs Phylogeny Complete.\n" );
         if ( $gsignal == 1 ) {
             &print_timeInterval( $runtime, "Reconstructing CDS SNP phylogeny\n" );
@@ -826,7 +826,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project\_all", $bootstrap, $error, $logfile );
+                "$project", $bootstrap, $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
             `cp $tbest $pamldir`;
@@ -854,7 +854,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project\_all", $bootstrap, $error, $logfile );
+                "$project", $bootstrap, $error, $logfile );
             $hyphydir = $outdir . '/paml';
             if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
             `cp $tbest $hyphydir`;
