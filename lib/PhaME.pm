@@ -438,7 +438,7 @@ sub movefiles {
     
     print "\nFinalizing...\n";
     system(
-        "mkdir $dir/alignments $dir/tables $dir/miscs; mv $dir/*.fna $dir/alignments/; mv $dir/*.txt $dir/tables; [ -f dir/*.delta ] && mv $dir/*.delta $dir/miscs;[ -f dir/*.*filter ] && mv $dir/*.*filter $dir/miscs"
+        "mkdir $dir/alignments $dir/tables $dir/miscs; mv $dir/*.fna $dir/alignments/; mv $dir/*.txt $dir/tables; mv $dir/*.delta $dir/miscs; mv $dir/*.*filter $dir/miscs"
     );
     if ($trees > 0){
         system("mkdir $dir/trees");
@@ -620,12 +620,19 @@ sub buildTree {
 
     if ( $tree == 3 || $tree == 4 ) {
         print OUT "Reconstructing phylogeny using IQ-tree after finding the best model\n";
-        print OUT "Also bootstraping IQ-Trees trees\n";
-        print OUT "\n";
+        if ($bootstrap > 0){
+            print OUT "Also bootstraping IQ-Trees trees\n";
+            print OUT "\n";
+            my $iqtree
+                = "iqtree -m TEST -b $bootstrap -s $outdir/$name\_all_alignment.fna -nt $thread 2>>$error >> $log\n\n";
+            print OUT $iqtree;
+            if ( system($iqtree) ) { die "Error running $iqtree.\n"; }
+        } else {
         my $iqtree
             = "iqtree -m TEST -s $outdir/$name\_all_alignment.fna -nt $thread 2>>$error >> $log\n\n";
         print OUT $iqtree;
         if ( system($iqtree) ) { die "Error running $iqtree.\n"; }
+        }
     }
     print OUT "Tree phylogeny complete.\n";
     close OUT;
@@ -669,15 +676,15 @@ sub bootstrap {
         if ( system($bestTree) ) { die "Error running $bestTree.\n"; }
 
     }
-    if ( $tree == 3 || $tree == 4 ) {
-        print OUT "Reconstructing phylogeny using IQ-tree after finding the best model\n";
-        print OUT "Also bootstraping IQ-Trees trees\n";
-        print OUT "\n";
-        my $iqtree
-            = "iqtree -m TEST -b $bootstrap -s $outdir/$name\_all_alignment.fna -nt $thread 2>>$error >> $log\n\n";
-        print OUT $iqtree;
-        if ( system($iqtree) ) { die "Error running $iqtree.\n"; }
-    }
+    # if ( $tree == 3 || $tree == 4 ) {
+    #     print OUT "Reconstructing phylogeny using IQ-tree after finding the best model\n";
+    #     print OUT "Also bootstraping IQ-Trees trees\n";
+    #     print OUT "\n";
+    #     my $iqtree
+    #         = "iqtree -redo -m TEST -b $bootstrap -s $outdir/$name\_all_alignment.fna -nt $thread 2 >>$error >> $log\n\n";
+    #     print OUT $iqtree;
+    #     if ( system($iqtree) ) { die "Error running $iqtree.\n"; }
+    # }
 
     return "Bootstrap complete";
     close OUT;

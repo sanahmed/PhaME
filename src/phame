@@ -11,7 +11,7 @@ use File::Basename;
 use Time::Piece;
 use PhaME;
 use Cwd;
-# use Statistics::Distribution;
+use Statistics::Distributions;
 # use Parallel::ForkManagers;
 use Bio::SeqIO;
 use Bio::Tools::CodonTable;
@@ -779,7 +779,7 @@ if ( $buildtree == 1 || $bs == 1) {
         if ( $bsignal == 1 ) {
             &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
             my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
-            "$project\_all", $bootstrap, $error, $logfile );
+            "$project", $bootstrap, $error, $logfile );
             &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
         }
     }
@@ -799,7 +799,7 @@ if ( $tree == 2 || $tree == 3 ) {
     $tbest = $outdir . "/RAxML_bestTree.$project\_cds";
 }
 if ( $tree == 1 ) {
-    $tbest = $outdir . "/RAxML_bestTree.$project\_all";
+    $tbest = $outdir . "/RAxML_bestTree.$project";
 }
 ################################################################################
 my $pamldir;
@@ -829,8 +829,8 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
                 "$project", $bootstrap, $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
-            `cp $tbest $pamldir`;
-            $ptree = $pamldir . "/RAxML_bestTree.$project\_all";
+            $ptree = $pamldir . "/RAxML_bestTree.$project";
+            `cp $tbest $ptree`;
         }
         elsif ( $tree == 0 ) {
             print
