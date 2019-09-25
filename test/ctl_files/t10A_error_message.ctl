@@ -23,7 +23,7 @@
   
     PosSelect = 3  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
 
-         code = 1  # 0:Bacteria; 1:Virus
+         code = 1  # 0:Bacteria; 1:Virus; 2: Eukarya
 
         clean = 0  # 0:no clean; 1:clean
 
