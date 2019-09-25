@@ -20,10 +20,10 @@ PhaME can be installed and used in following ways:
 
 If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. See [here](https://conda.io/miniconda.html). After installtion of conda, add channels for bioconda and conda-forge using:
   
-    $ conda config --add channels conda-forge
-    $ conda config --add channels defaults
-    $ conda config --add channels bioconda
-    $ conda config --add channels r
+    conda config --add channels conda-forge
+    conda config --add channels defaults
+    conda config --add channels bioconda
+    conda config --add channels r
 
 Then simply run:
 
@@ -31,50 +31,50 @@ Then simply run:
 
 We do recommend creating a separate conda environment for PhaME. You can create a conda environment by:
 
-    $ conda create -n my_env
-    $ conda install phame -n my_env
+    conda create -n my_env
+    conda install phame -n my_env
 
 THen run phame:
 
-    $ phame phame.ctl
+    phame phame.ctl
 
 
 ### 2. Using conda to separately install all dependencies and get the develop version from github:
 
 Create a separate conda environment:
 
-    $ conda create -n phame_env
+    conda create -n phame_env
 
 Install required dependencies into the environment
 
-    $ conda install -c bioconda perl-bioperl -n phame_env
-    $ conda install -c bioconda perl-bioperl -n phame_env
-    $ conda install -c bioconda samtools bctools -n phame_env
-    $ conda install -c bioconda samtools bcftools -n phame_env
-    $ conda install -c bioconda bcftools -n phame_env
-    $ conda install -c bioconda nucmer -n phame_env
-    $ conda install -c conda-forge nucmer -n phame_env
-    $ conda install -c bioconda mummer -n phame_env
-    $ conda install -c bioconda bowtie2 -n phame_env
-    $ conda install -c bioconda bwa -n phame_env
-    $ conda install -c bioconda fasttree -n phame_env
-    $ conda install -c bioconda bbmap -n phame_env
-    $ conda install -c bioconda raxml -n phame_env
-    $ conda install -c bioconda raxml -n phame_env
-    $ conda install -c bioconda perl-parallel-forkmanager -n phame_env
-    $ conda install -c bioconda iqtree -n phame_env
-    $ conda install -c bioconda perl-statistics-distributions -n phame_env
+    conda install -c bioconda perl-bioperl -n phame_env
+    conda install -c bioconda perl-bioperl -n phame_env
+    conda install -c bioconda samtools bctools -n phame_env
+    conda install -c bioconda samtools bcftools -n phame_env
+    conda install -c bioconda bcftools -n phame_env
+    conda install -c bioconda nucmer -n phame_env
+    conda install -c conda-forge nucmer -n phame_env
+    conda install -c bioconda mummer -n phame_env
+    conda install -c bioconda bowtie2 -n phame_env
+    conda install -c bioconda bwa -n phame_env
+    conda install -c bioconda fasttree -n phame_env
+    conda install -c bioconda bbmap -n phame_env
+    conda install -c bioconda raxml -n phame_env
+    conda install -c bioconda raxml -n phame_env
+    conda install -c bioconda perl-parallel-forkmanager -n phame_env
+    conda install -c bioconda iqtree -n phame_env
+    conda install -c bioconda perl-statistics-distributions -n phame_env
 
 
 Clone the latest github repo:
 
-    $ git clone https://github.com/LANL-Bioinformatics/PhaME.git
+    git clone https://github.com/LANL-Bioinformatics/PhaME.git
 
 
 Then test phame to see if the installation was complete using a short test run:
 
-    $ cd PhaME
-    $ test/TestAll.sh 1
+    cd PhaME
+    test/TestAll.sh 1
 
 
 ## CITATION
