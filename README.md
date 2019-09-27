@@ -60,6 +60,7 @@ Install required dependencies into the environment
     conda install -c bioconda perl-statistics-distributions -n phame_env --yes
     conda install -c bioconda paml -n phame_env --yes
     conda install -c bioconda mafft -n phame_env --yes
+    conda install -c bioconda hyphy -n phame_env --yes
 
 
 Clone the latest github repo:
@@ -68,7 +69,7 @@ Clone the latest github repo:
 
 
 Then test phame to see if the installation was complete using a short test run:
-
+    source activate phame_env
     cd PhaME
     test/TestAll.sh 1
 
