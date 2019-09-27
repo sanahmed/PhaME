@@ -69,6 +69,7 @@ Clone the latest github repo:
 
 
 Then test phame to see if the installation was complete using a short test run:
+
     source activate phame_env
     cd PhaME
     test/TestAll.sh 1
