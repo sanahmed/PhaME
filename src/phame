@@ -11,7 +11,7 @@ use File::Basename;
 use Time::Piece;
 use PhaME;
 use Cwd;
-# use Statistics::Distribution;
+# use Statistics::Distributions;
 # use Parallel::ForkManagers;
 use Bio::SeqIO;
 use Bio::Tools::CodonTable;
@@ -26,7 +26,7 @@ $| = 1;
 
 # set up environments
 $ENV{PATH}
-    = "$RealBin:$RealBin/../thirdParty/miniconda/bin:$RealBin/../bin:$ENV{PATH}";
+    = "$ENV{PATH}:$RealBin:$RealBin/../thirdParty/miniconda/bin:$RealBin/../bin";
 $ENV{PERL5LIB}
     = ( $ENV{PERL5LIB} )
     ? "$ENV{PERL5LIB}:$RealBin/../lib:$RealBin/../ext/lib/perl5"
@@ -56,14 +56,14 @@ AUTHORS
    Sanaa Ahmed
    Chienchi Lo
    2015/01/15
-   B-11
+   B-10
    Los Alamos National Laboratory
 =cut
 
 #...............................................................................
 # global variables
 my $PACKAGENAME    = "PhaME";
-my $PACKAGEVERSION = "1.0.2";
+my $PACKAGEVERSION = "1.0.4";
 my $AUTHORS        = "Migun Shakya, Chien-Chi Lo, Sanaa Ahmed";
 my $URL            = 'https://github.com/LANL-Bioinformatics/PhaME';
 my $vcheck         = '';
@@ -768,7 +768,7 @@ if ( $buildtree == 1 || $bs == 1) {
     if ($tree > 0 ){
         &print_timeInterval( $runtime, "Reconstructing all SNPs phylogeny\n" );
         my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
-        "$project\_all", $bootstrap, $error, $logfile );
+        "$project", $bootstrap, $error, $logfile );
         &print_timeInterval( $runtime, "All SNPs Phylogeny Complete.\n" );
         if ( $gsignal == 1 ) {
             &print_timeInterval( $runtime, "Reconstructing CDS SNP phylogeny\n" );
@@ -779,7 +779,7 @@ if ( $buildtree == 1 || $bs == 1) {
         if ( $bsignal == 1 ) {
             &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
             my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
-            "$project\_all", $bootstrap, $error, $logfile );
+            "$project", $bootstrap, $error, $logfile );
             &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
         }
     }
@@ -799,7 +799,7 @@ if ( $tree == 2 || $tree == 3 ) {
     $tbest = $outdir . "/RAxML_bestTree.$project\_cds";
 }
 if ( $tree == 1 ) {
-    $tbest = $outdir . "/RAxML_bestTree.$project\_all";
+    $tbest = $outdir . "/RAxML_bestTree.$project";
 }
 ################################################################################
 my $pamldir;
@@ -826,11 +826,11 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project\_all", $bootstrap, $error, $logfile );
+                "$project", $bootstrap, $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
-            `cp $tbest $pamldir`;
-            $ptree = $pamldir . "/RAxML_bestTree.$project\_all";
+            $ptree = $pamldir . "/RAxML_bestTree.$project";
+            `cp $tbest $ptree`;
         }
         elsif ( $tree == 0 ) {
             print
@@ -854,11 +854,11 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project\_all", $bootstrap, $error, $logfile );
+                "$project", $bootstrap, $error, $logfile );
             $hyphydir = $outdir . '/paml';
             if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
             `cp $tbest $hyphydir`;
-            $ptree = $hyphydir . "/RAxML_bestTree.$project\_all";
+            $ptree = $hyphydir . "/RAxML_bestTree.$project";
         }
         elsif ( $tree == 0 ) {
             print
@@ -902,8 +902,8 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
     &print_timeInterval( $runtime, "$end\n" );
 
     # RUN PAML
-    &print_timeInterval( $runtime, "Running PAML...\n" );
     if ( $pselection == 1 || $pselection == 3 ) {
+        &print_timeInterval( $runtime, "Running PAML...\n" );
         $end = PhaME::paml(
             $outdir, $bindir,     $ptree, 0,
             "Sites", "0,1,2,7,8", $core,  $threads,
@@ -920,10 +920,12 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
     # RUN HYPHY
     if ( $pselection == 2 || $pselection == 3 ) {
+        &print_timeInterval( $runtime, "Running HyPhy...\n" );
         PhaME::hyphy(
             $outdir,  $bindir, $tbest, $ptree, $core,
             $threads, "bsrel", $error, $logfile
         );
+        &print_timeInterval( $runtime, "$end\n" );
     }
 }
 ################################################################################

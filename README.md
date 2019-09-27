@@ -14,12 +14,16 @@ Provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 ## Installing PhaME
 
-PhaME can be installed using conda. If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. See [here](https://conda.io/miniconda.html). After installtion of conda, add channels for bioconda and conda-forge using:
+PhaME can be installed and used in following ways:
+
+### 1. Using conda directly
+
+If you do not have anaconda or miniconda installed, please do so. Installation of miniconda or anaconda is rather straight forward. See [here](https://conda.io/miniconda.html). After installtion of conda, add channels for bioconda and conda-forge using:
   
-    $ conda config --add channels r
-    $ conda config --add channels defaults
-    $ conda config --add channels conda-forge
-    $ conda config --add channels bioconda
+    conda config --add channels conda-forge
+    conda config --add channels defaults
+    conda config --add channels bioconda
+    conda config --add channels r
 
 Then simply run:
 
@@ -27,16 +31,49 @@ Then simply run:
 
 We do recommend creating a separate conda environment for PhaME. You can create a conda environment by:
 
-    $ conda create -n my_env
-    $ conda install phame -n my_env
+    conda create -n my_env
+    conda install phame -n my_env
 
-To get the latest version of PhaME, one can use "git" to obtain the package:
+THen run phame:
 
-    $ git clone https://github.com/mshakya/PhaME.git
-    $ cd PhaME
-    $ ./INSTALL.sh
+    phame phame.ctl
 
-However, ./INSTALL.sh is no longer supported. We recommend using bioconda to install all dependencies of PhaME and the `git clone` the repository to use the latest PhaME.
+
+### 2. Using conda to separately install all dependencies and get the develop version from github:
+
+Create a separate conda environment:
+
+    conda create -n phame_env
+
+Install required dependencies into the environment
+
+    conda install -c bioconda perl-bioperl -n phame_env --yes
+    conda install -c bioconda samtools bcftools -n phame_env --yes
+    conda install -c bioconda mummer -n phame_env --yes
+    conda install -c bioconda bowtie2 -n phame_env --yes
+    conda install -c bioconda bwa -n phame_env --yes
+    conda install -c bioconda fasttree -n phame_env --yes
+    conda install -c bioconda bbmap -n phame_env --yes
+    conda install -c bioconda raxml -n phame_env --yes
+    conda install -c bioconda perl-parallel-forkmanager -n phame_env --yes
+    conda install -c bioconda iqtree -n phame_env --yes
+    conda install -c bioconda perl-statistics-distributions -n phame_env --yes
+    conda install -c bioconda paml -n phame_env --yes
+    conda install -c bioconda mafft -n phame_env --yes
+    conda install -c bioconda hyphy -n phame_env --yes
+
+
+Clone the latest github repo:
+
+    git clone https://github.com/LANL-Bioinformatics/PhaME.git
+
+
+Then test phame to see if the installation was complete using a short test run:
+
+    source activate phame_env
+    cd PhaME
+    test/TestAll.sh 1
+
 
 ## CITATION
 
