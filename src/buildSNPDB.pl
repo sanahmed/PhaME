@@ -194,6 +194,7 @@ close CDSMAT;
 close IMAT;
 close CDSOUT;
 close CORE_STAT;
+close ALLCDSOUT;
 ################################################################################
 
 sub read_reference {

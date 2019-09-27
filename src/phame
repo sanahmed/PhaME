@@ -11,7 +11,7 @@ use File::Basename;
 use Time::Piece;
 use PhaME;
 use Cwd;
-use Statistics::Distributions;
+# use Statistics::Distributions;
 # use Parallel::ForkManagers;
 use Bio::SeqIO;
 use Bio::Tools::CodonTable;
