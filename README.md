@@ -47,23 +47,17 @@ Create a separate conda environment:
 
 Install required dependencies into the environment
 
-    conda install -c bioconda perl-bioperl -n phame_env
-    conda install -c bioconda perl-bioperl -n phame_env
-    conda install -c bioconda samtools bctools -n phame_env
-    conda install -c bioconda samtools bcftools -n phame_env
-    conda install -c bioconda bcftools -n phame_env
-    conda install -c bioconda nucmer -n phame_env
-    conda install -c conda-forge nucmer -n phame_env
-    conda install -c bioconda mummer -n phame_env
-    conda install -c bioconda bowtie2 -n phame_env
-    conda install -c bioconda bwa -n phame_env
-    conda install -c bioconda fasttree -n phame_env
-    conda install -c bioconda bbmap -n phame_env
-    conda install -c bioconda raxml -n phame_env
-    conda install -c bioconda raxml -n phame_env
-    conda install -c bioconda perl-parallel-forkmanager -n phame_env
-    conda install -c bioconda iqtree -n phame_env
-    conda install -c bioconda perl-statistics-distributions -n phame_env
+    conda install -c bioconda perl-bioperl -n phame_env --yes
+    conda install -c bioconda samtools bcftools -n phame_env --yes
+    conda install -c bioconda mummer -n phame_env --yes
+    conda install -c bioconda bowtie2 -n phame_env --yes
+    conda install -c bioconda bwa -n phame_env --yes
+    conda install -c bioconda fasttree -n phame_env --yes
+    conda install -c bioconda bbmap -n phame_env --yes
+    conda install -c bioconda raxml -n phame_env --yes
+    conda install -c bioconda perl-parallel-forkmanager -n phame_env --yes
+    conda install -c bioconda iqtree -n phame_env --yes
+    conda install -c bioconda perl-statistics-distributions -n phame_env --yes
 
 
 Clone the latest github repo:
