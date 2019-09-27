@@ -9,26 +9,26 @@ PhaME or Phylogenetic and Molecular Evolution (PhaME) is an analysis tool that p
 Given a reference, PhaME extracts SNPs from complete genomes, draft genomes and/or reads, uses SNP multiple sequence alignment to construct a phylogenetic tree, and provides evolutionary analyses (genes under positive selection) using CDS SNPs.
 
 
-PhaME: Under the hood.
+PhaME: Under the hood
 ======================
 
-Here, We have explained in detail how PhaME works in detail.
+PhaME’s input consists of a set of genomes in fasta and/or fastq formats, and corresponding annotation files in gff3 format if downstream analyses will include coding regions. A detailed step by step explanation of how PhaME analyzes genomes is provided below.
 
 Selecting Reference genome:
 -----------------------------
-PhaME is a reference genome based tool where all input genomes and metagenomes are first aligned against a reference genome. As a first step in the PhaME pipeline, given a set of reference genomes in path set in parameter `refdir` `phame.ctl` file, one genome is picked as the reference genome. PhaME provides multiple options to pick the most appropriate reference genome. First, reference genome can be picked randomly from the set. Second, users can select reference genome from the list. Lastly, users can use MinHash option, which will calculate the MinHash distance between all reference genomes with each other and with input contigs and raw reads to pick a genome that has the shortest average distance with each other. MinHash distances are calculated using BBMap [Bushnell]_.
+Since PhaME is a reference genome-based tool where all input genomes and metagenomes are aligned against a reference, the first step of PhaME’s analysis is selecting a reference genome. Given a set of genomes (in a folder listed under the “refdir” parameter of the control file), the reference genome can be selected using one of three options: option 1- a random genome is selected from the provided set of genomes; option 2- a specific genome is selected from the set via input from the user; option 3- the MinHash distance is calculated between all genomes provided (complete genomes, draft genomes, and raw reads) to determine which reference genome has the shortest average distance to all of the other genomes. MinHash distances are calculated using its implementation in BBMap [Bushnell]_.
 
 Self-nucmerization to remove repeats from reference genomes:
 ---------------------------------------------------------------
-PhaME is built on alignment tool nucmer [Kurtz 2004]_ for genome alignment. All genomes in fasta format that are complete and included as set of reference genomes are first aligned with self, called `self-nucmerization`, using `nucmer` to remove repeats within a genome. Following `nucmer` command is used for the self-nucmerization step:
+The genome alignment portion of PhaME is built on the tool nucmer2 for alignments of genomes in FASTA format. Each genome included is first aligned with itself using nucmer, called self-nucmerization, and then aligned regions called repeats are removed from the genomes for downstream analyses. The following nucmer command is used for the self-nucmerization step: 
 
 ::
 
-    nucmer --maxmatch --nosimplify --prefix=seq_seq$$ ref_genomeA.fasta ref_genomeA.fasta
+    nucmer --maxmatch --nosimplify --prefix=seq_seq ref_genomeA.fasta ref_genomeA.fasta 
 
 ::
 
-The option `--maxmatch`  reports all matches is used to ensure all possible alignments are reported for maximal removal of repeats. The identified repeat regions are then removed from downstream analyses.
+The option --maxmatch, which reports all matches, is used to ensure that all possible alignments are reported for maximal removal of repeats. 
 
 Genome Alignments
 --------------------------------
@@ -65,7 +65,7 @@ Also, `nucmer` only aligns `"A"` `"T"` `"C"` `"G"`, all other characters are ign
 
 Mapping of raw reads to reference genome
 -------------------------------------------
-PhaME as of now only processes short raw reads from Illumina. If raw reads, single or paired end, are included in the analyses, they are mapped to the reference genome using either `bowtie2` or `BWA`. For reads mapping of reference genome, following commands are used:
+Currently, PhaME only processes short, raw reads from Illumina. If raw reads, single or paired end, are included in the analyses, they are mapped to the reference genome using either bowtie2 or BWA based on users’ input. For reads mapping to the reference genome, the following commands are used:
 
 First, it builds database from the reference genome.
 ::
@@ -185,11 +185,13 @@ PhaME provides multiple tools (RAxML [Stamatakis 2014]_, FastTree [Price 2010]_,
 
 Selecting genes for molecular evolutionary analyses
 -------------------------------------------------------
-To perform selection analyses using PAML or HyPhy, codon alignments of genes are required. Based on the position of SNPs in the reference genome, if a SNP is within a coding region and if that coding region does not have a gap, they are extracted from the core genome alignment. The nucleotide sequences of the genes are then translated to protein sequences, aligned using the program `mafft`, and then reverse translated back to nucleotide using the perl code `pal2nal.pl` from http://www.bork.embl.de/pal2nal/.
+To perform selection analyses using PAML or HyPhy, codon alignments of genes are required. Based on the position of SNPs in the reference genome, if a SNP is within a coding region and if that coding region does not have a gap, they are extracted from the core genome alignment. The nucleotide sequences of the genes are translated to protein sequences, aligned using the program mafft 8, and then reverse translated back to nucleotide using the Perl code pal2nal.pl from http://www.bork.embl.de/pal2nal/.
 
 Molecular Evoluationary analyses
 ------------------------------------
-The set of gene alignments are then used for molecular evolutionary analyses using either PAML [Yang 2007]_ or HyPhy [Pond 2005]_. PAML is run twice for the same gene using two differnt models (`model=0` and `model=2`), first that sets one omega ratio for all branches and another that sets different omega ratios for all lineages. For the first model, additional parameter variation model that specifies, neutral (1), selection (2), beta and omega ratio between 0 and 1 (7), and beta, omega and an additional omega is run. For the Model 2 with variable omega ratios across all branches, the model with one omega across all sites are used. If HyPhy is selected, it uses the aBSREL (adaptive Branch-Site Random Effects Likelihood) model.
+
+The set of gene alignments are used for molecular evolutionary analyses using either PAML [Yang 2007]_ or HyPhy. Both packages can test for the presence of positively selected sites and lineages by allowing the dN/dS ratio (ω) to vary among sites and lineages. The adaptive branch-site REL test for episodic diversification (aBSREL) model in the HyPhy package is used to detect instances of episodic diversifying and positive selection. If PAML is selected, the M1a-M2a and M7- M8 nested models are implemented. In the latter case, the likelihood ratio test between the null models (M1a and M8) and the alternative model (M2a and M7) at a significance cutoff of 5% provides information on how the genes are evolving. The results for each gene are then summarized in a table containing information on whether the gene is evolving under positive, neutral, or negative selection, along with p-values. HyPhy is run with a model, which specifically looks for sign of positive selection in given sets of genes. The analysis produces a list of JSON files corresponding to each gene which can be uploaded to vision.hyphy.org/absrel for further analysis. We opted to provide PAML as an option, however we recommend using HyPhy for large projects due to its speed and concise output. 
+
 
 References
 --------------

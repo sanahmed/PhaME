@@ -58,6 +58,8 @@ Install required dependencies into the environment
     conda install -c bioconda perl-parallel-forkmanager -n phame_env --yes
     conda install -c bioconda iqtree -n phame_env --yes
     conda install -c bioconda perl-statistics-distributions -n phame_env --yes
+    conda install -c bioconda paml -n phame_env --yes
+    conda install -c bioconda mafft -n phame_env --yes
 
 
 Clone the latest github repo:
