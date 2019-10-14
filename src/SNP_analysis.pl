@@ -24,9 +24,9 @@ Usage: $0 -genbank <ref_Genbankfile> -SNP <SNPs_file> -format [nucmer | vcf] -ou
 my $time = time;
 my $msg;
 my $debug=0;
-my ($Genbankfile, $SNPs_file, $format,$gff_file,$fasta_file);
+my ($SNPs_file, $format,$gff_file,$fasta_file);
 my $outDir=$workingDir;
-GetOptions('genbank=s'=>\$Genbankfile,
+GetOptions( # 'genbank=s'=>\$Genbankfile,
            'gff=s' => \$gff_file,
            'fasta=s' => \$fasta_file,
            'SNP=s'=>\$SNPs_file,
@@ -34,7 +34,7 @@ GetOptions('genbank=s'=>\$Genbankfile,
            'output=s' =>\$outDir,
            'verbose' =>\$debug,
        )||die $usage;
-die $usage if ((!$Genbankfile and !$gff_file ) or !$SNPs_file );
+die $usage if ((!$gff_file ) or !$SNPs_file );
 
 my @SNPs_lines;
 my $variant_count=&load_SNP();
@@ -49,16 +49,9 @@ my $result;  # $result->{Locus_id}->{snp}, $result->{Locus_id}->{indel}
 my $inseq;
 my $myCodonTable   = Bio::Tools::CodonTable->new();
 
-if ($Genbankfile){
-    &print_timeInterval($time,"Loading Genbank");
-    $inseq = Bio::SeqIO->new(-file => $Genbankfile, -format => "genbank");
-    $result = &process_with_Genbank($inseq);
-    $inseq->close();
-}
-elsif($gff_file)
-{
-    $result = &process_with_GFF($gff_file,$fasta_file);
-}
+
+$result = &process_with_GFF($gff_file,$fasta_file);
+
 
 
 #### Output ####
@@ -290,7 +283,7 @@ sub process_with_Genbank
     } #end while () Genbank
     return \%result;
 }
-
+#------------------------------------------------------------------------#
 sub process_snp_file 
 {
    my $coding_location_r=shift;
@@ -434,10 +427,10 @@ sub process_snp_file
                 elsif ($mod % 3 == 1) # first base
                 {
                   $codon=substr($genome_seq,$ref_pos-1,3);
+
                   $ref_codon=$codon;
                   substr($codon,0,1,$snp);
                   $snp_codon=$codon;
-                 #print $ref_codon,"\t",$snp_codon,"\n";
                 }
                 elsif ($mod % 3 == 2) # sedond base
                 {
@@ -466,7 +459,7 @@ sub process_snp_file
              { 
               $ref_codon=ReverseComplement($ref_codon);
               $snp_codon=ReverseComplement($snp_codon);
-             } 
+             }
              $ref_aa= $myCodonTable->translate($ref_codon);
              $snp_aa= $myCodonTable->translate($snp_codon);
     
@@ -562,6 +555,7 @@ sub process_snp_file
     return (\%snps,\%indel);
 }
 
+#------------------------------------------------------------------------#
 sub readFastaFile
 {
     my $seq_r = shift;
