@@ -742,7 +742,9 @@ if ( $buildSNP == 1 ) {
             "GFF file provided, SNPs will be differentiated as coding vs noncoding\n");
         my ( $genname, $genpath, $gensuffix )
             = fileparse( "$annotation", qr/\.[^.]*/ );
+        $genname =~ tr|.|_|;
         PhaME::codingRegions( $outdir, $annotation, $genname );
+        &print_timeInterval( $runtime, "$annotation\n" );        
     }
     &print_timeInterval( $runtime, "Preparing to identify SNPs\n" );
     my $end
@@ -754,11 +756,12 @@ if ( $buildSNP == 1 ) {
         # print "\tto synonymous and non-synonymous if given\n\n";
         my ( $genname, $genpath, $gensuffix )
             = fileparse( "$annotation", qr/\.[^.]*/ );
+        $genname =~ tr|.|_|;
         my $cds_gff     = $outdir . "/$genname\_cds.gff";
         my $snps_folder = $outdir . "/snps";
         my $ref_fasta   = "$workdir/files/$genname.fna";
         PhaME::SNPsAnalysis( $cds_gff, $snps_folder, $ref_fasta, $logfile,
-            $error );
+            $error);
     }
 
     &print_timeInterval( $runtime, "$end\n" );
