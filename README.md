@@ -1,7 +1,7 @@
 ## Phylogenetic and Molecular Evolution (PhaME) analysis tool
 
 [![Build Status](https://travis-ci.org/mshakya/PhaME.svg?branch=master)](https://travis-ci.org/mshakya/PhaME)
-[![Waffle.io - Columns and their card count](https://badge.waffle.io/mshakya/PhaME-1.svg?columns=all)](https://waffle.io/mshakya/PhaME-1)
+<!-- [![Waffle.io - Columns and their card count](https://badge.waffle.io/mshakya/PhaME-1.svg?columns=all)](https://waffle.io/mshakya/PhaME-1) -->
 [![Documentation Status](https://readthedocs.org/projects/phame/badge/?version=latest)](https://phame.readthedocs.io/en/latest/?badge=latest)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat-square)](http://bioconda.github.io/recipes/phame/README.html)
 [![docker](https://quay.io/repository/biocontainers/phame/status)](https://quay.io/repository/biocontainers/phame)
