@@ -232,3 +232,21 @@ then
 	fi
 	################################################################################
 fi
+
+if [[ $1 -eq 16 ]] || [[ -z $1 ]];
+then
+	################### #13 Test the second time option#########################
+	mkdir -p test/workdirs/t16
+	cp test/data/ebola_reads/*R[1-2]*.fastq test/workdirs/t16
+	cp test/data/ebola_contigs/*.contig test/workdirs/t3_ebola_contigs
+	src/phame test/ctl_files/t16_ebola_comp_contigs_sread.ctl
+	a=$(grep -c ">" test/workdirs/t16/results/alignments/t16_all_snp_alignment.fna)
+	b=11
+	if [ "$a" -eq "$b" ];then
+		echo "Test 16 finished without any errors";
+	else
+		echo -e "Test 16: There is something wrong with second time option!"
+		exit 1
+	fi
+	################################################################################
+fi
