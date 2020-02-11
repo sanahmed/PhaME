@@ -77,11 +77,9 @@ Then test phame to see if the installation was complete using a short test run:
 
 ## CITATION
 
-From raw reads to trees: Whole genome SNP phylogenetics across the tree of life.
+Shakya, M., Ahmed. S.A, Davenport K.W., Flynn M.C., Lo. C-C, Chain P.S.G. Standardized phylogenetic and molecular evolutionary analysis applied to species across the microbial tree of life. Sci. Rep. 10, 1723 (2020).
 
-Sanaa Afroz Ahmed, Chien-Chi Lo, Po-E Li, Karen W Davenport, Patrick S.G. Chain
-
-bioRxiv doi: http://dx.doi.org/10.1101/032250
+doi:  https://doi.org/10.1038/s41598-020-58356-1
 
 --------------------------------------------------------------
 ## Contact
