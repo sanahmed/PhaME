@@ -667,11 +667,11 @@ sub bootstrap {
     open( OUT, ">>$log" );
     if ( $tree == 2 || $tree == 4 ) {
         my $bootTrees
-            = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
+            = "raxmlHPC-PTHREADS -p 10 -T $thread -m GTRGAMMAI -b 10000 -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_all_alignment.fna -w $outdir -N $bootstrap -n $name\_b -k 2>>$error >> $log\n\n";
         print OUT $bootTrees;
         if ( system($bootTrees) ) { die "Error running $bootTrees.\n"; }
         my $bestTree
-            = "raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_snp_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
+            = "raxmlHPC-PTHREADS -p 10 -T $thread -f b -m GTRGAMMAI -t $outdir/RAxML_bestTree.$name -s $outdir/$name\_all_alignment.fna -z $outdir/RAxML_bootstrap.$name\_b -w $outdir -n $name\_best 2>>$error >> $log\n\n";
         print OUT $bestTree;
         if ( system($bestTree) ) { die "Error running $bestTree.\n"; }
 
