@@ -271,6 +271,9 @@ close CTL;
 my $error   = "$outdir/$project.error";
 my $logfile = "$outdir/$project.log";
 
+
+print "PhaME v$PACKAGEVERSION \n";
+
 # Picking up reference genome if one is not picked by the user
 if ( $rsignal == 0 ) {
     opendir( DIR, $refdir );
