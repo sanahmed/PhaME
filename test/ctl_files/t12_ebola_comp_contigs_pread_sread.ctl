@@ -2,7 +2,7 @@
       workdir = ../workdirs/t12_ebola_comp_contigs_pread_sread # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
-      reffile = KJ660347.fasta  # reference filename 
+      reffile = KJ660347.ref_genome.fasta  # reference filename 
 
       project = t12  # main alignment file name
 
