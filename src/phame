@@ -403,12 +403,14 @@ elsif ( $time == 2 || $data == 7 ) {
 
 if ( $check == 0 ) {
     if ( $data == 0 ) {
+        print "Running PhaME for complete genomes ONLY\n";
         $nucmer    = 1;
         $buildSNP  = 1;
         $buildtree = 1;
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 1 ) {
+        print "Running PhaME for Contigs ONLY\n";
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -419,6 +421,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 2 ) {
+        print "Running PhaME for Reads ONLY\n";
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -429,6 +432,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 3 ) {
+        print "Running PhaME for Complete and genomes with contigs\n";
         $nucmer        = 1;
         $contig_nucmer = 1;
         $buildSNP      = 1;
@@ -436,6 +440,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 4 ) {
+        print "Running PhaME for Complete and read samples\n";
         $nucmer       = 1;
         $read_mapping = 1;
         $buildSNP     = 1;
@@ -443,6 +448,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 5 ) {
+        print "Running PhaME for genomes with contigs and read samples\n";
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -454,6 +460,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 6 ) {
+        print "Running PhaME for complete, genomes with contigs, and read samples\n";
         $nucmer        = 1;
         $contig_nucmer = 1;
         $read_mapping  = 1;
@@ -462,6 +469,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 7 ) {
+        print "Realignment\n";
         $buildSNP  = 1;
         $buildtree = 1;
         if ( $pselection > 0 ) { $ps = 1; }
@@ -611,7 +619,7 @@ if ( $check == 0 ) {
             }
         }
         if ( $read_mapping == 1 ) {
-            if (   $files =~ /.+\.f{1}a?s?t?q$/
+            if ( $files =~ /.+\.f{1}a?s?t?q$/
                 && $files !~ /.+\.f{1}n|s?a?s?t?a$/
                 && $files !~ /.+\.contig$|\.contigs$|\.ctg$]$/ )
             {
@@ -619,16 +627,19 @@ if ( $check == 0 ) {
                 my $read_list_name;
                 if ( $qname =~ /(.+)[_.]R?[12]$/ ) {
                     if ( $reads == 2 ) {
+                        print "Running PhaME for paired end reads only (*R1.fastq and *R2.fastq)\n";
                         $read_list_name = $1 . '_pread';
 
                         #                   print "$read\n";
                     }
                     if ( $reads == 1 && !exists $read_list{"$1_pread"} ) {
+                        print "Running PhaME for single end reads only (*.fastq)\n";
                         $read_list_name = $1 . '_sread';
                     }
                     if ( $reads == 3 ) {
+                        print "Running PhaME for both single and paired end reads (*R1.fastq and *R2.fastq, and *.fastq)\n";
                         delete $read_list{"$1_sread"};
-                        $read_list_name = $1 . '_read';
+                        $read_list_name = $1 . z'_read';
                         $read_list_name = $1 . '_pread'
                             if ( !-e "$workdir/$1.fastq"
                             && !-e "$workdir/$1.fq" );
@@ -642,6 +653,7 @@ if ( $check == 0 ) {
                     $read_list_name = $qname . '_sread';
                     $read_list{$read_list_name}++;
                 }
+                print $read_list_name;
             }
         }
     }    # workdir
