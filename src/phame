@@ -306,9 +306,14 @@ elsif ( $rsignal == 1 ) {
 
 print("\n");
 &print_timeInterval( "\n$runtime\n", "Loading information\n" );
-print "\tRefd:\t$refdir\n";
-print "\tWorkd:\t$workdir\n";
-print "\tOutd:\t$outdir\n";
+print "\trefdir = $refdir\n";
+print "\tworkdir = $workdir\n";
+print "\toutdir = $outdir\n";
+print "\tproject = $project\n";
+print "\tcdsSNPS = $gsignal\n";
+print "\tbuildSNPdb:\t$buildSNPdb\n";
+print "\tdata:\t$data\n";
+
 if ( !-d $refdir || !-d $workdir || !-d $outdir ) {
     print
         "One or more of the above directories does not exist.\nPlease provide correct directory paths\n";
@@ -403,14 +408,14 @@ elsif ( $time == 2 || $data == 7 ) {
 
 if ( $check == 0 ) {
     if ( $data == 0 ) {
-        print "Running PhaME for complete genomes ONLY\n";
+        &print_timeInterval( $runtime, "Running PhaME for complete genomes ONLY\n" );
         $nucmer    = 1;
         $buildSNP  = 1;
         $buildtree = 1;
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 1 ) {
-        print "Running PhaME for Contigs ONLY\n";
+        &print_timeInterval( $runtime, "Running PhaME for Contigs ONLY\n" );
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -421,7 +426,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 2 ) {
-        print "Running PhaME for Reads ONLY\n";
+        &print_timeInterval( $runtime, "Running PhaME for Reads ONLY\n" );
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -432,7 +437,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 3 ) {
-        print "Running PhaME for Complete and genomes with contigs\n";
+        &print_timeInterval( $runtime, "Running PhaME for Complete and genomes with contigs\n" );
         $nucmer        = 1;
         $contig_nucmer = 1;
         $buildSNP      = 1;
@@ -440,7 +445,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 4 ) {
-        print "Running PhaME for Complete and read samples\n";
+        &print_timeInterval( $runtime, "Running PhaME for Complete and read samples\n" );
         $nucmer       = 1;
         $read_mapping = 1;
         $buildSNP     = 1;
@@ -448,7 +453,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 5 ) {
-        print "Running PhaME for genomes with contigs and read samples\n";
+        &print_timeInterval( $runtime, "Running PhaME for genomes with contigs and read samples\n" );
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -460,7 +465,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 6 ) {
-        print "Running PhaME for complete, genomes with contigs, and read samples\n";
+        &print_timeInterval( $runtime, "Running PhaME for complete, genomes with contigs, and read samples\n" );
         $nucmer        = 1;
         $contig_nucmer = 1;
         $read_mapping  = 1;
@@ -469,7 +474,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 7 ) {
-        print "Realignment\n";
+        &print_timeInterval( $runtime, "Realignment..\n" );
         $buildSNP  = 1;
         $buildtree = 1;
         if ( $pselection > 0 ) { $ps = 1; }
@@ -637,9 +642,9 @@ if ( $check == 0 ) {
                         $read_list_name = $1 . '_sread';
                     }
                     if ( $reads == 3 ) {
-                        print "Running PhaME for both single and paired end reads (*R1.fastq and *R2.fastq, and *.fastq)\n";
+                        print "Running PhaME for both single and paired end reads (*R1.fastq and *R2.fastq, and *.fast)\n";
                         delete $read_list{"$1_sread"};
-                        $read_list_name = $1 . z'_read';
+                        $read_list_name = $1 . '_read';
                         $read_list_name = $1 . '_pread'
                             if ( !-e "$workdir/$1.fastq"
                             && !-e "$workdir/$1.fq" );
@@ -653,10 +658,9 @@ if ( $check == 0 ) {
                     $read_list_name = $qname . '_sread';
                     $read_list{$read_list_name}++;
                 }
-                print $read_list_name;
             }
         }
-    }    # workdir
+    }
     closedir DIR;
     &print_timeInterval( $runtime, "Complete. \n" );
 }    # check=0
