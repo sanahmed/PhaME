@@ -313,6 +313,30 @@ print "\tproject = $project\n";
 print "\tcdsSNPS = $gsignal\n";
 print "\tbuildSNPdb:\t$buildSNPdb\n";
 print "\tdata:\t$data\n";
+print "\ttree:\t$tree\n";
+if ( $tree == 1){
+    print "\tTrees will be made using FastTree.\n"
+}
+if ( $tree == 2){
+    print "\tTrees will be made using RaxML.\n"
+}
+
+if ( $tree == 3){
+    print "\tTrees will be made using iqtree.\n"
+}
+
+if ( $tree == 4){
+    print "\tTrees will be made using all three methods.\n"
+}
+
+if ( $bsignal == 0){
+    print "\tNo bootstraps.\n"
+}
+
+if ( $bsignal == 1){
+    print "\t$bootstrap bootstraps!\n"
+}
+
 
 if ( !-d $refdir || !-d $workdir || !-d $outdir ) {
     print
@@ -632,7 +656,6 @@ if ( $check == 0 ) {
                 my $read_list_name;
                 if ( $qname =~ /(.+)[_.]R?[12]$/ ) {
                     if ( $reads == 2 ) {
-                        print "Running PhaME for paired end reads only (*R1.fastq and *R2.fastq)\n";
                         $read_list_name = $1 . '_pread';
 
                         #                   print "$read\n";
@@ -790,20 +813,20 @@ if ( $buildtree == 1 || $bs == 1) {
     if ($tree > 0 ){
         &print_timeInterval( $runtime, "Reconstructing all SNPs phylogeny\n" );
         my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
-        "$project", $bootstrap, $error, $logfile );
+        "$project", $bsignal, $bootstrap, $error, $logfile );
         &print_timeInterval( $runtime, "All SNPs Phylogeny Complete.\n" );
         if ( $gsignal == 1 ) {
             &print_timeInterval( $runtime, "Reconstructing CDS SNP phylogeny\n" );
-            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds", $bootstrap, 
+            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds", 0, $bootstrap, 
             $error, $logfile );
             &print_timeInterval( $runtime, "CDS SNPs phylogeny Complete.\n" );
         }
-        if ( $bsignal == 1 ) {
-            &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
-            my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
-            "$project", $bootstrap, $error, $logfile );
-            &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
-        }
+        # if ( $bsignal == 1 ) {
+        #     &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
+        #     my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
+        #     "$project", $bootstrap, $error, $logfile );
+        #     &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
+        # }
     }
 }
 
@@ -848,7 +871,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project", $bootstrap, $error, $logfile );
+                "$project", 0, $bootstrap, $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
             $ptree = $pamldir . "/RAxML_bestTree.$project";
@@ -876,7 +899,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project", $bootstrap, $error, $logfile );
+                "$project", 0, $bootstrap, $error, $logfile );
             $hyphydir = $outdir . '/paml';
             if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
             `cp $tbest $hyphydir`;
