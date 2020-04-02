@@ -102,6 +102,7 @@ my $buildSNP      = 0;
 my $buildtree     = 0;
 my $ps            = 0;
 my $bs            = 0;
+my $gencode       = 1;
 my %fasta_list;
 my %contig_list;
 my %read_list;
@@ -241,6 +242,8 @@ while (<CTL>) {
     if (/N\s*=\s*(\d+)\s*#{0,1}.*$/)             { $bootstrap  = $1; }
     if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; }
     if ($pselection > 0) {$gsignal = 1; } # if ME is selected automaticall turn this on
+    # it only reads single digit right now, can look later how to make it read double digits
+    if (/GeneticCodes\s*=\s*(1|2|3|4|5|6|9|10|11|12|13|14|15|16|21|22|23)\s*#{0,1}.*$/) { $gencode = $1; } 
 
     if    (/code\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $code = $1; }
     if    ( $code == 1 )                     { $type = "virus"; }
@@ -331,6 +334,11 @@ if ( $bsignal == 0 and $tree > 0 ){
 
 if ( $bsignal == 1 and $tree > 0 ){
     print "\t$bootstrap bootstraps!\n"
+}
+
+if ($pselection > 0 ) {
+    print "\tMolecular Evolution analysis will be performed.\n";
+    print "\tGenetic code used is code # $gencode.\n";
 }
 
 
@@ -921,18 +929,18 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
     # translate genes
     &print_timeInterval( $runtime, "Translating genes that have SNPs\n" );
     $end = PhaME::translateGenes( $outdir, $bindir, $threads, "translate",
-        $error, $logfile );
+                                 $gencode, $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # align genes
     &print_timeInterval( $runtime, "Align proteins that have SNPs\n" );
-    $end = PhaME::alignGenes( $outdir, $bindir, $threads, "mafft", $error,
+    $end = PhaME::alignGenes( $outdir, $bindir, $threads, "mafft", $gencode, $error,
         $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # reverse translate genes
     &print_timeInterval( $runtime, "Reverse translate amino acids to codon\n" );
-    $end = PhaME::revTransGenes( $outdir, $bindir, $threads, "pal2nal",
+    $end = PhaME::revTransGenes( $outdir, $bindir, $threads, "pal2nal", $gencode,
         $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 

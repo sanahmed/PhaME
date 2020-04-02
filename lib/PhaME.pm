@@ -754,6 +754,7 @@ sub translateGenes {
     my $bindir  = shift;
     my $thread  = shift;
     my $program = shift;
+    my $gencode = shift;
     my $error   = shift;
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
@@ -761,7 +762,7 @@ sub translateGenes {
     open( OUT, ">>$log" );
     print OUT "\n";
     my $translate
-        = "parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
+        = "parallel_run.pl -d $genedir -t $thread -m $program -g $gencode 2>>$error >> $log\n\n";
     print OUT $translate;
     if ( system($translate) ) { die "Error running $translate.\n"; }
     close OUT;
@@ -773,6 +774,7 @@ sub alignGenes {
     my $bindir  = shift;
     my $thread  = shift;
     my $program = shift;
+    my $gencode = shift;
     my $error   = shift;
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
@@ -780,7 +782,7 @@ sub alignGenes {
     open( OUT, ">>$log" );
     print OUT "\n";
     my $align
-        = "parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
+        = "parallel_run.pl -d $genedir -t $thread -m $program -g $gencode 2>>$error >> $log\n\n";
     print OUT $align;
     if ( system($align) ) { die "Error running $align.\n"; }
     close OUT;
@@ -792,6 +794,7 @@ sub revTransGenes {
     my $bindir  = shift;
     my $thread  = shift;
     my $program = shift;
+    my $gencode = shift;
     my $error   = shift;
     my $log     = shift;
     my $genedir = $dir . '/PSgenes';
@@ -799,7 +802,7 @@ sub revTransGenes {
     open( OUT, ">>$log" );
     print OUT "\n";    
     my $revTrans
-        = "parallel_run.pl -d $genedir -t $thread -m $program 2>>$error >> $log\n\n";
+        = "parallel_run.pl -d $genedir -t $thread -m $program -g $gencode 2>>$error >> $log\n\n";
     print OUT $revTrans;
     if ( system($revTrans) ) { die "Error running $revTrans.\n"; }
     close OUT;

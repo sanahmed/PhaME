@@ -27,6 +27,8 @@
   
     PosSelect = 0  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
 
+    GeneticCodes = 1 # 1,2,3,4,5,6,9,10,11,12,13,14,15,16,21,22,23 (see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG4)
+
          code = 1  # 0:Bacteria; 1:Virus; 2: Eukarya
 
         clean = 1  # 0:no clean; 1:clean
