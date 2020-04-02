@@ -313,27 +313,23 @@ print "\tproject = $project\n";
 print "\tcdsSNPS = $gsignal\n";
 print "\tbuildSNPdb:\t$buildSNPdb\n";
 print "\tdata:\t$data\n";
-print "\ttree:\t$tree\n";
 if ( $tree == 1){
     print "\tTrees will be made using FastTree.\n"
-}
-if ( $tree == 2){
+} elsif ( $tree == 2){
     print "\tTrees will be made using RaxML.\n"
-}
-
-if ( $tree == 3){
+} elsif ( $tree == 3){
     print "\tTrees will be made using iqtree.\n"
-}
-
-if ( $tree == 4){
+} elsif ( $tree == 4){
     print "\tTrees will be made using all three methods.\n"
+} elsif ($tree == 0){
+    print "\tNo Trees to be made.\n"
 }
 
-if ( $bsignal == 0){
+if ( $bsignal == 0 and $tree > 0 ){
     print "\tNo bootstraps.\n"
 }
 
-if ( $bsignal == 1){
+if ( $bsignal == 1 and $tree > 0 ){
     print "\t$bootstrap bootstraps!\n"
 }
 
