@@ -6,6 +6,7 @@ use FindBin qw($RealBin);
 
 my $identity=95;
 my $len_cutoff=0;
+my $buffer=5;
 my $output="repeats_coords.txt";
 my $stats= "repeats_stats.txt";
 
@@ -16,6 +17,7 @@ GetOptions(
    'i=i'      => \$identity,
    'l=i'      => \$len_cutoff,
    'o=s'      => \$output,
+   'b=i'      => \$buffer,
    's=s'      => \$stats,
    'help|?'   => sub{Usage()},
 );
@@ -26,6 +28,7 @@ sub Usage
    perl $0 [options] <fasta>
         -i INT      the identity cutoff 0 to 100 (default: 95)
         -l INT      the repeat length cutoff (default:0)
+        -b INT      the buffer base length to skip self-hits (default:5)
         -o STRING   output filename (default: repeats_coords.txt)
         -s STRING   output stats filename (default: repeats_stats.txt)
 
@@ -77,6 +80,12 @@ while(<IN>){
    my $seq_id=$fields[7];
    my $start=$fields[0];
    my $end=$fields[1];
+   ## Skip example 
+   #[S1]    [E1]    [S2]    [E2]    [LEN 1]    [LEN 2]    [% IDY]    [TAGS]
+   #19871    29943    19871    29944    10073    10074    99.99    EPI_ISL_417419    EPI_ISL_417419
+   if ($start < ($fields[2]+$buffer) && $start > ($fields[2]-$buffer) && $end < ($fields[3]+$buffer)  && $end > ($fields[3]-$buffer)){
+      next;
+   }
    for my $pos ($start..$end){
       $hash{$seq_id}->{$pos}=1;
    }
