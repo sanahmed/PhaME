@@ -2,7 +2,7 @@
       workdir = ../workdirs/t5_ebola_complete_contigs # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
-      reffile = KJ660347.fasta  # reference filename 
+      reffile = KJ660347.ref_genome.fasta  # reference filename 
 
       project = t5  # main alignment file name
 
@@ -24,6 +24,8 @@
             N = 100  # Number of bootstraps to run *See below    
   
     PosSelect = 2 # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+
+    GeneticCodes = 9 # 1,2,3,4,5,6,9
 
          code = 1  # 0:Bacteria; 1:Virus; 2: Eukarya
 

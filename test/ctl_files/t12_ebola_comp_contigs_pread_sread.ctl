@@ -2,13 +2,13 @@
       workdir = ../workdirs/t12_ebola_comp_contigs_pread_sread # directory where contigs/reads files are located and output is stored
 
     reference = 1  # 0:pick a random reference; 1:use given reference; 2: use ANI based reference
-      reffile = KJ660347.fasta  # reference filename 
+      reffile = KJ660347.ref_genome.fasta  # reference filename 
 
       project = t12  # main alignment file name
 
       cdsSNPS = 0  # 0:no cds SNPS; 1:cds SNPs
 
-      buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
+      buildSNPdb = 1 # 0: only align to reference 1: build SNP database of all complete genome
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
 

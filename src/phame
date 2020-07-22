@@ -63,7 +63,7 @@ AUTHORS
 #...............................................................................
 # global variables
 my $PACKAGENAME    = "PhaME";
-my $PACKAGEVERSION = "1.0.4";
+my $PACKAGEVERSION = "1.0.5";
 my $AUTHORS        = "Migun Shakya, Chien-Chi Lo, Sanaa Ahmed";
 my $URL            = 'https://github.com/LANL-Bioinformatics/PhaME';
 my $vcheck         = '';
@@ -102,6 +102,7 @@ my $buildSNP      = 0;
 my $buildtree     = 0;
 my $ps            = 0;
 my $bs            = 0;
+my $gencode       = 1;
 my %fasta_list;
 my %contig_list;
 my %read_list;
@@ -136,23 +137,21 @@ my $control = $ARGV[0] || "phame.ctl";
 #...............................................................................
 #check for depenencies
 
+# from snippy
 sub parse_version {
-
-    # from snippy
-    my ( $cmd, $min, $re ) = @_;
-    open my $ver, '-|', $cmd . ' 2>&1'
-        or err ("Could not open pipe to '$cmd', install '$cmd' and try again!");
-    my $blob = join '', <$ver>;
-        err ("Could not read output of '$cmd'") unless $blob;
-
-    #msg("parse=[$blob]");
-    $blob =~ $re;
-    $ver = defined $1 ? $1 : 0;
-        err ("Need $cmd >= $min but you have $ver - please upgrade it.")
-        if $ver < $min;
-    print_timeInterval($runtime, "Checking version: $cmd is >= $min - ok, have $ver\n");
-    return $ver;
+  my($cmd, $min, $re) = @_;
+  open my $VER, '-|', $cmd.' 2>&1' or err("Could not open pipe to '$cmd', install '$cmd' and try again!");
+  my $blob = join '', <$VER>;
+  err("Could not read output of '$cmd'") unless $blob;
+  #msg("parse=[$blob]");
+  $blob =~ $re;
+  my $ver = defined $1 ? $1 : 0;
+  err("Need $cmd >= $min but you have $ver - please upgrade it.")
+    if version->parse("v$ver") < version->parse("v$min");
+  msg("Checking version: $cmd is >= $min - ok, have $ver");
+  return $ver;
 }
+
 
 sub check_version {
     parse_version( 'samtools --version', 1.3,   qr/samtools\s(\d+\.\d+)/ms );
@@ -241,6 +240,8 @@ while (<CTL>) {
     if (/N\s*=\s*(\d+)\s*#{0,1}.*$/)             { $bootstrap  = $1; }
     if (/PosSelect\s*=\s*(0|1|2|3)\s*#{0,1}.*$/) { $pselection = $1; }
     if ($pselection > 0) {$gsignal = 1; } # if ME is selected automaticall turn this on
+    # it only reads single digit right now, can look later how to make it read double digits
+    if (/GeneticCodes\s*=\s*(1|2|3|4|5|6|9|10|11|12|13|14|15|16|21|22|23)\s*#{0,1}.*$/) { $gencode = $1; } 
 
     if    (/code\s*=\s*(0|1|2)\s*#{0,1}.*$/) { $code = $1; }
     if    ( $code == 1 )                     { $type = "virus"; }
@@ -270,6 +271,9 @@ close CTL;
 
 my $error   = "$outdir/$project.error";
 my $logfile = "$outdir/$project.log";
+
+
+print "PhaME v$PACKAGEVERSION \n";
 
 # Picking up reference genome if one is not picked by the user
 if ( $rsignal == 0 ) {
@@ -303,9 +307,39 @@ elsif ( $rsignal == 1 ) {
 
 print("\n");
 &print_timeInterval( "\n$runtime\n", "Loading information\n" );
-print "\tRefd:\t$refdir\n";
-print "\tWorkd:\t$workdir\n";
-print "\tOutd:\t$outdir\n";
+print "\trefdir = $refdir\n";
+print "\tworkdir = $workdir\n";
+print "\toutdir = $outdir\n";
+print "\tproject = $project\n";
+print "\tcdsSNPS = $gsignal\n";
+print "\tbuildSNPdb:\t$buildSNPdb\n";
+print "\tdata:\t$data\n";
+if ( $tree == 1){
+    print "\tTrees will be made using FastTree.\n"
+} elsif ( $tree == 2){
+    print "\tTrees will be made using RaxML.\n"
+} elsif ( $tree == 3){
+    print "\tTrees will be made using iqtree.\n"
+} elsif ( $tree == 4){
+    print "\tTrees will be made using all three methods.\n"
+} elsif ($tree == 0){
+    print "\tNo Trees to be made.\n"
+}
+
+if ( $bsignal == 0 and $tree > 0 ){
+    print "\tNo bootstraps.\n"
+}
+
+if ( $bsignal == 1 and $tree > 0 ){
+    print "\t$bootstrap bootstraps!\n"
+}
+
+if ($pselection > 0 ) {
+    print "\tMolecular Evolution analysis will be performed.\n";
+    print "\tGenetic code used is code # $gencode.\n";
+}
+
+
 if ( !-d $refdir || !-d $workdir || !-d $outdir ) {
     print
         "One or more of the above directories does not exist.\nPlease provide correct directory paths\n";
@@ -400,12 +434,14 @@ elsif ( $time == 2 || $data == 7 ) {
 
 if ( $check == 0 ) {
     if ( $data == 0 ) {
+        &print_timeInterval( $runtime, "Running PhaME for complete genomes ONLY\n" );
         $nucmer    = 1;
         $buildSNP  = 1;
         $buildtree = 1;
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 1 ) {
+        &print_timeInterval( $runtime, "Running PhaME for Contigs ONLY\n" );
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -416,6 +452,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 2 ) {
+        &print_timeInterval( $runtime, "Running PhaME for Reads ONLY\n" );
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -426,6 +463,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 3 ) {
+        &print_timeInterval( $runtime, "Running PhaME for Complete and genomes with contigs\n" );
         $nucmer        = 1;
         $contig_nucmer = 1;
         $buildSNP      = 1;
@@ -433,6 +471,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 4 ) {
+        &print_timeInterval( $runtime, "Running PhaME for Complete and read samples\n" );
         $nucmer       = 1;
         $read_mapping = 1;
         $buildSNP     = 1;
@@ -440,6 +479,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 5 ) {
+        &print_timeInterval( $runtime, "Running PhaME for genomes with contigs and read samples\n" );
         my ( $list, $genome_size )
             = PhaME::prepareComplete( $workdir, $reference, $name )
             if ( $time ne "2" );
@@ -451,6 +491,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 6 ) {
+        &print_timeInterval( $runtime, "Running PhaME for complete, genomes with contigs, and read samples\n" );
         $nucmer        = 1;
         $contig_nucmer = 1;
         $read_mapping  = 1;
@@ -459,6 +500,7 @@ if ( $check == 0 ) {
         if ( $pselection > 0 ) { $ps = 1; }
     }
     if ( $data == 7 ) {
+        &print_timeInterval( $runtime, "Realignment..\n" );
         $buildSNP  = 1;
         $buildtree = 1;
         if ( $pselection > 0 ) { $ps = 1; }
@@ -608,7 +650,7 @@ if ( $check == 0 ) {
             }
         }
         if ( $read_mapping == 1 ) {
-            if (   $files =~ /.+\.f{1}a?s?t?q$/
+            if ( $files =~ /.+\.f{1}a?s?t?q$/
                 && $files !~ /.+\.f{1}n|s?a?s?t?a$/
                 && $files !~ /.+\.contig$|\.contigs$|\.ctg$]$/ )
             {
@@ -621,9 +663,11 @@ if ( $check == 0 ) {
                         #                   print "$read\n";
                     }
                     if ( $reads == 1 && !exists $read_list{"$1_pread"} ) {
+                        print "Running PhaME for single end reads only (*.fastq)\n";
                         $read_list_name = $1 . '_sread';
                     }
                     if ( $reads == 3 ) {
+                        print "Running PhaME for both single and paired end reads (*R1.fastq and *R2.fastq, and *.fast)\n";
                         delete $read_list{"$1_sread"};
                         $read_list_name = $1 . '_read';
                         $read_list_name = $1 . '_pread'
@@ -641,7 +685,7 @@ if ( $check == 0 ) {
                 }
             }
         }
-    }    # workdir
+    }
     closedir DIR;
     &print_timeInterval( $runtime, "Complete. \n" );
 }    # check=0
@@ -771,20 +815,20 @@ if ( $buildtree == 1 || $bs == 1) {
     if ($tree > 0 ){
         &print_timeInterval( $runtime, "Reconstructing all SNPs phylogeny\n" );
         my $end = PhaME::buildTree( $bindir, $outdir, $threads, $tree,
-        "$project", $bootstrap, $error, $logfile );
+        "$project", $bsignal, $bootstrap, $error, $logfile );
         &print_timeInterval( $runtime, "All SNPs Phylogeny Complete.\n" );
         if ( $gsignal == 1 ) {
             &print_timeInterval( $runtime, "Reconstructing CDS SNP phylogeny\n" );
-            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds", $bootstrap, 
+            PhaME::buildTree( $bindir, $outdir, $threads, $tree, "$project\_cds", 0, $bootstrap, 
             $error, $logfile );
             &print_timeInterval( $runtime, "CDS SNPs phylogeny Complete.\n" );
         }
-        if ( $bsignal == 1 ) {
-            &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
-            my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
-            "$project", $bootstrap, $error, $logfile );
-            &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
-        }
+        # if ( $bsignal == 1 ) {
+        #     &print_timeInterval( $runtime, "Bootstrapping phylogeny...\n" );
+        #     my $end = PhaME::bootstrap( $bindir, $outdir, $threads, $tree,
+        #     "$project", $bootstrap, $error, $logfile );
+        #     &print_timeInterval( $runtime, "Bootstrapping complete.\n" );
+        # }
     }
 }
 
@@ -829,7 +873,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project", $bootstrap, $error, $logfile );
+                "$project", 0, $bootstrap, $error, $logfile );
             $pamldir = $outdir . '/paml';
             if ( !-d $pamldir ) { `mkdir -p $pamldir`; }
             $ptree = $pamldir . "/RAxML_bestTree.$project";
@@ -857,7 +901,7 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
 
             # need to make raxml best tree
             PhaME::buildTree( $bindir, $outdir, $threads, 2,
-                "$project", $bootstrap, $error, $logfile );
+                "$project", 0, $bootstrap, $error, $logfile );
             $hyphydir = $outdir . '/paml';
             if ( !-d $hyphydir ) { `mkdir -p $hyphydir`; }
             `cp $tbest $hyphydir`;
@@ -883,18 +927,18 @@ if ( $ps == 1 ) {    # if selection analysis is turned ON
     # translate genes
     &print_timeInterval( $runtime, "Translating genes that have SNPs\n" );
     $end = PhaME::translateGenes( $outdir, $bindir, $threads, "translate",
-        $error, $logfile );
+                                 $gencode, $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # align genes
     &print_timeInterval( $runtime, "Align proteins that have SNPs\n" );
-    $end = PhaME::alignGenes( $outdir, $bindir, $threads, "mafft", $error,
+    $end = PhaME::alignGenes( $outdir, $bindir, $threads, "mafft", $gencode, $error,
         $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 
     # reverse translate genes
     &print_timeInterval( $runtime, "Reverse translate amino acids to codon\n" );
-    $end = PhaME::revTransGenes( $outdir, $bindir, $threads, "pal2nal",
+    $end = PhaME::revTransGenes( $outdir, $bindir, $threads, "pal2nal", $gencode,
         $error, $logfile );
     &print_timeInterval( $runtime, "$end\n" );
 

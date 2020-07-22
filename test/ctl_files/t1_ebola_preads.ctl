@@ -11,7 +11,7 @@
       buildSNPdb = 0 # 0: only align to reference 1: build SNP database of all complete genome
 
     FirstTime = 1  # 1:yes; 2:update existing SNP alignment
-      aligner = bowtie # bwa: bwa mem; bowtie: bowtie2
+      aligner = bwa # bwa: bwa mem; bowtie: bowtie2
 
          data = 4  # *See below 0:only complete(F); 1:only contig(C); 2:only reads(R); 
                    # 3:combination F+C; 4:combination F+R; 5:combination C+R; 
@@ -26,6 +26,8 @@
             N = 0  # Number of bootstraps to run *See below    
   
     PosSelect = 0  # 0:No; 1:use PAML; 2:use HyPhy; 3:use both
+
+    GeneticCodes = 1 # 1,2,3,4,5,6,9,10,11,12,13,14,15,16,21,22,23 (see https://www.ncbi.nlm.nih.gov/Taxonomy/Utils/wprintgc.cgi#SG4)
 
          code = 1  # 0:Bacteria; 1:Virus; 2: Eukarya
 

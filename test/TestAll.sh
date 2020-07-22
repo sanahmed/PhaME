@@ -196,6 +196,24 @@ then
 	################################################################################
 fi
 
+if [[ $1 -eq 12 ]] || [[ -z $1 ]];
+then
+	################### #11 Test the threshold option#########################
+	mkdir -p test/workdirs/t12_ebola_comp_contigs_pread_sread
+	cp test/data/ebola_reads/*.fastq test/workdirs/t12_ebola_comp_contigs_pread_sread/
+	cp test/data/ebola_contigs/*.contigs test/workdirs/t12_ebola_comp_contigs_pread_sread/
+	src/phame test/ctl_files/t12_ebola_comp_contigs_pread_sread.ctl
+	a=$(grep -c ">" test/workdirs/t12_ebola_comp_contigs_pread_sread/results/alignments/t12_all_snp_alignment.fna)
+	b=25
+	if [ "$a" -eq "$b" ];then
+		echo "Test 12 finished without any errors";
+	else
+		echo -e "Test 12: There is something wrong with using all types of data!"
+		exit 1
+	fi
+	################################################################################
+fi
+
 if [[ $1 -eq 13 ]] || [[ -z $1 ]];
 then
 	################### #13 Test the realignment option#########################
