@@ -41,6 +41,8 @@ THen run phame:
 
 ### 2. Using conda to separately install all dependencies and get the develop version from github:
 
+## WARNING: At the moment, we do not recommend this installation. Latest versions of some of the dependencies interfere with bioperl and the run will fail.
+
 Create a separate conda environment:
 
     conda create -n phame_env
